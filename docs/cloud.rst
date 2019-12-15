@@ -22,7 +22,7 @@ Essential Characteristics
 
 To access Amazon Web Services (AWS) Cloud services, you can use the AWS Management Console, the AWS Command Line Interface (CLI), or the AWS Software Development Kits (SDKs). These services are provisioned automatically without any human intervention from AWS staff.
 
-
+When you create a user, that user has no permissions by default. To give your users the permissions they need, you attach policies to them. It applies also to controlling user access to the AWS Management Console, AWS CLI or AWS SDKs.
 
 2. Broad network access
 =======================
@@ -47,47 +47,43 @@ You can download the AWS Console mobile app from Amazon Appstore, Google Play, o
 The global infrastructure that supports AWS cloud platform is distributed in several separate geographic areas around the world. These areas are called regions which consist of two or more Availability Zones (AZ) - most of the regions have 3 AZs -. Currently, these are the following regions:
 
 .. csv-table:: AWS Region List
-   :file: introduction_d/regions.csv
+   :file: cloud_d/regions.csv
    :widths: 20, 40, 40
    :header-rows: 1
 
 .. Note:: Available Regions.
+
    AWS GovCloud (US-West) account provides access to the AWS GovCloud (US-West) Region only. An Amazon AWS (China) account provides access to the Beijing and Ningxia Regions only. 
+
    You can't describe or access additional Regions from an AWS account, such as AWS GovCloud (US-West) or the China Regions.
+
    To use a Region introduced after March 20, 2019, you must enable the Region. For more information, see `Managing AWS Regions <https://docs.aws.amazon.com/general/latest/gr/rande-manage.html>`_ in the AWS General Reference.
 
 .. Note:: Enabled Regions.
+
    If the Region is enabled by default, the output includes the following:
 
-   "OptInStatus": "opt-in-not-required"
+   *"OptInStatus": "opt-in-not-required"*
 
    If the Region is not enabled, the output includes the following:
 
-   "OptInStatus": "not-opted-in"
+   *"OptInStatus": "not-opted-in"*
 
    After an opt-in Region is enabled, the output includes the following:
 
-   "OptInStatus": "opted-in"
+   *"OptInStatus": "opted-in"*
 
-This is the script used to obtain this AWS Region List:
-
-.. literalinclude:: introduction_d/describe_regions.py
-  :language: python
 
 .. csv-table:: AWS Availability Zones List
-   :file: introduction_d/azs.csv
+   :file: cloud_d/azs.csv
    :widths: 20, 40, 40
    :header-rows: 1
 
-
-.. literalinclude:: introduction_d/describe_azs.sh
-  :language: bash
-
 Every region has two redundant transit centers which provide connectivity to the region to the rest of the world. An Availability Zone (AZ) consists of several datacenters (it normally ranges from 2 to 8), all of them linked via intra-AZ connections. All AZ are connected among them through inter-AZ connections and to the exterior via Transit Center connections. Several AZ has more than 300K servers.
 
-.. figure:: /introduction_d/connectivity.png
+.. figure:: /cloud_d/connectivity.png
    :name: fig-connectivity
-   :target: /introduction_d/connectivity.png
+   :target: /cloud_d/connectivity.png
    :alt: Intra-Region connectivity
 
 	Intra-Region connectivity
@@ -116,7 +112,7 @@ Any service that you build with adjustable resource capacity can be automaticall
 
 CloudWatch ServiceLens enhances the observability of your services and applications by enabling you to integrate traces, metrics, logs, and alarms into one place. ServiceLens integrates CloudWatch with :ref:`secXRay` to provide an end-to-end view of your application to help you more efficiently pinpoint performance bottlenecks and identify impacted users. A service map displays your service endpoints and resources as “nodes” and highlights the traffic, latency, and errors for each node and its connections. You can choose a node to see detailed insights about the correlated metrics, logs, and traces associated with that part of the service. This enables you to investigate problems and their effect on the application. 
 
-.. figure:: /introduction_d/ServiceMap.png
+.. figure:: /cloud_d/ServiceMap.png
 
 	Service Map
 

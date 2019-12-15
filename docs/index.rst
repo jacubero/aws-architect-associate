@@ -1,5 +1,5 @@
-AWS Services
-############
+AWS Certified Solutions Architect – Associate
+#############################################
 
 .. .. _cover:
 
@@ -18,20 +18,16 @@ Contents:
    :maxdepth: 2
 
    Preface <preface>
-   Introduction to AWS <introduction>
-   AWS Services <services>
+   Cloud Computing <cloud>
    Compute Services <compute>
    Storage Services <storage>
    Networking and Content Delivery Services <network>
    Security, Identity and Compliance Services <security>
    Database Services <database>
    Application Integration Services <aplication>
-   End User Computing Services <euc>
-   Analytics Services <analytics>
-   Developer Tools Services <developer>
    Management and Governance Services <management>
    Cost management Services <cost>
-   Terraform <terraform>
+
 
 
    *

@@ -27,7 +27,11 @@ Contents:
    Application Integration Services <aplication>
    Management and Governance Services <management>
    Cost management Services <cost>
-
+   Domain 1: Design Resilient Architectures <resilient>
+   Domain 2: Define Performant Architectures <performant>
+   Domain 3: Specify Secure Applications and Architectures <secure>
+   Domain 4: Design Cost-Optimized Architectures <costoptimized>
+   Domain 5: Define Operationally Excellent Architectures <excellent>
 
 
    *

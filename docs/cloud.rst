@@ -44,7 +44,7 @@ You can download the AWS Console mobile app from Amazon Appstore, Google Play, o
 
 *The provider’s computing resources are pooled to serve multiple consumers using a multi-tenant model, with different physical and virtual resources dynamically assigned and reassigned according to consumer demand. There is a sense of location independence in that the customer generally has no control or knowledge over the exact location of the provided resources but may be able to specify location at a higher level of abstraction (e.g., country, state, or datacenter). Examples of resources include storage, processing, memory, and network bandwidth.*
 
-The global infrastructure that supports AWS cloud platform is distributed in several separate geographic areas around the world. These areas are called regions which consist of two or more Availability Zones (AZ) - most of the regions have 3 AZs -. Currently, these are the following regions:
+The global infrastructure that supports AWS cloud platform is distributed in several separate geographic areas around the world. These areas are called **regions** which consist of two or more **Availability Zones** (AZ) - most of the regions have 3 AZs. Currently, these are the following regions represented by a region code:
 
 .. csv-table:: AWS Region List
    :file: cloud_d/regions.csv
@@ -74,12 +74,9 @@ The global infrastructure that supports AWS cloud platform is distributed in sev
    *"OptInStatus": "opted-in"*
 
 
-.. csv-table:: AWS Availability Zones List
-   :file: cloud_d/azs.csv
-   :widths: 20, 40, 40
-   :header-rows: 1
+.. Note:: AWS Local Region.
 
-Every region has two redundant transit centers which provide connectivity to the region to the rest of the world. An Availability Zone (AZ) consists of several datacenters (it normally ranges from 2 to 8), all of them linked via intra-AZ connections. All AZ are connected among them through inter-AZ connections and to the exterior via Transit Center connections. Several AZ has more than 300K servers.
+	An AWS Local Region is a single datacenter which complement an existing AWS region. The Asia Pacific (Osaka) Local Region is a Local Region, which is a new type of region that comprises an isolated, fault-tolerant infrastructure design located within a single datacenter. The Asia Pacific (Osaka) Local Region consists of one Availability Zone and is intended to be used in conjunction with the Asia Pacific (Tokyo) Region. This region requires that customers request access through a sales representative.
 
 .. figure:: /cloud_d/connectivity.png
    :name: fig-connectivity
@@ -88,11 +85,21 @@ Every region has two redundant transit centers which provide connectivity to the
 
 	Intra-Region connectivity
 
+Every region has two redundant transit centers which provide connectivity to the region to the rest of the world. An Availability Zone (AZ) consists of several datacenters (it normally ranges from 2 to 8), all of them linked via intra-AZ connections and each with with redundant power supplies, networking and connectivity, housed in separated facilitiess. All AZ are connected among them through inter-AZ connections and to the exterior via Transit Center connections. AZs are represented by a region code followed by a letter identifier.
+
+.. csv-table:: AWS Availability Zones List
+   :file: cloud_d/azs.csv
+   :widths: 20, 40, 40
+   :header-rows: 1
+
+
 .. Hint:: More information on `AWS re:Invent 2016: Tuesday Night Live with James Hamilton <https://www.youtube.com/watch?v*AyOAjFNPAbA>`_
 
 AWS services aren’t replicated across regions by default unless you choose to do so. Each region is completely independent from the rest and is designed to be completely isolated from the other regions. This achieves the greatest possible fault tolerance and stability. Availability Zones are built to be independent and physically separated from one another. Data center locations are carefully selected to mitigate environmental risks, such as flooding, extreme weather, and seismic activity. A detailed description of AWS data centers secure design and controls can be found at `AWS data centers controls <https://aws.amazon.com/compliance/data-center/controls/?nc1*h_ls>`_.
 
-`Global infrastructure <https://infrastructure.aws/>`_.
+**AWS Edge Network Location** are locations where Amazon CloudFront, Amazon Route 53, AWS Firewall Manager, AWS Shield, and AWS WAF services are offered.
+
+You can access an `AWS Global infrastructure interactive map <https://infrastructure.aws/>`_.
 
 4. Rapid elasticity
 ===================
@@ -110,7 +117,7 @@ Any service that you build with adjustable resource capacity can be automaticall
 
 :ref:`secCloudWatch` monitors your AWS resources and the applications you run on AWS in real time. You can use CloudWatch to collect and track metrics, which are variables you can measure for your resources and applications. A namespace is a container for CloudWatch metrics. For the list of AWS namespaces, see `AWS Services That Publish CloudWatch Metrics <https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/aws-services-cloudwatch-metrics.html>`_.
 
-CloudWatch ServiceLens enhances the observability of your services and applications by enabling you to integrate traces, metrics, logs, and alarms into one place. ServiceLens integrates CloudWatch with :ref:`secXRay` to provide an end-to-end view of your application to help you more efficiently pinpoint performance bottlenecks and identify impacted users. A service map displays your service endpoints and resources as “nodes” and highlights the traffic, latency, and errors for each node and its connections. You can choose a node to see detailed insights about the correlated metrics, logs, and traces associated with that part of the service. This enables you to investigate problems and their effect on the application. 
+CloudWatch ServiceLens enhances the observability of your services and applications by enabling you to integrate traces, metrics, logs, and alarms into one place. ServiceLens integrates CloudWatch with AWS XRay to provide an end-to-end view of your application to help you more efficiently pinpoint performance bottlenecks and identify impacted users. A service map displays your service endpoints and resources as “nodes” and highlights the traffic, latency, and errors for each node and its connections. You can choose a node to see detailed insights about the correlated metrics, logs, and traces associated with that part of the service. This enables you to investigate problems and their effect on the application. 
 
 .. figure:: /cloud_d/ServiceMap.png
 
@@ -170,7 +177,7 @@ AWS Outposts come in two variants:
 AWS Outposts infrastructure is fully managed, maintained, and supported by AWS to deliver access to the latest AWS capabilities. Getting started is easy, you simply log into the AWS Management Console to order your Outpost, choosing from a wide catalog of Amazon EC2 instances and capacity and EBS storage options.  
 
 Advantages
-==========
+**********
 
 `The Six Main Benefits of Cloud Computing with Amazon Web Services <https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html>`_ are the following:
 
@@ -179,7 +186,6 @@ Advantages
 * **Benefit from massive economies of scale**. By using cloud computing, you can achieve a lower variable cost than you can get on your own. Because usage from hundreds of thousands of customers is aggregated in the cloud, providers such as AWS can achieve higher economies of scale, which translates into lower pay as-you-go prices.
 
 AWS has executed several price reductings on many products. You can get AWS prices changes information `Using the AWS Price List API <https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html>`_. For example the following chart illustres the EC2 price trend
-
 
 
 * **Stop guessing capacity**. Eliminate guessing on your infrastructure capacity needs. When you make a capacity decision prior to deploying an application, you often end up either sitting on expensive idle resources or dealing with limited capacity. With cloud computing, these problems go away. You can access as much or as little capacity as you need, and scale up and down as required with only a few minutes’ notice.
@@ -191,3 +197,9 @@ AWS has executed several price reductings on many products. You can get AWS pric
 **Go global in minutes**. Easily deploy your application in multiple regions around the world with just a few clicks. This means you can provide lower latency and a better experience for your customers at minimal cost.
 
 For more information about the Six Main Benefits of Cloud Computing with AWS see at `Andy Jassy talk <https://www.youtube.com/watch?v=yMJ75k9X5_8>>`_.
+
+Pricing
+*******
+
+
+

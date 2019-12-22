@@ -47,6 +47,20 @@ Virtual networks you can create that are logically isolated from the rest of the
 `Resource Locations <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resources.html>`_
 
 
+Security groups operate at the instance level.
+
+Security groups disallow all traffic unless there are specific allow rules for the traffic in the security group. They only provide for allow rules.
+
+Security groups evaluate all the rules on the group before deciding how to handle traffic.
+
+Changes to a security group take place immediately.
+
+For all new AWS accounts, 20 instances are allowed per region. However, you can increase this limit by requesting it via AWS support.
+
+Instances within a VPC with a public address have that address released when it is stopped and are reassigned a new IP when restarted.
+
+All EC2 instances in the default VPC have both a public and private IP address.
+
 .. _secECS:
 
 Amazon Elastic Container Service (ECS)

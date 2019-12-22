@@ -6,13 +6,14 @@ Management and Governance Services
 Amazon CloudWatch
 *****************
 
+CloudWatch provides the following default metrics: disk read operations, CPU usage, inbound network traffic.
 
 .. _secAWSAutoScaling:
 
 AWS Auto Scaling
 ****************
 
-
+If instances are scaling up and down quickly means that the thresholds for adding and removing instances are being met frequently. The simplest way to reduce frequent scaling in an application is to increase the cooldown timers so that scaling down requires greater thresholds of change in the triggers.
 
 AWS Cloud​Formation
 ******************

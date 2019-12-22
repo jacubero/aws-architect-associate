@@ -9,6 +9,11 @@ Amazon Aurora
 Amazon Relational Database Service (RDS)
 ****************************************
 
+A RDS instance performance can be improved by:
+
+* Increasing the instance size of the database.
+
+* Setting up CloudFront to handle traffic in web application servers whose content is in the database.
 
 .. _secDynamoDB:
 

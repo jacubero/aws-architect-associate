@@ -13,6 +13,8 @@ The National Institute of Standards and Technology (NIST) comprehensively outlin
 
 	*Cloud computing is a model for enabling ubiquitous, convenient, on-demand network access to a shared pool of configurable computing resources (e.g., networks, servers, storage, applications, and services) that can be rapidly provisioned and released with minimal management effort or service provider interaction.*
 
+`What is cloud computing? <https://aws.amazon.com/what-is-cloud-computing/>`_
+
 This cloud model is composed of five essential characteristics, three service models, and four deployment models.
 
 Essential Characteristics
@@ -124,7 +126,7 @@ AWS Outposts come in two variants:
 
 AWS Outposts infrastructure is fully managed, maintained, and supported by AWS to deliver access to the latest AWS capabilities. Getting started is easy, you simply log into the AWS Management Console to order your Outpost, choosing from a wide catalog of Amazon EC2 instances and capacity and EBS storage options.  
 
-Six Advantages of Cloud Computing
+Six advantages of cloud computing
 =================================
 
 `How AWS came to be <https://techcrunch.com/2016/07/02/andy-jassys-brief-history-of-the-genesis-of-aws/>`_
@@ -133,16 +135,93 @@ Six Advantages of Cloud Computing
 
 `The Six Main Benefits of Cloud Computing with Amazon Web Services <https://www.youtube.com/watch?v=yMJ75k9X5_8>`_
 
-AWS Pricing
-***********
+AWS cloud benefits
+------------------
+
+* No up-front investment
+
+* Low on-going costs
+
+* Focus on innovation
+
+* Flexible innovation
+
+* Speed and agility
+
+* Global reach on demand
+
+On-premises considerations
+--------------------------
+
+* Large upfront capital expense
+
+* Labor, patches and upgrade cycles
+
+* System administration
+
+* Fixed capacity
+
+* Procurement and setup
+
+* Limited geographic regions
+
+Overview of Amazon Web Services
+*******************************
+
+`Overview of Amazon Web Services <https://d1.awsstatic.com/whitepapers/aws-overview.pdf>`_
+
+AWS products and services
+=========================
+
+.. figure:: /intro_d/products.png
+   :name: fig-products
+   :target: /intro_d/products.png
+   :alt: AWS products and services
+
+AWS pricing
+===========
+
+.. figure:: /intro_d/prices.png
+
+	Pricing characteristics
 
 `How do you pay for AWS? <https://aws.amazon.com/pricing/>`_
 
 `How AWS Pricing Works <https://d0.awsstatic.com/whitepapers/aws_pricing_overview.pdf>`_
 
+`Simple monthly calculator <https://calculator.s3.amazonaws.com/index.html>`_
+
+`TCO calculator <https://aws.amazon.com/tco-calculator/>`_
+
+Security of the cloud
+=====================
+
+AWS compute security
+--------------------
+
+.. figure:: /intro_d/computesec.png
+
+	AWS compute security
+
+AWS memory and storage protection
+---------------------------------
+
+.. figure:: /intro_d/memorysec.png
+
+	AWS memory and storage protection
+
+Database security
+-----------------
+
+.. figure:: /intro_d/dbsec.png
+
+	Database security
+
 
 The AWS Well-Architected Framework
 **********************************
+
+`AWS Well-Architected Framework <https://aws.amazon.com/es/architecture/well-architected/>`_
 
 AWS Well-Architected Tool
 =========================
@@ -162,10 +241,18 @@ This is a free tool, available in the `AWS Management Console <https://console.a
 Security
 ========
 
+.. figure:: /intro_d/security.png
+
+	Security Pillar
+
 `Security pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Security-Pillar.pdf>`_
 
 Reliability
 ===========
+
+.. figure:: /intro_d/reliability.png
+
+	Reliability Pillar
 
 `Reliability Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Reliability-Pillar.pdf>`_
 
@@ -178,19 +265,29 @@ Reliability
 Cost Optimization
 =================
 
-`Cost Optimization <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
+.. figure:: /intro_d/cost.png
+
+	Cost Optimization Pillar
+
+`Cost Optimization Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
 
 Operational Excellence
 ======================
 
-`Operational Excellence <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
+.. figure:: /intro_d/operational.png
+
+	Operational Excellence Pillar
+
+`Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
 
 Performance efficiency
 ======================
 
-`Performance efficiency <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
+.. figure:: /intro_d/performance.png
 
-. _secGlobalInfrastructure:
+	Performance efficiency Pillar
+
+`Performance efficiency Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
 
 AWS Global Infrastructure
 *************************

@@ -6,6 +6,12 @@ Adding a compute layer
 Adding Compute with Amazon EC2
 ******************************
 
+Amazon EC2 allows to create and run virtual machines on AWS cloud. AWS calls these virtual machines *instances*. AWS provides various configurations of CPU, memory, storage, and networking capacity for your instances, known as *instance types*.
+
+.. figure:: /compute_d/ec2.png
+
+	Amazon EC2
+
 Launching Amazon EC2 instances with Amazon Machine Images (AMIs)
 ================================================================
 
@@ -25,7 +31,8 @@ Amazon EC2 and storing data
 Amazon EC2 instance types
 =========================
 
-Amazon EC2 allows to create and run virtual machines on AWS cloud. AWS calls these virtual machines *instances*. AWS provides various configurations of CPU, memory, storage, and networking capacity for your instances, known as *instance types*.
+.. figure:: /compute_d/instancetypes.png
+
 
 .. csv-table:: Instance Types List
    :file: /compute_d/instance_types.csv
@@ -40,6 +47,14 @@ Script:
 
 Amazon EC2 pricing options
 ==========================
+
+* **On-Demand**: Pay by the hour, no long-term commitments.
+
+* **Reserved**: pay upfront, 50-75% lower hourly rate.
+
+* **Spot**: Bid for unused EC2 capacity.
+
+* **Dedicated**: Dedicated to a single customer, isolated at hardware level.
 
 Amazon EC2 considerations
 =========================

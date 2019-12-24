@@ -124,6 +124,23 @@ AWS Outposts come in two variants:
 
 AWS Outposts infrastructure is fully managed, maintained, and supported by AWS to deliver access to the latest AWS capabilities. Getting started is easy, you simply log into the AWS Management Console to order your Outpost, choosing from a wide catalog of Amazon EC2 instances and capacity and EBS storage options.  
 
+Six Advantages of Cloud Computing
+=================================
+
+`How AWS came to be <https://techcrunch.com/2016/07/02/andy-jassys-brief-history-of-the-genesis-of-aws/>`_
+
+`Six Advantages of Cloud Computing <https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html>`_
+
+`The Six Main Benefits of Cloud Computing with Amazon Web Services <https://www.youtube.com/watch?v=yMJ75k9X5_8>`_
+
+AWS Pricing
+***********
+
+`How do you pay for AWS? <https://aws.amazon.com/pricing/>`_
+
+`How AWS Pricing Works <https://d0.awsstatic.com/whitepapers/aws_pricing_overview.pdf>`_
+
+
 The AWS Well-Architected Framework
 **********************************
 
@@ -142,8 +159,15 @@ This is a free tool, available in the `AWS Management Console <https://console.a
 
 4. **Make Improvements and Measure Progress**. After deciding what improvement actions to take, update the Improvement status to indicate that improvements are in progress. After making changes, you can return to the Improvement plan and see the effect those changes had on the workload. 
 
-Resilency
-=========
+Security
+========
+
+`Security pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Security-Pillar.pdf>`_
+
+Reliability
+===========
+
+`Reliability Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Reliability-Pillar.pdf>`_
 
 `Chaos Monkey <https://github.com/Netflix/chaosmonkey>`_ is a Netflix resiliency tool that helps applications tolerate random instance failures.
 
@@ -151,10 +175,30 @@ Resilency
 
 `La crisis con Amazon AWS <https://gallir.wordpress.com/2011/08/10/la-crisis-con-amazon-aws/>`_.
 
+Cost Optimization
+=================
+
+`Cost Optimization <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
+
+Operational Excellence
+======================
+
+`Operational Excellence <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
+
+Performance efficiency
+======================
+
+`Performance efficiency <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
+
 . _secGlobalInfrastructure:
 
 AWS Global Infrastructure
 *************************
+
+AWS Data Centers
+================
+
+`Learn how we secure AWS data centers by design <https://aws.amazon.com/compliance/data-center/>`_
 
 AWS Availability Zones
 ======================
@@ -168,6 +212,10 @@ An Availability Zone (AZ) consists of several datacenters, all of them linked vi
 
 AWS Regions
 ===========
+
+`Global Infrastructure <https://aws.amazon.com/about-aws/global-infrastructure/#reglink-pr>`_
+
+`AWS Global infrastructure interactive map <https://infrastructure.aws/>`_
 
 The global infrastructure that supports AWS cloud platform is distributed in several separate geographic areas around the world. These areas are called **regions** which consist of two or more **Availability Zones** (AZ) - most of the regions have 3 AZs. Currently, these are the following regions represented by a region code:
 
@@ -205,14 +253,10 @@ The global infrastructure that supports AWS cloud platform is distributed in sev
 
    Intra-Region connectivity
 
-.. Hint:: More information on `AWS re:Invent 2016: Tuesday Night Live with James Hamilton <https://www.youtube.com/watch?v*AyOAjFNPAbA>`_
-
-A detailed description of AWS data centers secure design and controls can be found at `AWS data centers controls <https://aws.amazon.com/compliance/data-center/controls/?nc1*h_ls>`_.
-
-You can access an `AWS Global infrastructure interactive map <https://infrastructure.aws/>`_.
+`AWS re:Invent 2016: Tuesday Night Live with James Hamilton <https://www.youtube.com/watch?v*AyOAjFNPAbA>`_
 
 AWS Edge Locations
 ==================
 
-
+`Amazon CloudFront Key Features <https://aws.amazon.com/cloudfront/features>`_
 

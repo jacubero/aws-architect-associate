@@ -31,8 +31,6 @@ Contents:
    Microservices and serverless architectures <microservices>
    RTO/RPO and backup recovery setup <recovery>
    Optimizations and review <optimizations>
-   Domain 4: Design Cost-Optimized Architectures <costoptimized>
-   Domain 5: Define Operationally Excellent Architectures <excellent>
 
 
    *

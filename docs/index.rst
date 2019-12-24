@@ -18,18 +18,19 @@ Contents:
    :maxdepth: 2
 
    Preface <preface>
-   Cloud Computing <cloud>
-   Compute Services <compute>
-   Storage Services <storage>
-   Networking and Content Delivery Services <network>
-   Security, Identity and Compliance Services <security>
-   Database Services <database>
-   Application Integration Services <aplication>
-   Management and Governance Services <management>
-   Cost management Services <cost>
-   Domain 1: Design Resilient Architectures <resilient>
-   Domain 2: Define Performant Architectures <performant>
-   Domain 3: Specify Secure Applications and Architectures <secure>
+   Introduction <intro>
+   The Simplest Architectures <simplest>
+   Adding a compute layer <compute>
+   Adding a database layer <database>
+   Networking in AWS <network>
+   AWS Identity and Access Management <iam>
+   Elasticity, High Availability, and Monitoring <elasticity>
+   Automation <automation>
+   Caching <caching>
+   Building decoupled architectures <decoupled>
+   Microservices and serverless architectures <microservices>
+   RTO/RPO and backup recovery setup <recovery>
+   Optimizations and review <optimizations>
    Domain 4: Design Cost-Optimized Architectures <costoptimized>
    Domain 5: Define Operationally Excellent Architectures <excellent>
 

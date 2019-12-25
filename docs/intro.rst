@@ -70,6 +70,7 @@ Any service that you build with adjustable resource capacity can be automaticall
 CloudWatch ServiceLens enhances the observability of your services and applications by enabling you to integrate traces, metrics, logs, and alarms into one place. ServiceLens integrates CloudWatch with AWS XRay to provide an end-to-end view of your application to help you more efficiently pinpoint performance bottlenecks and identify impacted users. A service map displays your service endpoints and resources as “nodes” and highlights the traffic, latency, and errors for each node and its connections. You can choose a node to see detailed insights about the correlated metrics, logs, and traces associated with that part of the service. This enables you to investigate problems and their effect on the application. 
 
 .. figure:: /intro_d/ServiceMap.png
+	:align: center
 
 	Service Map
 
@@ -182,8 +183,36 @@ AWS pricing
 ===========
 
 .. figure:: /intro_d/prices.png
+	:align: center
 
 	Pricing characteristics
+
+Consumption-based model
+-----------------------
+
+With a consumption-based model, AWS customers pay only for what they use rather than pay upfront for what they think they will need in the future.
+
+When a customer overprovisions, they order more servers than they need, and they end up with unused resources. When a customer underprovisions, they order too few servers and fail to deliver on their SLAs. In both cases, the trade-off is inefficiency and financial loss.
+
+AWS helps their customers avoid inefficiencies and financial losses by enabling their customers to launch the infrastructure they need when they need it. With this model, overprovisioning and underprovisioning are no longer issues. Customers align their infrastructure, services, and costs to usage patterns.
+
+.. figure:: /intro_d/provisioning.png
+	:align: center
+
+	Provisioning infrastructure
+
+AWS pricing models
+------------------
+
+AWS pricing models offer a second way AWS can help their customers lower costs. Customers can buy from traditional vendors using various payment plans, yet in the end, they are stuck with the same set of servers until their next refresh. With AWS, customers can optimize the usage model to the requirements of workloads by maturity and behavior.
+
+By *maturity*, we mean, "Does the customer have enough data to determine a usage baseline so they can use a Reserve Instance?" When we say *behaviour*, we mean, "Is data usage too spiky for Reserved Instances? Will Spot Instances work better?".
+
+Typically, customers start with On-Demand Instances to gauge their needs, and then switch to Reserved Instances (RIs), once they know their demand baseline. Reserved Instances reduce costs by up to 75% versus On-Demand.
+
+AWS excess capacity sold for a deep discount is call a Spot Instance.
+
+Finally, for customers with regulatory or software licensing constraints who need their own hosts, AWS provides Dedicated Hosts.
 
 `How do you pay for AWS? <https://aws.amazon.com/pricing/>`_
 
@@ -191,7 +220,52 @@ AWS pricing
 
 `Simple monthly calculator <https://calculator.s3.amazonaws.com/index.html>`_
 
+Frequent price reductions
+-------------------------
+
+The third way AWS lower costs is by continually reducing prices. AWS operates on a massive scale, allowing them to increase efficiencies and reduce costs. AWS then pass the savings to their customers through price reductions. Every time AWS reduces its prices, all AWS customers experience the savings immediately.
+
+When price reductions occur, customers automatically receive the lower prices. They never need to call AWS, contact an account manager, renegotiate a contract, or ask for the price reduction.
+
+One exception to price reductions is Reserved Instances. RIs are already heavily discounted with prices accounting for forecasted future discounts. With planning, customers can benefit from both worlds.
+
+Amazon flywheel
+---------------
+
+The Amazon flywheel, created by Jeff Bezos shows the Amazon business model of scale. It illustrates how the Amazon high-volume, low-margin business model works. As you can see, it's a positive feedback loop driven by price reductions.
+
+.. figure:: /intro_d/flywheel.png
+	:align: center
+
+	Amazon flywheel
+
+This is the AWS version of the Amazon flywheel. AWS offers lower prices, which means more customers will use AWS patforms. AWS then increases its infrastructure size, which improves AWS economies of scale. AWS can then lower infrastructure costs and lower prices for customers again. And this cycle continues.
+
+Another aspect of economies of scale is that AWS can offer services that a company might not be able to develop, support, or run in an efficient manner. These services might be relevant for only a limited number of customers, or they might not make sense for customers to develop on their own, yet with AWS scale, the srvices ecome inexpensive and easy-to-use. By using AWS, companies can focus more on innovation and less on infrastructure.
+
+.. figure:: /intro_d/AWSflywheel.png
+	:align: center
+
+	AWS flywheel
+
+Resources for cost analysis
+---------------------------
+
 `TCO calculator <https://aws.amazon.com/tco-calculator/>`_
+
+`AWS Economics Center <http://aws.amazon.com/economics/>`_
+
+`Case Studies and Research <http://aws.amazon.com/solutions/case-studies>`_
+
+TSO Logic was acquired December 2018 by Amazon for their ability to quickly deilver an optimized business case for AWS.
+
+TSO Logic's analytics software gives customers the answers they need to make soung cloud planning, migration, and modernization decisions.
+
+Offered as a service, TSO Logic gives customers an understanding of how much compute they have, how it's used, what it costs to operate, and the projected costs of running on AWS. 
+
+It also shows where on-premises instances are overprovisioned and where alternate AWS placements can meet or exceed those requirements at a lower cost.
+
+TSO Logic is availabel to AWS APN Partners based on certaing qualifications
 
 Security of the cloud
 =====================
@@ -199,24 +273,17 @@ Security of the cloud
 AWS compute security
 --------------------
 
-.. figure:: /intro_d/computesec.png
-
-	AWS compute security
+.. image:: /intro_d/computesec.png
 
 AWS memory and storage protection
 ---------------------------------
 
-.. figure:: /intro_d/memorysec.png
-
-	AWS memory and storage protection
+.. image:: /intro_d/memorysec.png
 
 Database security
 -----------------
 
-.. figure:: /intro_d/dbsec.png
-
-	Database security
-
+.. image:: /intro_d/dbsec.png
 
 The AWS Well-Architected Framework
 **********************************
@@ -241,18 +308,14 @@ This is a free tool, available in the `AWS Management Console <https://console.a
 Security
 ========
 
-.. figure:: /intro_d/security.png
-
-	Security Pillar
+.. image:: /intro_d/security.png
 
 `Security pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Security-Pillar.pdf>`_
 
 Reliability
 ===========
 
-.. figure:: /intro_d/reliability.png
-
-	Reliability Pillar
+.. image:: /intro_d/reliability.png
 
 `Reliability Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Reliability-Pillar.pdf>`_
 
@@ -265,27 +328,21 @@ Reliability
 Cost Optimization
 =================
 
-.. figure:: /intro_d/cost.png
-
-	Cost Optimization Pillar
+.. image:: /intro_d/cost.png
 
 `Cost Optimization Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
 
 Operational Excellence
 ======================
 
-.. figure:: /intro_d/operational.png
-
-	Operational Excellence Pillar
+.. image:: /intro_d/operational.png
 
 `Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
 
 Performance efficiency
 ======================
 
-.. figure:: /intro_d/performance.png
-
-	Performance efficiency Pillar
+.. image:: /intro_d/performance.png
 
 `Performance efficiency Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
 
@@ -344,11 +401,12 @@ The global infrastructure that supports AWS cloud platform is distributed in sev
    *"OptInStatus": "opted-in"*
 
 .. figure:: /intro_d/connectivity.png
-   :name: fig-connectivity
-   :target: /intro_d/connectivity.png
-   :alt: Intra-Region connectivity
+   	:name: fig-connectivity
+   	:target: /intro_d/connectivity.png
+   	:alt: Intra-Region connectivity
+	:align: center   
 
-   Intra-Region connectivity
+   	Intra-Region connectivity
 
 `AWS re:Invent 2016: Tuesday Night Live with James Hamilton <https://www.youtube.com/watch?v*AyOAjFNPAbA>`_
 

@@ -257,15 +257,25 @@ Resources for cost analysis
 
 `Case Studies and Research <http://aws.amazon.com/solutions/case-studies>`_
 
-TSO Logic was acquired December 2018 by Amazon for their ability to quickly deilver an optimized business case for AWS.
+*TSO Logic* was acquired December 2018 by Amazon for their ability to quickly deilver an optimized business case for AWS. TSO Logic's analytics software gives customers the answers they need to make soung cloud planning, migration, and modernization decisions. Offered as a service, TSO Logic gives customers an understanding of how much compute they have, how it's used, what it costs to operate, and the projected costs of running on AWS. It also shows where on-premises instances are overprovisioned and where alternate AWS placements can meet or exceed those requirements at a lower cost. TSO Logic is available to AWS APN Partners based on certaing qualifications.
 
-TSO Logic's analytics software gives customers the answers they need to make soung cloud planning, migration, and modernization decisions.
+*Migration Portfolio Assessment (MPA)* tool include the following key features:
 
-Offered as a service, TSO Logic gives customers an understanding of how much compute they have, how it's used, what it costs to operate, and the projected costs of running on AWS. 
+* Guided data ingestion.
 
-It also shows where on-premises instances are overprovisioned and where alternate AWS placements can meet or exceed those requirements at a lower cost.
+* Right-sized EC2 instance and storage recommendations based on performance profiles.
 
-TSO Logic is availabel to AWS APN Partners based on certaing qualifications
+* Run rate cost comparisons between current state and recommended AWS.
+
+* Over 100 variables with pre-propulated industry defaults to help dial in current costs, migration costs, and future run rates.
+
+* Migration pattern analysis and recommendations.
+
+* Migration project estimating for resources, timelines, and costs.
+
+* Customizable dashboards to visualize data.
+
+* Secure access for Advanced and Premier tier AWS APN Partners.
 
 Security of the cloud
 =====================
@@ -325,12 +335,239 @@ Reliability
 
 `La crisis con Amazon AWS <https://gallir.wordpress.com/2011/08/10/la-crisis-con-amazon-aws/>`_.
 
+Operational resiliency
+----------------------
+
+Operational resilient IT organizations depend on the health of 4 cornerstones: operations, security, software, and infrastructure.
+
+Operations failures
+^^^^^^^^^^^^^^^^^^^
+
+Some primary causes of operations failures are:
+
+* Human errors, such as lack of clearly defined procedures or user privilege.
+
+* Configuration errors in hardware or operating system settings and startup scripts.
+
+* Procedural errors, like restoring the wrong backup or forgetting to restart a device.
+
+* Commonplace accidents in the data center, like tripping over power cords, dropping equipment, or disconnecting devices.
+
+AWS leverages automation; manages services from end to end; provides system-wide visbility for usage, performance, and operational metrics; enables security and governance configuration; and monitors API access.
+
+Security: causes for breaches
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The causes for security breaches include:
+
+* Malware, such as worms, viruses, and trojan horses.
+
+* Network attacks, like open ports, SYN floods, and fragmented packets.
+
+* Unpatched applications or operating systems.
+
+* Security issues, such as password disclosures, social engineering, credentials not stored securely, non-strict password policies, and poor privilege and access management.
+
+* Poor or limited authentication.
+
+AWS has a shared security model, which means that AWS shares security responsibilities with customers. In this model, AWS is responsible for the security of everything from the hypervisor level to the operating system.
+
+AWS helps to reduce security risks in numerous ways:
+
+* Leverages AWS automation and tools available to help customers mitigate the most severe security risks, including denial of service attacks.
+
+* Provides the AWS Identity Access Management (IAM), service to centrally manage users and credentials, which helps customers reduce or eliminate the existence of "rogue servers".
+
+* Leverages our roster of 30 plus compliance certifications and accreditations to help our customers build secure, compliance-ready environment.
+
+.. figure:: /intro_d/shared.png
+	:align: center
+
+	AWS shared security model
+
+Software: causes for failure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Common causes for software resilience failures include:
+
+* Resource exhaustion, like runaway processes, memory leaks, and file growth.
+
+* Computational or logic errors, such as faulty references, de-allocated memory, corrupt pointers, sync errors, and race conditions.
+
+* Inadequate monitoring, such as the inability to identify issues.
+
+* Failed upgrades, such as intercompatibility and integrations.
+
+AWS provides services in a way that allows customers to increase or decrease the resources they need and have AWS manage the changes. To provide software resilence, AWS:
+
+* Offer blue and green deployments that allow for quick rollbacks.
+
+* Automates continuous integration and continuous delivery workflow.
+
+* Runs smaller code deployments to reduce unit, integration, and system bugs.
+
+* Provides current and secure resources with OS patching.
+
+* Creates and manages a collection of related AWS resources.
+
+Infrastructure: causes for failure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Causes for infrastructure failure include:
+
+* Hardware failure of servers, storage, or networks.
+
+* Natural disaster, like hurricanes, floods, and earthquakes.
+
+* Power outages, including failed power supplies and batteries.
+
+* Volumetric attacks, such as DDoS, DNS amplification; or UDP/ICMP floods.
+
+AWS helps reduce infrastructure failures in numerous ways:
+
+* AWS continues to expand their world-class infrastructure and leads the industry in improving data centers on a massive scale.
+
+* Customers can run applications and failover across multiple Availability Zones and Regions.
+
+* AWS systems are designed to be highly available and durable. S3 is designed to provide eleven 9s of durability and four 9s of availability. Amazon Ec2 is designed for four 9s of availability, and Amazon EBS volumes are designed for five 9s of availability.
+
+* As a standard, each AWS Availability Zone in each Region is redundantly connected to multiple tier-one transit providers.
+
+* At AWS every compute instance is served by two independent power sources, each with utility, UPS, and back-up generator power. 
+
 Cost Optimization
 =================
 
 .. image:: /intro_d/cost.png
 
 `Cost Optimization Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
+
+Cloud financial management
+--------------------------
+
+Cloud financial management includes four key areas.
+
+.. image:: /intro_d/financial.png
+
+To enable cost transparency you must have the right tagging scheme and apply it to all areas of spending. User-defined tags allow customers to label their resources so they can manage them. At a minimum, from cost perspective, customers should use the following 5 tags:
+
+* What cost center does it belong to? This may belong to more then one.
+
+* What application or workload does it support?
+
+* Who owns it?
+
+* What is the expiration date? When should it be turned off? This helps with Reverved Instance purchasing.
+
+* Automation tags can state directions such as "shut me down on the weekend" for and non-production environment, or "This instance runs non-critical workloads and can be freed up for disaster recovery in case of a mulfunction on a different Availability Zone."
+
+An ideal tool for measuring and monitoring should provide:
+
+* Cost and usage data.
+
+* Optimization recommendations.
+
+* Other information that helps teams make data-driven, cost-based decisions.
+
+AWS Cost Explorer is a free tool that helps customers dive deeper into cost and usage data to indetify trends, pinpoint cost drivers, and detect anomalies.
+
+AWs has identified 4 key pillars of cost optimization best practices:
+
+Righ-sizing instances
+^^^^^^^^^^^^^^^^^^^^^
+
+This means selecting the least expensive instance available that meets the functional and performance requirements. Right-sizing is the process of reviewing depoyed resources and seeking opportunities to downsize when possible. For example, if only CPU and RAM are underused, a customer can switch to a smaller size instance.
+
+AWS Cost Explorer generates EC2 instance rightsizing recommendations by scanning your past usage over the previous 14 days. From there, AWS removes Spot Instance usage and any instances it believes that you terminated. AWS then analyzes the remaining instance uage to identify idle and underutilized instances:
+
+* Idle instances are instances that have lower than 1% maximum CPU utilization.
+
+* Underutilized instances are instances with maximum CPU utilization between 1% and 40%.
+
+When AWS Cost Explorer identifies an idle instance, it will generate a termination recommendation. When it identifies an underutilized instance, AWS simulates covering that uasge with a smaller instance within the same family.
+
+Increasing application elasticity
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Turn off non-production instances
+"""""""""""""""""""""""""""""""""
+
+In regards to increasing application elasticity for cost optimization, reviewing production versus non-production instances is key. Instances that are non-production, sucas dev, test, and QA, may not need to run during nonworking hours, such as nights and weekends. In these cases, these servers can be shut down, and will stop incurring charges if they are not Reserved Instances. Typically when a nonproduction instance has a usage percentage less than or equal to 36%, it is less expensive to use On-Demand pricing versus Reserved Instances.
+
+A customer can create an AWS Lambda function that can automate the starting and stopping of instances based on parameters like idling and time of day:
+
+`How do I stop and start Amazon EC2 instances at regular intervals using Lambda? <https://aws.amazon.com/es/premiumsupport/knowledge-center/start-stop-lambda-cloudwatch/>`_
+
+Automatic scaling
+"""""""""""""""""
+
+Automatic scaling helps to ensure the correct number of instances are available to handle the workload of an application. Both the minimum and maximum number of instances can be specified, and automatic scaling ensures that you never go below or above the thresholds.
+
+This provides the customer the opportunity to provision and pay for a baseline and then automatically scale for peak when demand spikes, which lowers costs with no performance impact.
+
+Automatic scaling can be scheduled based on predefined times or performance. Recently, with the introduction of predective scaling for EC2, AWS will use  data collected from your actual EC2 usage and billions of data points drwan from AWS' own observations, in combination with well-trained machine learning models to predict expected traffic ( and EC2 usage) including daily and weekly patterns. The prediction process produces a scaling plan that can drive one or more groups of auto scaled EC2 instances. This allows you to automate the process of proactively scaling, ahead of daily and weekly peaks, improving overall user experience for your site or business, and avoid over-provisioning, which will reduce your EC2 costs. 
+
+Choosing the right pricing model
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using Reserved Instances can have a significant impact on savings compared to on-demand, in some cases up to 75%. Typically, Reserved Instances are used for workloads that need to run most or all of the time, such as production environments. The commitment level could be 1 year or 3 years. AWS services offering RIs are: Amazon EC2, ECS, RDS, DynamoDB, Redshift, ElastiCache, Reserved Transcode Slots and Reserved Queues (AWS Elemental MediaConvert).
+
+While using RIs, in certain cases, customers can take advantage of regional benefits. Regional benefits can simplify reserved instance optimization by allowing a reserved instance to be applied for the whole AWS Region, rather than just a specific Availability Zone, which can simplify capacity planning.
+
+.. figure:: /intro_d/regional.png
+	:align: center
+
+	Regional RIs simplify optimization
+
+AWS Cost Explorer generates RI recommendations for AWS services including Amazon EC2, RDS, ElastiCache and Elasticsearch. You can use the *Recommendations* feature to perform "what-if" scenarios comparing costs and savings related to different RI types (standard versus convertible RIs), and RIs term lengths (1 versus 3 years).
+
+Customers can combine regional RIs with on-demand capacity reservations to benefit from billing discounts. On-demand capacity reservations means:
+
+* Reserving capacity for Amazon EC2 instances in a specific Availability Zone for any duration. This ensures access to EC2 capacity when needed, for as long as needed.
+
+* Capacity reservations can be created at any time, without entering into a 1-year or 3-year term commitment, and the capacity is available immediately.
+
+* Capacity reservations can be cancelled at anytime to stop incurring charges.
+
+Capacity reservation is charged the equivalent on-demand rate, regardless of whether the instances are run. Customers can combine regional RIs with capacity reservatins to get billing discounts. If customers do not use a reservation, it is shown as an unused reservation on the customer's EC2 bill.
+
+Zonal RI billing discounts do not apply to capacity reservations. Capacity reservations can't be created in placement groups. Capacity reservations can't be used with dedicated hosts.
+
+Convertible RIs give customers the ability to modify reservations across families, sizes, operating system, and tenancy. The only aspect customer cannot modify is the Region. So, as long as the customer stays in the same Region, they can continue to modify the RIs. Convertibles give customers the opportunity to maximize flexibility and increase savings.
+
+The only time customers cannot convert RIs is between the time the request to exchange is submitted and the time the request to exchange is fulfilled. Typically requests take only a matter of hours to fulfill but could take a up to 2 days.
+
+.. figure:: /intro_d/convertible.png
+	:align: center
+
+	Standard and convertible RI payments
+
+Some guidelines for exchanging convertible RIs are the following:
+
+* Customers can exchange to the same value or higher of convertible RIs.
+
+* Converted RIs retain the expiration data of the original RIs.
+
+* Converted RIs have the same term as the original RIs.
+
+* When exchanging a group of convertible RIs:
+
+  * Converted RIs have the latest expiration data of the whole group.
+
+  * In the case of multiple terns, converted RIs will be a 3-year RIs.
+
+For complete set of conversion rules, see `Exchanging Convertible Reserved Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-convertible-exchange.html>`_.
+
+AWS offers 3 core purchasing option: On-Demand, Reserved Instances, Spot Instances. Each purchasing model launches the same underlying EC2 instances.
+
+Using **On-demand Instances** is often where customers begin their Amazon EC2 journey, because they need to define teir needs and support spikey workloads.
+
+Then, once customers have identified what is steady state and what is predictable, **Reserved Instances** come into play. Reserved Instances are instances that require a 1 to 3-year commitment, and in exchange, customers get a significatn discount off of On-Demand prices. This is ideals for customers' committed and more predictable, steady state use.
+
+**Spot instances** are the most inexpensive and flexible way to access Amazon EC2 instances. Spot is spare, on-demand capacity that is available for discounts of up to 90% off On-Demand prices. Some of the differences with Spot compared to Reserved Instances and On-Demand Instances is the deep discount, no commitment requirement, and customers can pay for Linux instances by the second and Windows instances by the hour. One last key difference with Sot is spare, on-demand capacity. If AWS has a spike in requests in the on-demand space, AWS reclaims Spot instances with a 2-minute notification. The best workloads for Spot instances are fault-tolerant, flexible, and stateless
+
+Optimizing storage
+^^^^^^^^^^^^^^^^^^
 
 Operational Excellence
 ======================
@@ -339,12 +576,82 @@ Operational Excellence
 
 `Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
 
+Business agility
+----------------
+
+Here, you can see a list of KPIs for measuring business agility:
+
+.. image:: /intro_d/kpis.png
+
+Time to market for new applications
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Some of the most important activities that a healthy business must do to continue to grow and innovate are to scope, prioritize, and take on new initiatives. You can think about the initiative process like a project funnel.
+
+.. figure:: /intro_d/funnel.png
+	:align: center
+
+	Innovate by increasing "fail fast" while reducing risks and costs
+
+Code throughput and systems stability
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+DevOps practices help customers deliver software faster, more reliably, and with fewer errors. Two key DEvOps- related IT performance dimensions are code throughput and systems stability.
+
+Lead time for changes and deployment frequency correspond to code throughput. Throughput is measured by how frequently a team is able to deploy code and how quickly it can move from committing code to deploying it.
+
+Change failure rate and Mean Time to Recover (MTTR) correspond to systems stability. Stability is measured by how quickly a system can recover from downtime and how many changes succeed versus how many fail.
+
 Performance efficiency
 ======================
 
 .. image:: /intro_d/performance.png
 
 `Performance efficiency Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
+
+Staff productivity
+------------------
+
+As enterprises move to AWS, a few common pattersn emerge ata the IT staff level. Tactical, undifferentiated work previously required for traditional data centers, like provisioning resources, moves from manual to automated. This saves staff time and reduces time to market. This allows customers' resurces to move to more strategic work.
+
+As AWS maturity increases, customers learn how to further improve their businesses with AWS. They adopt new services and technologies, which can result in additional cost reductions and accelerated time to market.
+
+.. figure:: /intro_d/maturity.png
+	:align: center
+
+	AWS maturity versus activities
+
+IT team members who used to work on projects like storage array deployments and server refreshes can transition to become DevOps specialists. By being integrated into the dev team, they can support the development of new products and services.
+
+.. figure:: /intro_d/server.png
+	:align: center
+
+	Server benefits
+
+.. figure:: /intro_d/network.png
+	:align: center
+
+	Network benefits
+
+.. figure:: /intro_d/storage.png
+	:align: center
+
+	Storage benefits
+
+.. figure:: /intro_d/application.png
+	:align: center
+
+	Application benefits
+
+.. figure:: /intro_d/facilities.png
+	:align: center
+
+	Facilities benefits
+
+.. figure:: /intro_d/securityben.png
+	:align: center
+
+	Security benefits
 
 AWS Global Infrastructure
 *************************

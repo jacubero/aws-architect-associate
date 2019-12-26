@@ -19,7 +19,7 @@ Contents:
 
    Preface <preface>
    Introduction <intro>
-   The Simplest Architectures <simplest>
+   The simplest architectures <simplest>
    Adding a compute layer <compute>
    Adding a database layer <database>
    Networking in AWS <network>

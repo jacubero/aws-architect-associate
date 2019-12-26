@@ -4,6 +4,8 @@ RTO/RPO and backup recovery setup
 Disaster planning
 *****************
 
+`Backup and Recovery Approaches Using AWS <https://d1.awsstatic.com/whitepapers/Storage/Backup_and_Recovery_Approaches_Using_AWS.pdf>`_
+
 Recovery strategies
 *******************
 

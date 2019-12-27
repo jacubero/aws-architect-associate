@@ -357,6 +357,8 @@ The AWS Well-Architected Framework
 
 `AWS Well-Architected Framework whitepaper <https://d1.awsstatic.com/whitepapers/architecture/AWS_Well-Architected_Framework.pdf>`_
 
+`AWS Architecture Center <https://aws.amazon.com/architecture>`_
+
 The purposes of AWS Well-Architected Framework are the following:
 
 * Increases awareness of architectural best practices.
@@ -365,13 +367,10 @@ The purposes of AWS Well-Architected Framework are the following:
 
 * Provides a consistent approach to evaluating architectures
 
-It is composed of Questions, Pillars and Design Principles.
-
-Pillars
-=======
+It is composed of Questions, Pillars and Design Principles. The AWS Well-Architected Framework includes many best-practices design principles for AWS solutions. These principles may be general, such as the importance of enabling traceability. But hey also include pillar-specific design principles, such as maintaining defining security responses based on traced information, an automating responses when possible.
 
 Security
---------
+========
 
 .. image:: /intro_d/security.png
 
@@ -391,8 +390,21 @@ Security is the ability to protect information, systems, and assets while delive
 
 `AWS Security Best Practices <https://d1.awsstatic.com/whitepapers/Security/AWS_Security_Best_Practices.pdf>`_
 
+Design Principles
+-----------------
+
+* Implement security at all layers
+
+* Enable traceability: To log and audit all actions and changes to an environment, to automatically respond and take action.
+
+* Apply principle of least privilege
+
+* Focus on securing your system
+
+* Automate
+
 Reliability
------------
+===========
 
 .. image:: /intro_d/reliability.png
 
@@ -412,29 +424,55 @@ Reliability is the ability of a system to recover from infrastructure or service
 
 `La crisis con Amazon AWS <https://gallir.wordpress.com/2011/08/10/la-crisis-con-amazon-aws/>`_.
 
-Cost Optimization
+Design Principles
 -----------------
+
+* Test recovery procedures
+
+* Automatically recover
+
+* Scale horizontally
+
+* Stop guessing capacity
+
+* Manage change in automation
+
+Cost Optimization
+=================
 
 .. image:: /intro_d/cost.png
 
 Cost Optimization is the ability to avoid or eliminate unneeded cost or suboptimal resources. It involves:
 
-* Cost-effective resources
-
-* Optimizing over time
+* Use cost-effective resources
 
 * Matched supply and demand
 
-* Expenditure awareness
+* Increase expenditure awareness
+
+* Optimize over time
 
 `Cost Optimization Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
 
+Design Principles
+-----------------
+
+* Adopt a consumption model
+
+* Measure overal efficiency
+
+* Reduce spending on data center operations
+
+* Analyze and attricute expenditure
+
+* Use manage services
+
 Operational Excellence
-----------------------
+======================
 
 .. image:: /intro_d/operational.png
 
-Operational Excellence is the ability to run and monitor systemas to deliver business value, and continually improve supporting processes and procedures. It involves:
+Operational Excellence is the ability to run and monitor systems to deliver business value, and continually improve supporting processes and procedures. It involves:
 
 * Prepare
 
@@ -445,28 +483,34 @@ Operational Excellence is the ability to run and monitor systemas to deliver bus
 `Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
 
 Performance efficiency
-----------------------
+======================
 
 .. image:: /intro_d/performance.png
 
 Performance efficiency is the ability to use computing resources efficiently to meet system requirements, and to maintain that efficiency as demand changes and technologies evolve. It involves:
 
-* Selection
+* Select customizable solutions
 
-* Review
+* Review to continually innovate
 
-* Monitoring
+* Monitor AWS services
 
-* Tradeoffs
+* Consider the trade-offs
 
 `Performance efficiency Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
 
-Design principles
-=================
+Design Principles
+-----------------
 
-The AWS Well-Architected Framework includes may best-practices design principles for AWS solutions. These principles may be general, such as the importance of enabling traceability. But hey also include pillar-specific design principles, such as maintaining defining security responses based on traced information, an automating responses when possible.
+* Democratize advanced technologies
 
-* **Enable traceability**: To log and audit all actions and changes to an environment, to automatically respond and take action.
+* Go global in minutes
+
+* Use a serverless architecture
+
+* Experiment more often
+
+* Have mechanical sympathy
 
 AWS Well-Architected Tool
 =========================
@@ -482,13 +526,6 @@ This is a free tool, available in the `AWS Management Console <https://console.a
 3. **Review the Improvement Plan**. Based on the best practices you selected, AWS WA Tool identifies areas of high and medium risk as measured against the AWS Well-Architected Framework. The Improvement items section shows the recommended improvement items identified in the workload. The questions are ordered based on the pillar priority that is set, with any high risk items listed first followed by any medium risk items.
 
 4. **Make Improvements and Measure Progress**. After deciding what improvement actions to take, update the Improvement status to indicate that improvements are in progress. After making changes, you can return to the Improvement plan and see the effect those changes had on the workload. 
-
-AWS Best Practices
-******************
-
-`Architecting for the Cloud <https://d1.awsstatic.com/whitepapers/AWS_Cloud_Best_Practices.pdf>`_
-
-`Fault-Tolerant Components on AWS <https://d1.awsstatic.com/whitepapers/aws-building-fault-tolerant-applications.pdf>`_
 
 AWS Trusted Advisor
 ===================

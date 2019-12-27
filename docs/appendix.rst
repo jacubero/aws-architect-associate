@@ -13,6 +13,9 @@ New rules can be deployed within minutes in response to changing traffic pattern
 AWS Shield
 **********
 
+AWS Shield Standard
+===================
+
 AWS Shield is a managed DDoS protection service that safeguards applications running on AWS. There are 2 tiers of AWS Shield: Standard and Advanced.
 
 .. figure:: /appendix_d/standard.png
@@ -22,6 +25,9 @@ AWS Shield is a managed DDoS protection service that safeguards applications run
 AWS Shield Standard protects applications running on AWS by providing always-on detection and automatic inline mitigations of DDoS attacks, to minimize application downtime and performance degradation. All AWS customers benefit from the automatic protections of AWS Shield Standard, at no additional charge. It defends against most common, frequently ocurring network and transport layer DDoS attacks that target web sites or applications. It integrates with Amazon CloudFront and Amazon Route 53, to provide comprehensive availability protection against many types of infrastructure attacks. 
 
 A combination of traffic signatures, anaomaly alogorithms and other analysis techniques are employed to detect malicious traffic in real-time. Automated mitigation techniques are built into this service, applied inline to your applications so there is no latency impact. Several techniques, such as deterministic packet filtering and priority-based traffic shaping are used to automatically mitigate attacks without impacting your applications. You can mitigate application layer attacks by writing rules using AWS WAF, only paying for what you use. It is a self service and there is no need to engage AWS support to receive protection against DDoS attacks.
+
+AWS Shield Advanced
+===================
 
 .. figure:: /appendix_d/advanced.png
 
@@ -34,14 +40,34 @@ Using advaced routing techniques, this service tier provides additional capacity
 Protecting DNS
 ==============
 
+AWS Shield Standard protects your Amazon Route 53 Hosted Zones from infrastructure layer DDoS attacks, including reflection attacks or SYN floods that frequently target DNS. A variety of techniques, such as header validationss and pritority-based traffic shaping, automatically mitigate these attacks.
+
+AWS Shield Advanced provides greater protection, visibility into attacks on your Route 53 infrastructure, and help from AWS response team for extreme excenarios.
+
+Protecting web applications and APIs
+====================================
+
+When using Amazon CloudFront, AWS Shield Standard provides comprehensive protection against infrastructure layer attacks like SYN floods, UDP floods, or other reflection attacks. Always-on detection and mitigation systems automatically scrub bad trafic at layer 3 and 4 to protect your application.
+
+With AWS Shield Advanced the AWS response team actuvely applies any mitigations necessary for sophisticated infrastructure layer 3 or 4 attacks using traffic engineering. Application layer attacks, like HTTP floods, are also protected.
+
+The always-on detection system baselines customers' steady-state application traffic and monitors for anomalies. Using AWS WAF, you can customize any application layer mitigation.
+
+Protecting other applications
+=============================
+
+For other custom applications, not based on TCP (for example UDP and SIP), you cannot use services like Amazon CloudFront or ELB. In these cases, you often need to run your application directly on internet-facing EC2 instances.
+
+AWS Shield Standard protects your EC2 instance from common infrastructure layer 3 or 4 attacks, such as UDP reflection attacks that include DNS, NTP, and SSDP reflection attacks. Techniques, such as priority-based traffic shaping, are automatically engaged when a well-defined DDoS attack signature is detected.
+
+With AWS Shield Advanced on Elastic IP address, you have enhanced detection that automatically recognizes the type of AWS resource and size of EC2 instance and applies pre-defined mitigators. You can create custom mitigation profiles, and during the attack, all your Amazon VPC NACLs are automatically enforced at the border of the AWS network, giving you access to additional bandwidth and scrubbing capacity to mitigate large volumetric DDoS attacks. It also protects against SYN floods or other vectors, such as UDP floods.
+
 Amazon Inspector
 ****************
 
 Amazon Inspector is an automated security assessment service that helps improve the security and compliance of applications deployed on AWS. The service automatically assesses applications for vulnerabilities or deviations from best practices. After performing an assessment, Amazon Inspector produces a detailed report with prioritized steps for remediation.
 
 It is agent-based, API-driven, and delivered as a service. This makes it easy for you to build right into your existing DevOps process, decentralizing and automating vulnerability assessments, and empowering your DevOps teams to make security assessment an integral part of the deployment process.
-
-
 
 AWS Config
 **********
@@ -92,39 +118,39 @@ As enterprises move to AWS, a few common pattersn emerge ata the IT staff level.
 
 As AWS maturity increases, customers learn how to further improve their businesses with AWS. They adopt new services and technologies, which can result in additional cost reductions and accelerated time to market.
 
-.. figure:: /intro_d/maturity.png
+.. figure:: /appendix_d/maturity.png
 	:align: center
 
 	AWS maturity versus activities
 
 IT team members who used to work on projects like storage array deployments and server refreshes can transition to become DevOps specialists. By being integrated into the dev team, they can support the development of new products and services.
 
-.. figure:: /intro_d/server.png
+.. figure:: /appendix_d/server.png
 	:align: center
 
 	Server benefits
 
-.. figure:: /intro_d/network.png
+.. figure:: /appendix_d/network.png
 	:align: center
 
 	Network benefits
 
-.. figure:: /intro_d/storage.png
+.. figure:: /appendix_d/storage.png
 	:align: center
 
 	Storage benefits
 
-.. figure:: /intro_d/application.png
+.. figure:: /appendix_d/application.png
 	:align: center
 
 	Application benefits
 
-.. figure:: /intro_d/facilities.png
+.. figure:: /appendix_d/facilities.png
 	:align: center
 
 	Facilities benefits
 
-.. figure:: /intro_d/securityben.png
+.. figure:: /appendix_d/securityben.png
 	:align: center
 
 	Security benefits
@@ -174,7 +200,7 @@ AWS helps to reduce security risks in numerous ways:
 
 * Leverages our roster of 30 plus compliance certifications and accreditations to help our customers build secure, compliance-ready environment.
 
-.. figure:: /intro_d/shared.png
+.. figure:: /appendix_d/shared.png
 	:align: center
 
 	AWS shared security model
@@ -234,14 +260,14 @@ Business agility
 
 Here, you can see a list of KPIs for measuring business agility:
 
-.. image:: /intro_d/kpis.png
+.. image:: /appendix_d/kpis.png
 
 Time to market for new applications
 -----------------------------------
 
 Some of the most important activities that a healthy business must do to continue to grow and innovate are to scope, prioritize, and take on new initiatives. You can think about the initiative process like a project funnel.
 
-.. figure:: /intro_d/funnel.png
+.. figure:: /appendix_d/funnel.png
 	:align: center
 
 	Innovate by increasing "fail fast" while reducing risks and costs
@@ -260,7 +286,7 @@ Cloud financial management
 
 Cloud financial management includes four key areas.
 
-.. image:: /intro_d/financial.png
+.. image:: /appendix_d/financial.png
 
 To enable cost transparency you must have the right tagging scheme and apply it to all areas of spending. User-defined tags allow customers to label their resources so they can manage them. At a minimum, from cost perspective, customers should use the following 5 tags:
 

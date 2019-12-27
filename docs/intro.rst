@@ -359,6 +359,22 @@ The AWS Well-Architected Framework
 
 `AWS Architecture Center <https://aws.amazon.com/architecture>`_
 
+The AWS Well-Architected Framework covers:
+
+* Strategies and best practices for architecting in the cloud.
+
+* It provides you with a way to measure your architecture against AWS best practices.
+
+* Identifies how to address any shortcomings.
+
+The AWS Well-Architected Framework enables the customer:
+
+* To make informed decisions about their architecture.
+
+* Think in a cloud-natively way.
+
+* Understand the impact of design decisions that are made.
+
 The purposes of AWS Well-Architected Framework are the following:
 
 * Increases awareness of architectural best practices.
@@ -367,14 +383,47 @@ The purposes of AWS Well-Architected Framework are the following:
 
 * Provides a consistent approach to evaluating architectures
 
-It is composed of Questions, Pillars and Design Principles. The AWS Well-Architected Framework includes many best-practices design principles for AWS solutions. These principles may be general, such as the importance of enabling traceability. But hey also include pillar-specific design principles, such as maintaining defining security responses based on traced information, an automating responses when possible.
+It is composed of Questions, Pillars and Design Principles. 
+
+General design principles
+=========================
+
+The AWS Well-Architected Framework includes many best-practices design principles for AWS solutions. These principles may be general, such as the importance of enabling traceability. But hey also include pillar-specific design principles, such as maintaining defining security responses based on traced information, an automating responses when possible.
+
+The general design principles in a on-premises environment are:
+
+* *You have to guess the infrastructure needs*. It is often based on high level business requirements and demand and often before a line of code is written.
+
+* *You cannot afford to test at scale*. A complete duplicate of production costs is hard to justify, especially with low utilization. So when you go to production, you normally find a whole new class of issues at high scale.
+
+* *You fear make significant architectural changes* because you do not have no way to test it properly. It would stop you from delivering other features because of your environment is single pipeline.
+
+* *Experiments* were PoC at the start. It is *hard to justify* later due to the effort of getting resources to try different things out. You manually build and customize which is hard to reproduce. 
+
+* *Your architecture is frozen in time*. Eventhough everything progresses, such as your user are doing, the requirements and even the business model.
+
+The general design principles in an AWS environment are different. Customers can:
+
+* *Stop guessing capacity needs*.
+
+* *Test systems at production scale*.
+
+* Automate to *make experimentation easier*.
+
+* *Allow architectures to evolve*.
+
+* *Build data-driven architectures*.
+
+* *Improve through game days*.
+
+A **workload** is defined as a collection of interrelated applications, infrastructure, policy, governance, and operations running on AWS that provide business or operational value.
 
 Security
 ========
 
 .. image:: /intro_d/security.png
 
-Security is the ability to protect information, systems, and assets while delivering business value through risk assessments and mitigation strategies. It involves:
+Security is the ability to protect information, systems, and assets while delivering business value through risk assessments and mitigation strategies. The focus areas are:
 
 * Identity and access management
 
@@ -401,14 +450,14 @@ Design Principles
 
 * Focus on securing your system
 
-* Automate
+* Automate responses to security events: 
 
 Reliability
 ===========
 
 .. image:: /intro_d/reliability.png
 
-Reliability is the ability of a system to recover from infrastructure or service failures, dynamically acquire computing resources to meet demand, and mitigate disruptions, such as misconfigurations or transient network issues. It involves:
+Reliability is the ability of a system to recover from infrastructure or service failures, dynamically acquire computing resources to meet demand, and mitigate disruptions, such as misconfigurations or transient network issues. The focus areas are:
 
 * Foundations
 
@@ -442,7 +491,7 @@ Cost Optimization
 
 .. image:: /intro_d/cost.png
 
-Cost Optimization is the ability to avoid or eliminate unneeded cost or suboptimal resources. It involves:
+Cost Optimization is the ability to avoid or eliminate unneeded cost or suboptimal resources. The focus areas are:
 
 * Use cost-effective resources
 
@@ -472,7 +521,7 @@ Operational Excellence
 
 .. image:: /intro_d/operational.png
 
-Operational Excellence is the ability to run and monitor systems to deliver business value, and continually improve supporting processes and procedures. It involves:
+Operational Excellence is the ability to run and monitor systems to deliver business value, and continually improve supporting processes and procedures. The focus areas are:
 
 * Prepare
 
@@ -487,7 +536,7 @@ Performance efficiency
 
 .. image:: /intro_d/performance.png
 
-Performance efficiency is the ability to use computing resources efficiently to meet system requirements, and to maintain that efficiency as demand changes and technologies evolve. It involves:
+Performance efficiency is the ability to use computing resources efficiently to meet system requirements, and to maintain that efficiency as demand changes and technologies evolve. The focus areas are:
 
 * Select customizable solutions
 
@@ -527,20 +576,18 @@ This is a free tool, available in the `AWS Management Console <https://console.a
 
 4. **Make Improvements and Measure Progress**. After deciding what improvement actions to take, update the Improvement status to indicate that improvements are in progress. After making changes, you can return to the Improvement plan and see the effect those changes had on the workload. 
 
-AWS Trusted Advisor
-===================
+Common uses
+===========
 
-AWS Trusted Advisor is an online tool that provides you real time guidance to help you provision your resources following AWS best practices. AWS Trusted Advisor analyzes your AWS environment and provides best practice recommendations in five categories:
+* Learn how to build cloud-native architectures.
 
-* Cost Optimization
+* Build a backlog.
 
-* Performance
+* Use a gating mechanism before launch.
 
-* Security
+* Compare maturity of different teams.
 
-* Fault Tolerance
-
-* Service Limits
+* Due-diligence for acquisitions.
 
 AWS Global Infrastructure
 *************************
@@ -566,35 +613,6 @@ AWS Regions
 `Global Infrastructure <https://aws.amazon.com/about-aws/global-infrastructure/#reglink-pr>`_
 
 `AWS Global infrastructure interactive map <https://infrastructure.aws/>`_
-
-The global infrastructure that supports AWS cloud platform is distributed in several separate geographic areas around the world. These areas are called **regions** which consist of two or more **Availability Zones** (AZ) - most of the regions have 3 AZs. Currently, these are the following regions represented by a region code:
-
-.. csv-table:: AWS Region List
-   :file: intro_d/regions.csv
-   :widths: 20, 40, 40
-   :header-rows: 1
-
-.. Note:: Available Regions.
-
-   AWS GovCloud (US-West) account provides access to the AWS GovCloud (US-West) Region only. An Amazon AWS (China) account provides access to the Beijing and Ningxia Regions only. 
-
-   You can't describe or access additional Regions from an AWS account, such as AWS GovCloud (US-West) or the China Regions.
-
-   To use a Region introduced after March 20, 2019, you must enable the Region. For more information, see `Managing AWS Regions <https://docs.aws.amazon.com/general/latest/gr/rande-manage.html>`_ in the AWS General Reference.
-
-.. Note:: Enabled Regions.
-
-   If the Region is enabled by default, the output includes the following:
-
-   *"OptInStatus": "opt-in-not-required"*
-
-   If the Region is not enabled, the output includes the following:
-
-   *"OptInStatus": "not-opted-in"*
-
-   After an opt-in Region is enabled, the output includes the following:
-
-   *"OptInStatus": "opted-in"*
 
 .. figure:: /intro_d/connectivity.png
    	:name: fig-connectivity

@@ -13,11 +13,11 @@ Cost Factors
 
 To estimate the cost of using S3, you need to consider the following:
 
-* **Storage**. The number and size of objects stored in your S3 buckets as well as the type of storage (storage class). You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
+* **Storage** (Gbs per month). The number and size of objects stored in your S3 buckets as well as the type of storage (storage class). You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
 
 * **Requests**. The number and type of requests. GET requests incur charges ata different rates than other requests, such as PUT and COPY requests.
 
-* **Data transfer**. The amount of data transferred out of the Amazon S3 region
+* **Data transfer**. The amount of data transferred out of the Amazon S3 region. Transfer into Amazon S3 is free. Transfer out from Amazon S3 to Amazon CloudFront or the same region is free of charge as well.
 
 
 
@@ -59,13 +59,13 @@ Storage classes
 
 The typical lifecycle of data is the newer it is, the more frequently it is consumed. Amazon S3 offers a range of storage classes designed for different use cases. These include:
 
-* S3 Standard for general-purpose storage of frequently accessed data.
+* **S3 Standard** for general-purpose storage of frequently accessed data.
 
-* S3 Intelligent-Tiering for data with unknown or changing access patterns.
+* **S3 Intelligent-Tiering** for data with unknown or changing access patterns.
 
-* S3 Standard-Infrequent Access (S3 Standard-IA) and S3 One Zone-Infrequent Access (S3 One Zone-IA) for long-lived, but less frequently accessed data.
+* **S3 Standard-Infrequent Access (S3 Standard-IA)** and **S3 One Zone-Infrequent Access (S3 One Zone-IA)** for long-lived, but less frequently accessed data. S3 Standard-IA has lower cost per GB stored and higher cost per PUT, COPY, POST or GET request. It has a 30-day storage minimum.
 
-* Amazon S3 Glacier and Amazon S3 Glacier Deep Archive for long-term archive and digital preservation.
+* **Amazon S3 Glacier** and Amazon **S3 Glacier Deep Archive** for long-term archive and digital preservation.
 
 S3 Intelligent-Tiering
 ----------------------

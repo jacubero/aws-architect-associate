@@ -233,6 +233,55 @@ Domain 2: Define Performant Architectures
 2.1 Choose performant storage and databases
 ===========================================
 
+Elastic Block Store
+-------------------
+
+The EBS volume types offer different tradeoff in performance. SSD are more expensive and offer more perform better in IOPS, meaning random reads and writes. HDD are cheaper and perform better for sequential reads and writes.
+
+.. figure:: /domains_d/ENSperformance.png
+	:align: center
+
+	EBS volume types performance  
+
+Another key to highly performant architectures is to offload all static content to S3 instead of keeping them on the servers. Instead of folders from your webservers for your html, javascript, CSS, images, video files, and any other static content, you want to move all of them to S3. This dramatically improves your webserver performance. It takes load out of the webserver and frees CPU and memory for serving dynamic content.
+
+Amazon S3 buckets
+-----------------
+
+To upload your data to S3 you need:
+
+1. Create a bucket in one of the AWS Regions. The bucket name becomes the subdomain of the S3 object URL.
+
+2. Upload any number of objects to the bucket. 
+
+S3 objects automatically get a URL assigned to them that is based on the bucket name. You can have a virtual host-based URL or a path-based URL. The virtual host-based URL contains the bucket name as part of the domain name:
+
+.. code-block:: console
+   :caption: Virtual host-based URL
+
+    http://[bucket name].s3.amazonaws.com
+
+    http://[bucket name].s3-aws-region.amazonaws.com
+
+The path-based URL has the bucket name as the bucket as the first part of the path:
+
+.. code-block:: console
+   :caption: Path-based URL
+
+    http://s3-aws-region.amazonaws.com/[bucket name]/[key]
+
+You can use an URL with the region name or without it, and it will redirect to the region that corresponds. Buckets are always tight to a region, eventhough you can reference them without the region name. Buckets name are globally unique. If a call a bucket "mybucket", no other bucket in any region can have the same name. The full path after the bucket name is called the key.
+
+Lifecycle policies
+------------------
+
+A common pattern with data files is that initially they are hot, there is a lot of interest in processing them, but over time they are not accessed that often, finally there are rarely accessed. However, you need to hold them for some time. This is where lifecycle policies come in. They can move cold data to cheaper storage and the hot data to the more accesible storage.
+
+Performant storage on databases
+-------------------------------
+
+
+
 2.2 Apply caching to improve performance
 ========================================
 

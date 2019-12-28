@@ -519,15 +519,75 @@ Design Principles
 Operational Excellence
 ======================
 
+Operational Excellence is the ability to run and monitor systems to deliver business value, and continually improve supporting processes and procedures. 
+
+Its key service is **AWS CloudFormation**. You can have IaC and the CloudFormation templates are correct documentation of your environment.
+
+The focus areas and their key tools are:
+
+* **Prepare**: 
+
+	* Understand the business goals they are trying to achieve and *set up operational priorities* to support these goals and use these priorities to focus their operational improvement efforts where they have the greatest impact.
+
+	* *Design for operations* is focused on architecting for runtime. This includes making architectural design decisions that would enable deployments of your workloads using techniques that mitigate deployment risks and allow you to reduce defects and fix or workaround them safely in production. It includes instrumenting your workloads to enable understanding of their operational health and enable useful businesses and technical insights. Ideally, design standards and templates should be established and shared across organizations to simplify development efforts and reduce duplication effort.
+
+	* *Operational readiness* is focused on validating the readiness of both the workloads into production and the operational team to support the workload in production. Evaluation of the workload includes consideration of your standards and governance conduct using checklists to ensure consistent evaluation. Review of the operational team including team size and skillset as well as the capture of procedures. Routine operations procedures should be capture in runbooks and processed for issue resolutuion in playbooks. Ideally, procedures should be scripted to increase consistency and execution, reduce the introduction of human error and to enable automation triggered in response to observed events.
+
+* **Operate**:
+
+	* *Understangding the operational health* of your workload. It is defined in the achievement of business and customer outcomes. You must define metrics to measure the behavior of the workload against expected outcomes. Metrics to measure the status of the workloads and their components and metrics to measure the execution of operations activities. 
+
+	* *Deriving business and technical insights*. By establishing baselines and collecting and analysing these metrics you can evaluate operational health, gain business insights and identify areas for intervention or improvement. 
+
+	* *Responding to operational events*. Both planned and unplaned operational events should be anticipated. Planned events may include may include sales promotions, deployments and game days. Unplanned events may include component failures. Runbooks and playbooks should be used to enable consistent response to events and to limit the introduction of human error.
+
+* **Evolve**: It is focused on dedicated work cycles to make continuous incremental improvement to your operations.
+
+	* *Learn from experience*. Customers should evaluate oportunities from improvements captured from feedback loops, lessons learned analysis and cross-team reviews.
+
+	* *
+
+Their key tools are:
+
+* **Prepare**: *AWS Config and AWS Config Rules* can be used to create standards for workloads and determine if environment are compliant with standards before putting them into production.
+
+* **Operate**: *Amazon CloudWatch* to monitor the operational health of the workload
+
+* **Evolve**: *Amazon Elasticsearch* to analyze log data and get actionable insights quickly and securely.
+
+
+Design Principles
+-----------------
+
+Operational excellence design in an on-premises environment:
+
+* Most changes are made by human beings following runbooks that are often out of date.
+
+* It is easy to be focused on the technology metrics rather than business outcomes.
+
+* Because making changes are difficult and risky you tend to want them often and therefore tend to batch changes into large releases.
+
+* You rarely simulate failures or events because tou do not have the system or human capacity to do this.
+
+* Often things are moving so fast that you move from one reactive situation to the next, with no time to learn from mistakes.
+
+* Dure to the rate of change it becomes to keep documentation current.
+
+Operational excellence design in an AWS environment:
+
+* Performs operations by code with business metrics with you can measure against.
+
+* Annotated documentation.
+
+* By automating change and using code, you can make frequent, small and reversible changes.
+
+* Refine operations procedures frequently by making game days and detecting failures in procedures.
+
+* Learn from these and other operational events to improve your responses.
+
+* Because infrastructure is code, you can detect when documentation is out of date and even generate documentation and include annotations to enable its use and automation.
+
 .. image:: /intro_d/operational.png
-
-Operational Excellence is the ability to run and monitor systems to deliver business value, and continually improve supporting processes and procedures. The focus areas are:
-
-* Prepare
-
-* Operate
-
-* Evolve
 
 `Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
 

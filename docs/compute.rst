@@ -28,7 +28,9 @@ Amazon EBS
 
 `AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic Block Storage (Amazon EBS) (STG310-R1) <https://www.youtube.com/watch?v=BuJa6Vl8cn8>`_
 
-Aamazon EBS provides 3 volume types: General purpose (SSD), Provisioned IOPS (SSD) and Magnetic.
+`Introduction to Amazon Elastic Block Store (EBS) <https://www.qwiklabs.com/focuses/370?parent=catalog>`_
+
+Amazon EBS provides 3 volume types: General purpose (SSD), Provisioned IOPS (SSD) and Magnetic.
 
 Cost factors
 ^^^^^^^^^^^^

@@ -4,11 +4,11 @@ Elasticity, High Availability, and Monitoring
 Understanding the basics
 ************************
 
-**Fault tolerance** refers to the ability of a system to remain operational even if some components of that system fail. It can be seen as the built-in redundancy of an application's components.
+**Fault tolerance** refers to the ability of a system to remain operational even if some components of that system fail. It can be seen as the built-in redundancy of an application's components. The user does not suffer any impact from a fault, the SLA is met.
 
 **High availability** is a concept regarding the entire system. It goes to ensure that:
 
-* Systems are generally functioning and accessible.
+* Systems are generally functioning and accessible, but it may perform in a degraded state.
 
 * Downtime is minimized as much as possible.
 

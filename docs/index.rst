@@ -32,6 +32,7 @@ Contents:
    RTO/RPO and backup recovery setup <recovery>
    Optimizations and review <optimizations>
    Appendix <appendix>
+   Domains <domains>
 
 
    *

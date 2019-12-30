@@ -421,7 +421,9 @@ A **workload** is defined as a collection of interrelated applications, infrastr
 Security
 ========
 
-.. image:: /intro_d/security.png
+`Security pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Security-Pillar.pdf>`_
+
+`AWS Security Best Practices <https://d1.awsstatic.com/whitepapers/Security/AWS_Security_Best_Practices.pdf>`_
 
 Security is the ability to protect information, systems, and assets while delivering business value through risk assessments and mitigation strategies. The focus areas are:
 
@@ -435,12 +437,10 @@ Security is the ability to protect information, systems, and assets while delive
 
 * Incident response
 
-`Security pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Security-Pillar.pdf>`_
-
-`AWS Security Best Practices <https://d1.awsstatic.com/whitepapers/Security/AWS_Security_Best_Practices.pdf>`_
-
 Design Principles
 -----------------
+
+.. image:: /intro_d/security.png
 
 * Implement security at all layers
 
@@ -455,7 +455,7 @@ Design Principles
 Reliability
 ===========
 
-.. image:: /intro_d/reliability.png
+`Reliability Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Reliability-Pillar.pdf>`_
 
 Reliability is the ability of a system to recover from infrastructure or service failures, dynamically acquire computing resources to meet demand, and mitigate disruptions, such as misconfigurations or transient network issues. The focus areas are:
 
@@ -465,8 +465,6 @@ Reliability is the ability of a system to recover from infrastructure or service
 
 * Failure management
 
-`Reliability Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Reliability-Pillar.pdf>`_
-
 `Chaos Monkey <https://github.com/Netflix/chaosmonkey>`_ is a Netflix resiliency tool that helps applications tolerate random instance failures.
 
 `Bees with Machine Guns! <https://github.com/newsapps/beeswithmachineguns>`_ is a utility for arming (creating) many bees (micro EC2 instances) to attack (load test) targets (web applications).
@@ -475,6 +473,8 @@ Reliability is the ability of a system to recover from infrastructure or service
 
 Design Principles
 -----------------
+
+.. image:: /intro_d/reliability.png
 
 * Test recovery procedures
 
@@ -489,7 +489,7 @@ Design Principles
 Cost Optimization
 =================
 
-.. image:: /intro_d/cost.png
+`Cost Optimization Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
 
 Cost Optimization is the ability to avoid or eliminate unneeded cost or suboptimal resources. The focus areas are:
 
@@ -501,10 +501,10 @@ Cost Optimization is the ability to avoid or eliminate unneeded cost or suboptim
 
 * Optimize over time
 
-`Cost Optimization Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Cost-Optimization-Pillar.pdf>`_
-
 Design Principles
 -----------------
+
+.. image:: /intro_d/cost.png
 
 * Adopt a consumption model
 
@@ -518,6 +518,8 @@ Design Principles
 
 Operational Excellence
 ======================
+
+`Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
 
 Operational Excellence is the ability to run and monitor systems to deliver business value, and continually improve supporting processes and procedures. 
 
@@ -559,6 +561,8 @@ Their key tools are:
 Design Principles
 -----------------
 
+.. image:: /intro_d/operational.png
+
 Operational excellence design in an on-premises environment:
 
 * Most changes are made by human beings following runbooks that are often out of date.
@@ -587,14 +591,10 @@ Operational excellence design in an AWS environment:
 
 * Because infrastructure is code, you can detect when documentation is out of date and even generate documentation and include annotations to enable its use and automation.
 
-.. image:: /intro_d/operational.png
-
-`Operational Excellence Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Operational-Excellence-Pillar.pdf>`_
-
 Performance efficiency
 ======================
 
-.. image:: /intro_d/performance.png
+`Performance efficiency Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
 
 Performance efficiency is the ability to use computing resources efficiently to meet system requirements, and to maintain that efficiency as demand changes and technologies evolve. The focus areas are:
 
@@ -606,10 +606,10 @@ Performance efficiency is the ability to use computing resources efficiently to 
 
 * Consider the trade-offs
 
-`Performance efficiency Pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Performance-Efficiency-Pillar.pdf>`_
-
 Design Principles
 -----------------
+
+.. image:: /intro_d/performance.png
 
 * Democratize advanced technologies
 

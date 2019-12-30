@@ -280,10 +280,93 @@ A common pattern with data files is that initially they are hot, there is a lot 
 Performant storage on databases
 -------------------------------
 
+We have several options: 
 
+* Relational Database with **Amazon RDS**. You should use RDS when:
+
+	* You are using joins, complex transactions or complex queries.
+
+	* You have a medium-to-high query/write rate.
+
+	* Do not scale more than a single worker node/shard.
+
+	* High durability.
+
+You should not use RDS (but use DynamoDB) when:
+
+	* Massive read/write rates (e.g. 150K writes/second).
+
+	* Sharding.
+
+	* You use simple GET/PUT requests and queries.
+
+	* You need a engine that is not provided by AWS or you want a customized RDBMS.
+
+The RDS master DB can be scaled up by using a bigger instance type for it. The other way to scale RDS is by using read replicas. Read replicas are supported with Aurora, PostgreSQL, MySQL and MariaDB. Using read replicas you can offloads the read requests to the read replicas and take some of the load out of the master DB.
+
+.. figure:: /domains_d/readreplicas.png
+	:align: center
+
+	RDS read replicas
+
+* Managed NoSQL database with **Amazon DynamoDB**, adequate for access patterns that match the key-value paradigm. Yo do not specify how much space you need when you create a DynamoDB table. The DynamoDB grows as your data footprint changes. You do specify the throughput (how many reads/writes) you need and DynamoDB scales to allocate resources based on throughput capacity requirements (read/write). The throughput is specified in read capacity units (rcus) and write capacity units (wcus).
+
+	* Read capacity unit (1 read per second for an item up to 4 KB in size). Each rcu gives you:
+
+		* One strongly consistent read per second, meaning that you read something and read it back and you are guaranteed to have the latest value.
+
+		* If you willing to relax the strong consistency requirement. You can get two eventually consistent reads per second.
+
+	* Write capacity unit (1 write for second for an item up to 1 KB in size).
+
+* Data Warehouse with **Amazon Redshift**. Redshift gives you a SQL interface, it is useful if you analytic queries instead of transactional queries. You are not inserting or getting a single row rather you want to compute aggregate numbers across an entire table.
 
 2.2 Apply caching to improve performance
 ========================================
+
+Amazon CloudFront
+=================
+
+Caching can improve the performance of your application without requiring to redesigning or rewriting the core logic or algorithms. You can cache the data from your application at different levels. You can cache at the web level using a CDN such as CloudFront.
+
+.. figure:: /domains_d/cloudfront.png
+	:align: center
+
+	Caching in CloudFront 
+
+Amazon ElastiCache
+==================
+
+You can apply caching at the application and database levels. You can use ElastiCache to cache what you otherwise you repetedly fetch from the DB backend. By using a cache with your DB backend, you can take some of your load out of your databases. Moreover, you can improve the RTT of your queries because you are heading the cache instead of the DB for many of them.
+
+.. figure:: /domains_d/elasticache.png
+	:align: center
+
+	RDS read replicas
+
+ElastiCache gives you 2 different types of caches:
+
+* **Memcached**. It is simpler and easier to setup. It has the following features:
+
+	* Multithreading.
+
+	* Low maintenance.
+
+	* Easy horizontal scalability and auto discovery.
+
+* **Redis**. It is more sophisticated and gives you support for data types. It is more than a simple key-value store.
+
+	* Support for data structures.
+
+	* Persistence.
+
+	* Atomic operations.
+
+	* Pub/sub messaging.
+
+	* Read replicas/failover.
+
+	* Cluster mode/sharded clusters.
 
 2.3 Design solutions for elasticity and scalability
 ===================================================

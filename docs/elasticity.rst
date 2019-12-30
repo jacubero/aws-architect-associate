@@ -61,6 +61,11 @@ The fault tolerant service tools are the following:
 Monitoring
 **********
 
+AWS Cost Explorer
+=================
+
+Cost Explorer helps you visualize and manage your AWS costs and usages over time. It offers a set of reports you can view data with for up to the last 13 months, forecast how much you're likely to spend for the next 3 months, and get recommendations for what Reserved Instances to purchase. You use Cost Explorer to identify areas that need further inquiry and see trends to understand your costs.
+
 Amazon CloudWatch
 =================
 

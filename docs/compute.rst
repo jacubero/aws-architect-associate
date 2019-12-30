@@ -110,6 +110,9 @@ Operating systems and Software packages:
 .. _secEC2pricing:
 
 Amazon EC2 pricing options
+**************************
+
+Amazon EC2 pricing options
 ==========================
 
 AWS offers 3 core purchasing options: On-Demand, Reserved Instances, Spot Instances. Each purchasing model launches the same underlying EC2 instances.
@@ -208,8 +211,19 @@ Amazon EC2 Spot instances integrate natively with a number of other AWS services
 
 `Amazon EC2 Spot Instances workshops website <https://ec2spotworkshops.com/>`_
 
+Amazon EC2 dedicated options
+============================
+
+
+AWS tagging strategies
+======================
+
+`AWS Tagging Strategies <https://aws.amazon.com/answers/account-management/aws-tagging-strategies/>`_
+
+* **Cost Allocation Tags** only eases the organization of your resource costs on your cost allocation report, to make it easier for you to categorize and track your AWS costs.
+
 Amazon EC2 considerations
-=========================
+*************************
 
 
 `Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_

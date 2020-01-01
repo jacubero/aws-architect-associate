@@ -15,6 +15,7 @@ With Amazon RDS you manage Application optimization and AWS manages: OS installa
 The basic building block of Amazon RDS is the DB instance. A DB instance is an isolated DB environment that can contain multiple user-created DBs and can be accessed by using the same tools and applications that you use with an standalone DB instance. The resources found in a DB instance are determined by its DB instance class, and the type of storage is dictated by the type of disks. DB instances and storage differ in performance characteristics and price, allowing you to tailor your performance and cost to the needs of your DB. When you choose to create a DB instance, you first have to specify which DB engine to run. Amazon RDsS currently supports MySQL, Amazon Aurora, MS SQL Server, PostgreSQL, MariaDB and Oracle. 
 
 .. figure:: /database_d/rds.png
+	:align: center
 
 	Amazon RDS DB instance
 
@@ -24,6 +25,7 @@ High Availability with Multi-AZ
 One of the most powerful features of Amazon RDS is the ability to configure your DB instance for HA with a multi-AZ deployment. Once configured, Amazon RDS automatically generates a standby copy of the DB instance in another AZ within the same Amazon VPC. After seeding the DB copy, transactions are synchronously replicated to the standby copy. Running a DB instance with Multi-AZ can enhance availability during planned system maintenance and help protect your DBs against DB instance failure and AZ disruption. If the master DB instance fails, Amazon RDS automatically brings the standby DB online as the new master. Because of the synchronous replication, there should be no data loss. Because your applications reference the DB by name using RDS DNS endpoint, you don't need to change anything in your application code to use the standby copy for failover.
 
 .. figure:: /database_d/multiAZ.png
+	:align: center
 
 	High Availability with Multi-AZ
 

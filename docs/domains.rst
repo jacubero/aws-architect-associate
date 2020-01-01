@@ -601,3 +601,14 @@ Domain 5: Define Operationally-Excellent Architectures
 
 5.1 Choose design features in solutions that enable operational excellence
 ==========================================================================
+
+Test axioms
+===========
+
+* IAM roles are easier and safer than keys and passwords.
+
+* Monitor metrics across the system.
+
+* Automate responses to metrics where appropriate.
+
+* Provide alerts for anomalous conditions.

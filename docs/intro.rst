@@ -557,7 +557,6 @@ Their key tools are:
 
 * **Evolve**: *Amazon Elasticsearch* to analyze log data and get actionable insights quickly and securely.
 
-
 Design Principles
 -----------------
 
@@ -589,7 +588,7 @@ Operational excellence design in an AWS environment:
 
 * Learn from these and other operational events to improve your responses.
 
-* Because infrastructure is code, you can detect when documentation is out of date and even generate documentation and include annotations to enable its use and automation.
+* Anticipate failure. Because infrastructure is code, you can detect when documentation is out of date and even generate documentation and include annotations to enable its use and automation.
 
 Performance efficiency
 ======================

@@ -225,6 +225,22 @@ AWS tagging strategies
 Amazon EC2 considerations
 *************************
 
+The appropriate user names for connecting to a newly created Amazon EC2 instance are as follows:
+
+* For an Amazon Linux AMI, the user name is ``ec2-user``.
+
+* For a RHEL AMI, the user name is ``ec2-user`` or ``root``.
+
+* For an Ubuntu AMI, the user name is ``ubuntu`` or ``root``.
+
+* For a Centos AMI, the user name is ``centos``.
+
+* For a Debian AMI, the user name is ``admin`` or ``root``.
+
+* For a Fedora AMI, the user name is ``ec2-user``.
+
+* For a SUSE AMI, the user name is ``ec2-user`` or ``root`.
+
 
 `Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
 

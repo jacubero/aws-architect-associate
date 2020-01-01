@@ -49,9 +49,9 @@ This an attachable storage that connects to one EC2 instance at a time.
 Think of EBS volumes as durable, attachable storage for your EC2 instances. These are the 4 types of EBS volumes.
 
 .. figure:: /domains_d/EBStypes.png
-	:align: center
+    :align: center
 
-	Types of EBS volumes
+    Types of EBS volumes
 
 There are 2 primary types of EBS volumes: SSD and HDD and each one has 2 subtypes. SSD volumes have much better IOPS, which is read/write operations per second. This is because SSD are Solid State disks with no moving parts. HDD or Hard Disk Drives have good throughput and gives you lower IOPS.
 
@@ -62,7 +62,7 @@ With SSD and HDD, there are 2 subtypes of EBS volumes. General Purpose SSD (gp2)
 Amazon EFS
 ^^^^^^^^^^
 
-`Introduction to Amazon Elastic File System (EFS) <https://www.qwiklabs.com/focuses/8523?catalog_rank=%7B%22rank%22%3A1%2C%22num_filters%22%3A0%2C%22has_search%22%3Atrue%7D&parent=catalog&search_id=4127036>`_
+`Introduction to Amazon Elastic File System (EFS) <https://www.qwiklabs.com/focuses/8523?parent=catalog>`_
 
 This is similar to EBS because you mount it as a disk in your EC2 instances.
 
@@ -77,9 +77,9 @@ This is similar to EBS because you mount it as a disk in your EC2 instances.
 * It is compatible with Linux-based AMIs for Amazon EC2. It is not currently supported for Windows.
 
 .. figure:: /domains_d/efs.png
-	:align: center
+    :align: center
 
-	Amazon EFS architecture
+    Amazon EFS architecture
 
 You create an EFS volume and then create mount points for it in a particular VPC. The EFS volumen can only attach to a single VPC at a time. Within this VPC, you get mount targets that your EC2 instances can then connect to.
 
@@ -371,17 +371,61 @@ ElastiCache gives you 2 different types of caches:
 2.3 Design solutions for elasticity and scalability
 ===================================================
 
+To make your applications perform well regardless of how much traffic they receive, we want to be able to scale them. We want to grow them in response to traffic spikes, this improves performance. At the same time, we want to shrink when the traffic subsides, this helps to keep our costs low. There are 2 types of scaling for your applications:
+
+* **Vertical scaling** is when change in the specifications of the instances (CPU, memory). If you replace a smaller instance with a larger one, is also called scaling up. If you replace a larger one with a smaller one, then it scales down.
+
+* **Horizongal scaling** is when you increase o decrease the number of instances (add or remove instances as needed). It is called scaling in and scaling out. The easiest way to do horizontal scaling is through Auto Scaling.
+
+Test axioms
+===========
+
+* If data is unstructured, Amazon S3 is generally the storage solution.
+
+* Use caching strategically to improve performance.
+
+* Know when and why to use Auto Scaling.
+
+* Coose the instance and database type that makes the most sense for your workload and performance need.
+
 Domain 3: Specify Secure Applications and Architectures
 *******************************************************
 
 3.1 Determine how to secure application tiers
 =============================================
 
+`Amazon Web Services: Overview of Security Processes <https://d1.awsstatic.com/whitepapers/Security/AWS_Security_Whitepaper.pdf>`_
+
+`AWS Security Best Practices <https://d1.awsstatic.com/whitepapers/Security/AWS_Security_Best_Practices.pdf>`_
+
+`IAM Best Practices <https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html>`_
+
 3.2 Determine how to secure data
 ================================
 
 3.3 Define the networking infrastructure for a single VPC application
 =====================================================================
+
+It is reccommended to use subnets to define Internet accessibility.
+
+* *Public subnets*. To support inbound/outbound access to the public Internet, include a routing table entry to an internet gateway.
+
+* *Private subnets*. They do not have a routing table entry to an internet gateway. It is not directly accessible from the public Internet. To support restricted, outbound-only public Internet access, typically use a "jump box" (NAT/proxy/bastion host).
+
+There are 2 main mechanisms to restricting access to a VPC: Security groups and Network ACLs.
+
+.. figure:: /domains_d/nacls.png
+    :align: center
+
+    Security groups versus Network ACLs
+
+The different tiers of an application can be separated through security groups. You can use security groups to control traffic into, out of, and between resources.
+
+.. figure:: /domains_d/secgroups.png
+    :align: center
+
+    Security groups
+
 
 Domain 4: Design Cost-Optimized Architectures
 *********************************************

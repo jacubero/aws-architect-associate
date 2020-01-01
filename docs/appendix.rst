@@ -205,6 +205,8 @@ AWS helps to reduce security risks in numerous ways:
 
 	AWS shared security model
 
+AWS managed services move the line of responsibility higher.
+
 Software: causes for failure
 ----------------------------
 
@@ -360,3 +362,5 @@ Resources for preparing the exam
 ********************************
 
 `Practice questions <https://tutorialsdojo.com/aws-solutions-architect-associate-questions-with-explanations-part-1/>`_ 
+
+`Solutions Architect Associate Bootcamp <https://github.com/parallax/reinvent-2018/blob/master/aws-sa-exam.md>`_

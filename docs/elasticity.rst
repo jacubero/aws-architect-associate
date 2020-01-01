@@ -100,9 +100,9 @@ There are 3 components required for auto-scaling:
 
 1. Create a **launch configuration**. This defines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups and roles to apply to the instance.
 
-2. Create a **Auto Scaling group**. This defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group. If you set a minimum of 2, if the number of servers goes below 2, another instance will be launched. If you set a maximum of 8, you will never have more than 8 instances in your group. The desire capacity is the number that you wich to start with. 
+2. Create a **Auto Scaling group**. This defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the minimum, the maximum, ans the desired size of the Auto Scaling Group. If you set a minimum of 2, if the number of servers goes below 2, another instance will be launched. If you set a maximum of 8, you will never have more than 8 instances in your group. The desire capacity is the number that you wich to start with. You can select the health check type.
 
-3. Deine a least one **Auto Scaling policy**. This specifies when to launch or terminate EC2 instances. You can schedule Auto Scaling every Thrusday at 9:00 a.m. as an example, or create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in.  
+3. Define a least one **Auto Scaling policy**, which specifies how much to scale in or scale out. This specifies when to launch or terminate EC2 instances. You can schedule Auto Scaling every Thrusday at 9:00 a.m. as an example, or create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in. You can attach one or more Auto Scaling policies to an Auto Scaling group.
 
 One common configuration to have dynamic Auto Scaling is to create CloudWatch alarms based on performance information from your EC2 instances or a load balancer. When a performance threshold is breached, a CloudWatch alarm triggers an Auto Scaling event which either scales out or scales in EC2 instances in the environment. 
 
@@ -110,8 +110,11 @@ One common configuration to have dynamic Auto Scaling is to create CloudWatch al
 
 	Sample CloudWatch alarm
 
+CloudWatch can monitor metrics such as CPU, network traffic and queue size. CloudWatch has a feature called CloudWatch Logs that alllows you pick up logs from EC2 instances, AWS Lambdas or CloudTrail. You can store the logs in the CloudWatch logs. You can also convert logs into metrics by extracting metrics using patterns. CloudWatch provides default metric across many AWS services and resources. You can also define custom metrics for your applications.
 
 `AWS re:Invent 2018: Capacity Management Made Easy with Amazon EC2 Auto Scaling (CMP377) <https://www.youtube.com/watch?v=PideBMIcwBQ&feature=emb_logo>`_
+
+`Introduction to Amazon EC2 Auto Scaling <https://www.qwiklabs.com/focuses/7932?parent=catalog>`_
 
 Scaling your databases
 **********************

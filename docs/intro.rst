@@ -423,8 +423,6 @@ Security
 
 `Security pillar <https://d1.awsstatic.com/whitepapers/architecture/AWS-Security-Pillar.pdf>`_
 
-`AWS Security Best Practices <https://d1.awsstatic.com/whitepapers/Security/AWS_Security_Best_Practices.pdf>`_
-
 Security is the ability to protect information, systems, and assets while delivering business value through risk assessments and mitigation strategies. The focus areas are:
 
 * Identity and access management
@@ -446,11 +444,11 @@ Design Principles
 
 * Enable traceability: To log and audit all actions and changes to an environment, to automatically respond and take action.
 
-* Apply principle of least privilege
+* Apply principle of least privilege: persons (or processes) can perform all activities they need to perform, and no more.
 
 * Focus on securing your system
 
-* Automate responses to security events: 
+* Automate responses to security events
 
 Reliability
 ===========

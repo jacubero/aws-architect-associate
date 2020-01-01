@@ -218,6 +218,8 @@ There are 3 fundamental characteristics you pay for with AWS: compute capacity, 
 
 	Pricing characteristics
 
+Prices for many services are tiered, so that you get a volume discount. The more you use it, the cheaper the service you get.
+
 Consumption-based model
 -----------------------
 

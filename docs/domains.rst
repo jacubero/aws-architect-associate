@@ -512,8 +512,89 @@ Domain 4: Design Cost-Optimized Architectures
 4.1 Determine how to design cost-optimized storage
 ==================================================
 
+Considerations for estimating the cost of using Amazon S3 are the following:
+
+1. Storage class.
+
+2. Storage amount.
+
+3. Number of requests.
+
+4. Amount of data transfer.
+
+Considerations for estimating the cost of using Amazon EBS are the following:
+
+1. How many and what type of volumes.
+
+2. Input/output operations per second (IOPS)
+
+3. How frequently I am making snapshots and how long I am storing these snapshots.
+
+4. Data transfer.
+
 4.2 Determine how to design cost-optimized compute
 ==================================================
+
+Considerations for estimating the cost of using Amazon EC2 are the following:
+
+1. Clock hours of server time.
+
+2. Machine configuration.
+
+3. Machine purchase type.
+
+4. Number of instances.
+
+5. Load balancing.
+
+6. Detailed monitoring.
+
+7. Auto Scaling.
+
+8. Elastic IP addresses.
+
+9. Operating systems and software packages.
+
+Amazon EC2 pricing factor are the following:
+
+* EC2 instance families.
+
+* Tenancy: default or dedicated
+
+* Pricing options.
+
+.. Note:: Instance storage.
+
+   Instance storage is free but is ephemeral.
+
+Serverless architectures
+------------------------
+
+Another way to save cost is by using serverless architectures. In these architectures, you don't pay for the idle time. The compute logic could be through AWS Lambda, static content via Amazon S3, Amazon DynamoDB for storing state, and Amazon API Gateway to attach a REST endpoint to Lambda that can be called via Web from a browser or other HTTP client.
+
+Amazon CloudFront
+-----------------
+
+CloudFront can help reduce your costs by avoiding fetching S3 data by caching it on CloudFront. Considerations for estimating the cost of using Amazon CloudFron are the following:
+
+1. Traffic distribution.
+
+2. Requests.
+
+3. Data transfer out.
+
+Caching with CloudFront can have positive impacts on both performance and cost-optimization.
+
+Test axioms
+===========
+
+* If you know it's going to be on, reserve it.
+
+* Any unused CPU time is a waste of money.
+
+* Use the most cost-effective data storage service and class.
+
+* Determine the most cost-effective EC2 pricing model and instance type for each workload.
 
 Domain 5: Define Operationally-Excellent Architectures
 ******************************************************

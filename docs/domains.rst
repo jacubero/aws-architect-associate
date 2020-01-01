@@ -152,16 +152,16 @@ High Availability
 Decoupling ensures that if one tier or component fails, the others are not impacted because they are decoupled.
 
 .. figure:: /domains_d/tightly.png
-	:align: center
+    :align: center
 
-	Example of tightly-coupled system
+    Example of tightly-coupled system
 
 This a tightly-coupled system: The web server takes requests and then sends an email over the email service. When the email service goes down, the web server is forced to become unoperational. The email service going down can be a perfectly normal event: may you bring down the email server to upgrade it to a new version of the email service, or to upgrade the HW or may it can be a failure of the email service. Regardless, the impact of failures is large in tightly coupled systems.
 
 .. figure:: /domains_d/decoupled.png
-	:align: center
+    :align: center
 
-	Example of decoupled system
+    Example of decoupled system
 
 This system has an SQS for holding messages for the email service. The Web server has not to wait for the email service to do its jobs, it queues the work and moves on. This kind of asynchronous interaction is much more resource efficient of the web server side. Furthermore, if the email service goes down, the web server is not impacted, it can continue to function. Not only that: none of the messages are lost, the messages are safely persisted in the SQS queue and it will wait for the email service to come back again. Once the service comes back online, the messages can be processed.
 
@@ -171,16 +171,16 @@ Scalability
 Another benefit from decoupling is scalability. In this system, a web server is calling a logging service. If the web server sends a high volume of requests to the logging service, it can overwhelm it and caused it to become overloaded.
 
 .. figure:: /domains_d/overload.png
-	:align: center
+    :align: center
 
-	Example of a overloaded system
+    Example of a overloaded system
 
 We can solve this problem by decoupling the web server from the logging server using SQS queue. The logging service can scale out when the volume of requests goes up. When the volume of requests goes down, the logging service can scale down. The scale down is important to keep our costs down when we are not using the extra servers.
 
 .. figure:: /domains_d/notoverloaded.png
-	:align: center
+    :align: center
 
-	Example of a decoupled system preventing from overloading
+    Example of a decoupled system preventing from overloading
 
 We can use a load balancer for decoupling. It distributes the incoming requests across the servers running the logging services. The load balancer is useful when the backend service return response is important. If there is no response required by the caller (in this case the web server), a queue can be used instead.
 
@@ -190,9 +190,9 @@ Identity of components
 Suppose we have an external client making requests to web server inside a VPC. The request and the response goes over the public Internet. If the web server goes offline, the client will have an error. If we have some automation implemented so that we replace the web server with another server which is based on the same image. The problem is that the new server has a new IP address assigned by the VPC. This means that the client is not able to it up to the IP is propagated to the client through DNS.
 
 .. figure:: /domains_d/newIP.png
-	:align: center
+    :align: center
 
-	System with the new web server with a different IP
+    System with the new web server with a different IP
 
 One way to solve this problem is to use an elastic IP address. If the server goes offline, the new instance will use the same Elastic IP address. An Elastic IP address is an IP address that can move from one instance to another. We have decoupled the identity of the server.
 
@@ -212,9 +212,9 @@ Fault tolerance
 The more loose your system is coupled, the more easily it scales and the more fault-tolerant it can be.
 
 .. figure:: /domains_d/fault.png
-	:align: center
+    :align: center
 
-	Tightly-coupled systems versus Loosely-coupled systems  
+    Tightly-coupled systems versus Loosely-coupled systems  
 
 Test axioms
 ===========
@@ -239,9 +239,9 @@ Elastic Block Store
 The EBS volume types offer different tradeoff in performance. SSD are more expensive and offer more perform better in IOPS, meaning random reads and writes. HDD are cheaper and perform better for sequential reads and writes.
 
 .. figure:: /domains_d/ENSperformance.png
-	:align: center
+    :align: center
 
-	EBS volume types performance  
+    EBS volume types performance  
 
 Another key to highly performant architectures is to offload all static content to S3 instead of keeping them on the servers. Instead of folders from your webservers for your html, javascript, CSS, images, video files, and any other static content, you want to move all of them to S3. This dramatically improves your webserver performance. It takes load out of the webserver and frees CPU and memory for serving dynamic content.
 
@@ -403,6 +403,61 @@ Domain 3: Specify Secure Applications and Architectures
 3.2 Determine how to secure data
 ================================
 
+We can break down the problem of securing data into 2 problems:
+
+* *Data in transit* when data moves in and out of AWS or within AWS.
+
+* *Data at rest* when data is stored in Amazon S3 or EBS or some other systems in AWS.
+
+Data in transit
+---------------
+
+For securing the transfer of dara in and out of your AWS infrastructure, you can use:
+
+* SSL over web.
+
+* VPN for IPSec for data moving between corporate data centers and AWS.
+
+* IPSec over AWS Direct Connect.
+
+* Import/Export services via Snowball and Snowball mobile that keep the data encrypted.
+
+In Data sent to the AWS API, the AWS API calls use HTTPS/SSL by default.
+
+Data at rest
+------------
+
+Data stored at Amazon S3 is private by default, it requires AWS credentials for access. It can be accessed over HTTP or HTTPS. There is an audit mode of access to all objects. It supports ACL and policies over buckets, prefixes (directory/folder) and objects. There are several options for encryption to choose on:
+
+* *Server-side* encryption where the data get encrypted before hits the disks on AWS servers. Options:
+
+	* Amazon S3-Managed keys (SSE-S3).
+
+	* KMS-Managed keys (SSE-KMS).
+
+	* Customer-provided keys (SSE-C)
+
+* *Client-side* encryption that requires encrypting the data before sending it to AWS service. Options:
+
+	* KMS managed master encryption keys (CSE-KMS).
+
+	* Customer managed master encryption keys (CSE-C).
+
+Sometimes the client-side encryption is required for compliance with regulations. You can store keys using:
+
+* *Key Management Service* which is a customer software-based key management integrated with many AWS services (for instance Amazon EBS, S3, RDS, Readshift, Elastic Transcode, WorkMail, EMR) and you can use it directly from application.
+
+* *AWS CloudHSM* which is a HW-based key management that you can use it directly from application and it is FIPS 140-2 compliant.
+
+Test axioms
+===========
+
+* Lock down the root user.
+
+* Security groups only allow. Network ACLs allow explicit deny.
+
+* Prefer IAM roles to access keys.
+
 3.3 Define the networking infrastructure for a single VPC application
 =====================================================================
 
@@ -426,6 +481,30 @@ The different tiers of an application can be separated through security groups. 
 
     Security groups
 
+The services to get traffic in or out of a VPC are:
+
+* Intenet Gateway: It enables connecting to the Internet.
+
+* Virtual Private Gateway: It enables connecting to customer's data center through a VPN.
+
+* Direct Connect: It sets up a Dedicted pipe between customer's data center and AWS.
+
+* VPC peering: It enables connecting VPCs to each others.
+
+* NAT gateways: It allows Internet traffic from private subnets.
+
+.. figure:: /domains_d/vpcs.png
+    :align: center
+
+    Outbound traffic from private instances
+
+The NAT gateway is more scalable than a NAT instance and it is managed service. A NAT instance is cheaper because it is a single instance.
+
+`AWS re:Invent 2018: Your Virtual Data Center: VPC Fundamentals and Connectivity Options (NET201) <https://www.youtube.com/watch?v=jZAvKgqlrjY>`_
+
+`Linux Bastion Hosts on AWS <https://aws.amazon.com/quickstart/architecture/linux-bastion/>`_
+
+`Amazon Virtual Private Cloud User Guide <https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html>`_
 
 Domain 4: Design Cost-Optimized Architectures
 *********************************************

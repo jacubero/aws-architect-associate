@@ -35,6 +35,7 @@ Amazon RDS Read Replicas
 Amazon RDS also supports the creation of read replicas for MySQL, MariaDB, PostgreSQL and Amazon Aurora. Updates made to the source DB instance are aynchronously copied to the read replica instance. You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. Using read replicas, you can also scale out beyond the capacity constraints of a single DB instance for read-heavy DB workloads. Read replicas can also be promoted to become the master DB instance, but due to the asynchronous replication, this requires manual action.
 
 .. figure:: /database_d/read.png
+	:align: center
 
 	Amazon RDS read replicas
 

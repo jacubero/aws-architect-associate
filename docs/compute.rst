@@ -15,6 +15,7 @@ Amazon EC2 allows to create and run virtual machines on AWS cloud. AWS calls the
 Launching Amazon EC2 instances with Amazon Machine Images (AMIs)
 ================================================================
 
+`How do I create an Amazon Machine Image (AMI) from my EBS-backed EC2 instance? <https://www.youtube.com/watch?time_continue=5&v=vSKWBBrEbNQ&feature=emb_logo>`_
 
 Launching Amazon EC2 instances with user data
 =============================================

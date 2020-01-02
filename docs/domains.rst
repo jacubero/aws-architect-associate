@@ -429,7 +429,7 @@ Data at rest
 
 Data stored at Amazon S3 is private by default, it requires AWS credentials for access. It can be accessed over HTTP or HTTPS. There is an audit mode of access to all objects. It supports ACL and policies over buckets, prefixes (directory/folder) and objects. There are several options for encryption to choose on:
 
-* *Server-side* encryption where the data get encrypted before hits the disks on AWS servers. Options:
+* **Server-side encryption**. Request Amazon S3 to encrypt your object before saving it on disks in its data centers and then decrypt it when you download the objects. Options:
 
 	* Amazon S3-Managed keys (SSE-S3).
 
@@ -437,13 +437,13 @@ Data stored at Amazon S3 is private by default, it requires AWS credentials for 
 
 	* Customer-provided keys (SSE-C)
 
-* *Client-side* encryption that requires encrypting the data before sending it to AWS service. Options:
+* **Client-side encryption** that requires encrypting the data before sending it to AWS service. Encrypt data client-side and upload the encrypted data to Amazon S3. In this case, you manage the encryption process, the encryption keys, and related tools. Options:
 
-	* KMS managed master encryption keys (CSE-KMS).
+	* *KMS managed master encryption keys (CSE-KMS)*. When using an AWS KMS-managed customer master key to enable client-side data encryption, you provide an AWS KMS customer master key ID (CMK ID) to AWS.
 
-	* Customer managed master encryption keys (CSE-C).
+	* *Customer managed master encryption keys (CSE-C)*. Your client-side master keys and your unencrypted data are never sent to AWS. It's important that you safely manage your encryption keys because if you lose them, you can't decrypt your data. Sometimes the CSE-C is required for strict compliance and regulatory requirements of the company. 
 
-Sometimes the client-side encryption is required for compliance with regulations. You can store keys using:
+You can store keys using:
 
 * *Key Management Service* which is a customer software-based key management integrated with many AWS services (for instance Amazon EBS, S3, RDS, Readshift, Elastic Transcode, WorkMail, EMR) and you can use it directly from application.
 

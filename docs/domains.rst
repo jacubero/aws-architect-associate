@@ -49,7 +49,7 @@ This an attachable storage that connects to one EC2 instance at a time.
 Think of EBS volumes as durable, attachable storage for your EC2 instances. These are the 4 types of EBS volumes.
 
 .. figure:: /domains_d/EBStypes.png
-    :align: center
+   :align: center
 
     Types of EBS volumes
 

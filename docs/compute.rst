@@ -24,6 +24,17 @@ Launching Amazon EC2 instances with user data
 Amazon EC2 and storing data
 ===========================
 
+Instance store
+--------------
+
+The data in an instance store persists only during the lifetime of its associated instance. If an instance reboots (intentionally or unintentionally), data in the instance store persists. However, data in the instance store is lost under any of the following circumstances:
+
+* The underlying disk drive fails
+
+* The instance stops
+
+* The instance terminates
+
 Amazon EBS
 ----------
 
@@ -48,6 +59,8 @@ To estimate the cost of using EBS, you need to consider the following:
 
 Amazon EFS
 ----------
+
+`Amazon Elastic File System - Scalable, Elastic, Cloud-Native File System for Linux <https://www.youtube.com/watch?v=AvgAozsfCrY&feature=emb_logo>`_
 
 `AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic File System (Amazon EFS) (STG301-R1) <https://www.youtube.com/watch?v=4FQvJ2q6_oA>`_
 
@@ -125,6 +138,8 @@ With all these pricing models, the key is striking a balance. Use RIs for predic
 
 Reserved Instances
 ==================
+
+`Introduction to Amazon EC2 Reserved Instances <https://www.youtube.com/watch?time_continue=1&v=XrmdkRQZhUQ&feature=emb_logo>`_
 
 Using Reserved Instances can have a significant impact on savings compared to on-demand, in some cases up to 75%. Typically, Reserved Instances are used for workloads that need to run most or all of the time, such as production environments. The commitment level could be 1 year or 3 years. AWS services offering RIs are: Amazon EC2, ECS, RDS, DynamoDB, Redshift, ElastiCache, Reserved Transcode Slots and Reserved Queues (AWS Elemental MediaConvert). RI types are Standard, Convertible and Scheduled.
 

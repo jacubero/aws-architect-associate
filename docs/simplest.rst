@@ -8,19 +8,6 @@ Amazon S3
 
 `Introduction to Amazon Simple Storage Service (S3) <https://www.qwiklabs.com/focuses/8582?parent=catalog>`_
 
-Cost Factors
-============
-
-To estimate the cost of using S3, you need to consider the following:
-
-* **Storage** (Gbs per month). The number and size of objects stored in your S3 buckets as well as the type of storage (storage class). You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
-
-* **Requests**. The number and type of requests. GET requests incur charges ata different rates than other requests, such as PUT and COPY requests.
-
-* **Data transfer**. The amount of data transferred out of the Amazon S3 region. Transfer into Amazon S3 is free. Transfer out from Amazon S3 to Amazon CloudFront or the same region is free of charge as well.
-
-
-
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_
@@ -42,6 +29,17 @@ To estimate the cost of using S3, you need to consider the following:
 `Multipart Upload Overview <https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html>`_
 
 `AWS re:Invent 2018: [REPEAT 2] Best Practices for Amazon S3 and Amazon Glacier (STG203-R2) <https://www.youtube.com/watch?time_continue=16&v=rHeTn9pHNKo&feature=emb_logo>`_ 
+
+Cost Factors
+============
+
+To estimate the cost of using S3, you need to consider the following:
+
+* **Storage** (Gbs per month). The number and size of objects stored in your S3 buckets as well as the type of storage (storage class). You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
+
+* **Requests**. The number and type of requests. GET requests incur charges ata different rates than other requests, such as PUT and COPY requests.
+
+* **Data transfer**. The amount of data transferred out of the Amazon S3 region. Transfer into Amazon S3 is free. Transfer out from Amazon S3 to Amazon CloudFront or the same region is free of charge as well.
 
 Amazon S3 Glacier
 *****************

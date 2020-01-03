@@ -10,6 +10,8 @@ Amazon RDS and Amazon DynamoDB
 Amazon RDS
 ==========
 
+`Understanding Amazon Relational Database Service (RDS) <https://www.youtube.com/watch?v=eMzCI7S1P9M>`_
+
 With Amazon RDS you manage Application optimization and AWS manages: OS installation and patches, DB software install and patches, DB backups, HA, Scaling, Power and rack & stack, server maintenance.
 
 The basic building block of Amazon RDS is the DB instance. A DB instance is an isolated DB environment that can contain multiple user-created DBs and can be accessed by using the same tools and applications that you use with an standalone DB instance. The resources found in a DB instance are determined by its DB instance class, and the type of storage is dictated by the type of disks. DB instances and storage differ in performance characteristics and price, allowing you to tailor your performance and cost to the needs of your DB. When you choose to create a DB instance, you first have to specify which DB engine to run. Amazon RDsS currently supports MySQL, Amazon Aurora, MS SQL Server, PostgreSQL, MariaDB and Oracle. 

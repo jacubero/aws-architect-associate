@@ -9,8 +9,9 @@ Adding Compute with Amazon EC2
 Amazon EC2 allows to create and run virtual machines on AWS cloud. AWS calls these virtual machines *instances*. AWS provides various configurations of CPU, memory, storage, and networking capacity for your instances, known as *instance types*.
 
 .. figure:: /compute_d/ec2.png
+   :align: center
 
-	Amazon EC2
+	 Amazon EC2
 
 Launching Amazon EC2 instances with Amazon Machine Images (AMIs)
 ================================================================
@@ -82,17 +83,6 @@ Amazon EC2 families
 * **Accelerated Computing**: P3, P2, Inf1, G4, G3, F1.
 
 * **Storage Optimized** I3, I3en, D2, H1.
-
-
-.. csv-table:: Instance Types List
-   :file: /compute_d/instance_types.csv
-   :widths: auto
-   :header-rows: 1
-
-Script:
-
-.. literalinclude:: compute_d/describe_instance_types.py
-  :language: python
 
 Cost Factors
 ============

@@ -3,10 +3,73 @@ The simplest architectures
 
 `AWS Storage Services Overview <https://d1.awsstatic.com/whitepapers/AWS%20Storage%20Services%20Whitepaper-v9.pdf>`_
 
+* **Block storage** is data organized as an array of unrelated blocks. Host file system places data on disk. AWS provides block storage with Amazon EBS.
+
+* **File storage** is unrelated data blocks managed by a file (serving) system. Native file system places data on disk. For example NTFS for Microsoft storage. Data stored in a file system contains attributes such as permissions, file owner and they are stored as metadata in the file system. AWS provides file storage with Amazon EFS.
+
+* **Object storage**. It is a flat system which stores data as objects which encapsulates the attributes, metadata, and other properties. It stores the data, data attributes, metadata, and object IDs as objects. It provides API access to data. It is metadata driven, policy-based, etc. It allows you to store ilimitedless amount of data and scales easily. Content type, permissions and the file owner are stored as metadata in a file system. There are more metadata that can be stored as object. You can create custom metadata named values that can be used for such things as analytics. AWS provides object storage with Amazon S3.
+
+Each storage option has a unique combination of performance, durability, cost and interface.
+
 Amazon S3
 *********
 
+Amazon S3 Overview
+==================
+
 `Introduction to Amazon Simple Storage Service (S3) <https://www.qwiklabs.com/focuses/8582?parent=catalog>`_
+
+It is intentionally built with a minimum feature set focusing on simplicity and robutness: It is a highly durable, highly available, high performant object storage service. It provides you an easy-to-use, scalable object storage service that is payable as you go and integrates with other AWS services and 3rd party solutions. Main characteristics:
+
+* You pay for what you use. You don't need to preprovision the size of your Amazon S3 for your data.
+
+* It is designed for 11 nines of durability.
+
+* It is performant system that is highly scalable.
+
+* It has different storage classes and transitions targets:
+
+	* S3 Standard.
+
+	* S3 Standard - Infrequent Access.
+
+	* S3 One Zone - Infrequent Access.
+
+	* and the possibility to automatically transition data to Amazon Glacier.
+
+Amazon S3 stores the data as objects within buckets. An object consists of data and optionally any metadata that describes that file.
+
+Object Storage Classes
+----------------------
+
+Consider the type of data, the resiliency requirements and usage pattern in order to decide which object storage class is best suited to your needs.
+
+The first and default option is **Amazon S3 Standard** designed for the active data or hot workloads, it provides milliseconds access and has the highest cost of the 3 classes. If you don't know what your access patterns are or you need frequent retrieval, start with S3 Standard. Some common use cases are Big Data analysis, Content distribution and Web site hosting.
+
+As your data ages and it's accessed less, you can use **Amazon S3 Standard - IA**. It is designed for colder or less frequently accessed data that requires milliseconds access. For example, you can leverage the Standard IA class to store detailed application logs that you analyze infrequently. It provides the same performance, throughput and low latency as the Standard storage class. It is lower in storage costs but along with storage costs, there is a retrieval cost associated with object access higher than with Amazon S3 Standard. Some common use cases are backup storage, DR, data that doesn't change frequently.
+
+**Amazon S3 One Zone - IA** is ideal for customers who want a lower-cost option for infrequently accessed data, require similar milliseconds access but don't require the same durability and resiliency as the previous classes. It costs less than the previous classes as it stores data in only 1 AZ. It has the same associated retrieval cost as Amazon S3 Standard - IA. It is a good choice for example for storing secondary backup copies of on-premises data, or easily recreated data, or storage use of Amazon S3 Cross Region replication target from another AWS S3 Region.
+
+Amazon Glacier is suitable for archiving data where data access in frequent. Archive data is not available for real-time access. You must restore the objects before you can access them. It is storage service designed for long-term archival storage and asynchronous retrieval from minutes to hours. For example you can leverage Amazon Glacier for storing long-term backup archives. The cost of storage for Amazon Glacier is less than the other storage classes and has also an additional cost for data retrieval. There are 3 retrieval options ranging in time from minutes to hours.
+
+S3 Standard, S3 Standard-IA and Glacier replicates its data across at least to 3 different AZs within a single region. If you do not need this resiliency, S3 One Zone-IA is stored in 1 AZ. If this AZ is destroyed, you will lose your data.
+
+.. figure:: /simplest_d/classes.png
+  :align: center
+
+   Comparing Object Storage Classes
+
+Using Amazon S3
+===============
+
+Buckets
+-------
+
+Amazon S3 uses buckets to store your data. Before you can transfer data into Amazon S3, you must first create a bucket. The data that is transfer is stored as objects in the bucket. When creating bucket you don't pre-determine size, apy for what you use.
+
+One factor that you must consider when creating a bucket is the region where the bucket will be created. Wherever region the bucket is created in is where your data resides. You consider the location to optimize latency, minimize cost and comply with regulations.
+
+Data in Amazon S3 do not expands regions automatically, although you can replicate your bucket to other regions if needed. This feature is called Cross-Region replication.
 
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
 
@@ -37,7 +100,7 @@ To estimate the cost of using S3, you need to consider the following:
 
 * **Storage** (Gbs per month). The number and size of objects stored in your S3 buckets as well as the type of storage (storage class). You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
 
-* **Requests**. The number and type of requests. GET requests incur charges ata different rates than other requests, such as PUT and COPY requests.
+* **Requests**. The number and type of requests. GET requests incur charges at different rates than other requests, such as PUT and COPY requests.
 
 * **Data transfer**. The amount of data transferred out of the Amazon S3 region. Transfer into Amazon S3 is free. Transfer out from Amazon S3 to Amazon CloudFront or the same region is free of charge as well.
 
@@ -74,7 +137,7 @@ It works by storing objects in 2 access tiers: one tier that is optimized for fr
 
 The S3 Intelligent-Tiering charges a per object monitoring fee to monitor and place an object in the optimal access tier. As a result, on a relative basis, the object fee is less when the objects are larger and thus the amount you can save is potentially higher. In the following image, you can see an example of the potential cost savings for objects stored in S3 Standard versus S3 Intelligent-Tiering. For these calculations, we assumed 10 PB of data, in US-East-1 AWS Region, and a minimum object size of 128 KB.
 
-.. image:: /intro_d/comparison.png
+.. image:: /simplest_d/comparison.png
 
 Choosing regions for your architectures
 ***************************************

@@ -71,6 +71,92 @@ One factor that you must consider when creating a bucket is the region where the
 
 Data in Amazon S3 do not expands regions automatically, although you can replicate your bucket to other regions if needed. This feature is called Cross-Region replication.
 
+When you create a bucket, the bucket is owned by the AWS account that created it and the bucket ownership is not transferable. There is no limit in the number of object that can be stored in a bucket. There is no difference in performance whether you use many or just a few. You can store all of your objects in a single bucket or you can organize them across several buckets. You cannot create a bucket within another bucket. By default, you can create 100 buckets under each of your AWS accounts. If you need additional buckets, you can increase your bucket limit by submitting a service limit increase.
+
+When naming your bucket, there are some rules you need to follow: the name of your bucket must globally unique and to be DNS-compliant. Be aware of uppercase letters in your bucket name, all names should be lowercase. The rules for DNS-compliant names are:
+
+* Bucket names must be 3 and 63 characters long.
+
+* Bucket names can contain lowercase letters, numbers, and hyphens. Each label must start and end with a lowercase letter or a number.
+
+* Bucket names must not be formatted as an IP address.
+
+* It is recommended that you do not use periods in bucket names.
+
+Objects
+-------
+
+The file and metadata that you upload or create are essentially containerized in an object. Knowning the parts that make up an object is useful when you need to find accessed object in your bucket or when you create policies to secure your data.
+
+If we have an object called ``mybucket/mydocs/mydocument.doc``. The *key* is the name we assigned to an object, in this example: ``mydocs/mydocument.doc``. You will use the object key to retrieve the object. Although you can use any UTF-8 characters in an object name, using the key naming best practices helps ensure maximum compatibility with other applications. The following object key name guideliens will helps you compliance with DNS, website characters, XML parsers and other APIs:
+
+* Alpahnumeric characters: 0-9, a-z, A-Z.
+
+* Special characters: !, -, _, ., *, `, (, ).
+
+If you utilize any other characters in key names, they may require special handling.
+
+The parts that makes up an object are:
+
+* *Version ID* uniquely identify an object. It is the string that AWS generates when you add an object to a bucket. This is utilized when versioning is enabled on your bucket.
+
+* *Value* is the content that you are storing. It can be any sequence of bytes. Objects size can be 0-5 TB.
+
+* *Metadata* is a set of name/value pairs where you can store information regarding the object. Your applications and data analysis may take advantage of your metadata to identify an classify your data. There are 2 kinds of metadata:
+
+	* System-defined metadata. For every object stored in a bucket, Amazon S3 maintains a set of system metadata of the objects for managing them. For example: creation time and date, size, content type, storage class. Some system metadata can be modified, for more details go to `Object Key and Metadata <https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html>`_
+
+	* User-defined metadata. You provide this optional information as a name-value pair when you send the request to create an object or update the value when you need. User-defined metadata requires a special prefix: ``x-amz-meta-`` when uploadin via the REST API, otherwise S3 will not set the key-value pair as user-defined. You can only set the value of the metadata at the time when you upload it. After you uploaded the object, you cannot modify existing metadata. The only way to modify existing object metadata is to make a copy of the object and set the new metadata value. There is one exception to this: the use of object tags. Object tags are another for of metadata that help with the organization of the data that can be changed at any time.
+
+* *Access control information*. You can control access to the objects stored in Amazon S3. It supports resource access control such as ACLs, bucket policies, and User-based access control.
+
+Another important aspect about objects is that objects are not partially updated. When you make a change to an object or upload a new copy into the bucket which does not have versioning enabled, a new object is created an overwrites the existing object. If you have versioning enabled in your bucket an upload a new copy, a new version of the object is created.
+
+Amazon S3 is a distributed system. If it receives multiple write requests for the same object simultaneously, it overwrites all but the last object written.
+
+Amazon S3 does not provided object locking.
+
+Accessing your data
+-------------------
+
+There multiple ways in which you can make your requests to retrieve or add data to your Amazon S3 bucket:
+
+* You can view, upload and download objects through the AWS Console. For large amounts of data this is not the best way to transfer or access the data. The maximum size of a file that you can upload using the console is 78 GB.
+
+* Via AWS CLI.
+
+* Via AWS SDK.
+
+Amazon S3 supports 2 types of URLs to access objects:
+
+* *Path-style URL*. Structure:
+
+.. code-block:: console
+
+	http://<region-specific endpoint>/<bucket name>/<object name>
+
+Example:
+
+.. code-block:: console
+
+	http://s3-eu-west-1.amazonaws.com/mybucket/sensordata.html
+
+* *Virtual-hosted-style*. Structure:
+
+.. code-block:: console
+
+	http://<bucketname>.s3.amazonaws.com/<object key>
+
+Example:
+
+.. code-block:: console
+
+	http://s3-eu-west-1.amazonaws.com/mybucket/sensordata.html
+
+It is recommended to use Virtual-hosted-style URLs. It is useful if you are using your S3 bucket to host a static website. You can also publish to the root directory of your bucket virtual server. This ability can be important since many existing applications search for files in this standard location.
+
+You should be aware that when accessing
+
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_

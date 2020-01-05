@@ -280,11 +280,68 @@ Cross-Origin Resource Sharing
 
 * You want to host a web font in your S3 bucket. A web page in a different domain may try to use this web font. Before the browser loads this web page, it will perform a CORS check to make sure that the domain from which the page is being loaded is allowed to access resources from your S3 bucket.
 
-* Javascript in one domain's web pages (http://www.example.com)
+.. figure:: /simplest_d/font.png
+   :align: center
 
+   CORS use case example
 
+* Javascript in one domain's web pages (http://www.example.com) wants to use resources from your S3 bucket by using the endpoint ``website.s3.amazonaws.com``. The browser will allow such cross-domain access only if CORS is enabled on your bucket.
+
+With CORS support in S3, you can build web applications with S3 and selectively allow cross-origin access to your S3 resources.
+
+To enable CORS, create a CORS configuration XML file with rules that identify the origins that you will allow to access your bucket, the operations (HTTP methods) that you will support for each origin, and other operation-specific information. You can add up to 100 ules to the configuration. You can apply the CORS configuration to the S3 bucket by using the AWS SDK.
+
+Managing access
+---------------
 
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
+
+By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and user-based policies.
+
+* Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies.
+
+.. code-block:: JSON
+
+	{
+	    "Version": "2012-10-17",
+	    "Statement": [
+	        {
+	            "Action": [
+	                "s3:GetObject",
+	                "s3:ListBucket"
+	            ],
+	            "Effect": "Allow",
+	            "Resource": "arn:aws:s3:::MYEXAMPLEBUCKET",
+	            "Principal": {
+	            	"AWS": [
+	            		"arn:aws:iam::123456789012:user/testuser"
+	            	]
+	            }
+	        }
+	    ]
+	}
+
+* Access policies which are attached to users in your account are called user policies. 
+
+.. code-block:: JSON
+
+	{
+	    "Version": "2012-10-17",
+	    "Statement": [
+	        {
+	            "Action": [
+	                "s3:GetObject",
+	                "s3:ListBucket"
+	            ],
+	            "Effect": "Allow",
+	            "Resource": "arn:aws:s3:::<bucket_name>/<key_name>",
+	        }
+	    ]
+	}
+
+You may choose to use resource-based policies, user policies, or some combination of these to manage permissions to your S3 resources. Both bucket policies and user policies are written in JSON format and not easily distinguishable by looking at the policy itself, but by looking at what the policy is attached to, it should help you figure out which type of policy it is. The `AWS Policy Generator <https://awspolicygen.s3.amazonaws.com/policygen.html>`_ is a tool that enables you to create policies that control access to AWS products and resources.
+
+
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_
 

@@ -55,7 +55,7 @@ Amazon Glacier is suitable for archiving data where data access in frequent. Arc
 S3 Standard, S3 Standard-IA and Glacier replicates its data across at least to 3 different AZs within a single region. If you do not need this resiliency, S3 One Zone-IA is stored in 1 AZ. If this AZ is destroyed, you will lose your data.
 
 .. figure:: /simplest_d/classes.png
-  :align: center
+   :align: center
 
    Comparing Object Storage Classes
 
@@ -151,11 +151,38 @@ Example:
 
 .. code-block:: console
 
-	http://s3-eu-west-1.amazonaws.com/mybucket/sensordata.html
+	http://mybucket.s3.amazonaws.com/sensordata.html
 
 It is recommended to use Virtual-hosted-style URLs. It is useful if you are using your S3 bucket to host a static website. You can also publish to the root directory of your bucket virtual server. This ability can be important since many existing applications search for files in this standard location.
 
-You should be aware that when accessing
+You should be aware that when accessing your with HTTP-based URL, if your name your bucket to match your registered domain name such as ``www.example.com`` and set that DNS name as a CNAME alias for ``www.example.com.s3.amazonaws.com`` you can access objects with a customized URL such as:
+
+.. code-block:: console
+
+	http://www.example.com/sensordata.html
+
+When accessing your bucket with a HTTP-based URL, if your bucket has a period in your bucket name it can cause certificate exceptions when accessed. To support HTTP access to your bucket, you should avoid using a period in the bucket name.
+
+How a request is routed
+-----------------------
+
+S3 uses DNS to route requests to facilities that can process them. This system works very effectively. However, temporary routing errors can occur. If a request arrives at the wrong Amazon S3 region, S3 responds with a temporary redirect that tells the requester to resend the request to the correct region. If a request is incorrectly formed, S3 uses permanent redirects to provide direction on how to perform the request correctly and S3 will respond with a 400 error.
+
+In the following diagram are the steps of how the DNS request process occurs:
+
+1. The client makes a DNS request to get an object stored on S3.
+
+2. The client receives one or more IP addresses for facilites that can process the request.
+
+3. The client makes a request to S3 regional endpoint.
+
+4. S3 return a copy of the object.
+
+.. figure:: /simplest_d/request.png
+   :align: center
+
+   How a request is routed
+
 
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
 

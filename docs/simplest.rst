@@ -170,6 +170,11 @@ S3 uses DNS to route requests to facilities that can process them. This system w
 
 In the following diagram are the steps of how the DNS request process occurs:
 
+.. figure:: /simplest_d/request.png
+   :align: center
+
+   How a request is routed
+
 1. The client makes a DNS request to get an object stored on S3.
 
 2. The client receives one or more IP addresses for facilites that can process the request.
@@ -178,10 +183,105 @@ In the following diagram are the steps of how the DNS request process occurs:
 
 4. S3 return a copy of the object.
 
-.. figure:: /simplest_d/request.png
-   :align: center
+Operations on Objects
+---------------------
 
-   How a request is routed
+PUT
+^^^
+
+In order to get an object into a bucket, you will use the PUT operation. You can upload or copy objects of up tp 5 GB in a single PUT operation. For larger objects up to 5 TB, you must use the multipart upload API.
+
+Multipart upload allows you to upload a single object as a set of parts. You can upload each part separately. If one of the parts fails to upload, you can retransmit that particular part without retransmitting the remaining parts. After all the parts of your object are uploaded to the server, you must send a complete multipart upload request that indicates that multipart upload has been completed. S3 then assembles these parts and creates the complete object. You should consider using multipart upload for objects larger than 100 MB. With multipart uploads you can upload parts in parallel to improve throughput, recover quickly from network issues, pause and resume object uploads, and begin an upload before you know the final size of an object.
+
+You can also abort a mulitpart upload. When you abort an upload, S3 deletes all the parts that were already uploaded and frees up storage. S3 retains all parts on the server until you complete or abort the upload. Make sure to complete or abort an upload to avoid unnecessary storage costs related to incomplete uploads. You can also take advantage of lifecyle rules to clean up incomplete multipart uploads automatically. As a best practice, it is recommended to enable the Clean up incomplete multipart uploads in the lifecycle settings even if you are not sure that you are actually making use of multipart uploads. Some applications will default to the use of multipart uploads when uploading files avove a particular, application-dependent, size.
+
+COPY
+^^^^
+
+Once your objects are in the bucket you can use the COPY operation to create copies of an object, rename an object, move it to a different S3 location, or to update its metadata.
+
+GET
+^^^
+
+Using a GET request you can retrieve a complete object from your bucket. You can also retrieve an object in parts using ranged GETs, by specifying the range of bytes needed. This is useful in scenarios where network connectivity is poor or your application can or must process only subsets of object data.
+
+DELETE
+^^^^^^
+
+You can delete a single object or delete multiple objects in single delete request. There are 2 things that can occur when you issue a DELETE request, depending if versioning is enabled or disabled on your bucket.
+
+In a bucket that is not versioning-enabled, you can permanently delete an object by specifying the key that you want to delete. Issuing the delete request permanently removes the object and it is not recoverable, there is no recycle bin type feature in buckets when versioning is disabled.
+
+In a bucket that is versioning-enabled, you can permanently delete an object or a delete marker is created by S3 and the object, depending on how the delete request is made:
+
+* If you specify a key only with the delete request, S3 adds a delete market which becomes the current version of the object. If you try to retrieve an object that has a delete marker, S3 returns a 404 Not Found error. You can recover the object by removing the delete marker from the current version of the object and it will then become available againg for retrieval. 
+
+* You can also permanently delete individual versions of an object, by invoking a delete request with a key and the version ID. To completely remove the object from your bucket, you must delete each individual version.
+
+List Keys
+^^^^^^^^^
+
+With object storage such as S3, there is no hierarchy of objects stored in buckets, it is a flat storage system. In order to organize your data you can use prefixes in key names to group similar items. You can use delimiters (any string such as / or _) in key names to organize your keys and create a logical hierarchy. If you use prefixes and delimiters to organize keys in a bucket, you can retrieve subsets of keys that match certain criteria. You can list keys by prefix. You can also retrieve a set of common key prefixes by specifying a delimeter. This implementation of the GET operation returns some or all (up to 1000) of the objects in a bucket.
+
+In the following example, the bucket named scores contains objects with English and Maths scores of students for the year 2017. 
+
+.. code-block:: console
+
+	aws s3api list-objects --bucket scores --query "Contents[].{Key: Key}"
+
+	2017/score/english/john.txt
+	2017/score/english/sam.txt
+	2017/score/maths/john.txt
+	2017/score/maths/sam.txt
+	2017/score/summary.txt
+	overallsummary.txt
+
+To list keys related to the year 2017 in our scores bucket, specify the prefix of ``2017/``.
+
+.. code-block:: console
+
+	aws s3api list-objects --bucket scores --prefix 2017/ --query "Contents[].{Key: Key}"
+
+	2017/score/english/john.txt
+	2017/score/english/sam.txt
+	2017/score/maths/john.txt
+	2017/score/maths/sam.txt
+	2017/score/summary.txt
+
+To retrieve the key for the 2017 scores summary in the scores bucket, specify a prefix of ``2017/score/`` and delimiter of ``/``. The key ``2017/score/summary.txt`` is returned because it contains the prefix ``2017/score/`` and does not contain the delimiter ``/`` after the prefix.
+
+.. code-block:: console
+
+	aws s3api list-objects --bucket scores --prefix 2017/score/ --delimiter / --query "Contents[].{Key: Key}"
+
+	2017/score/summary.txt
+
+To find subjects for which scores are available in our bucket, list the keys by specifying the prefix of `2017/score/`` and delimiter of ``/`` and then you will get a response with the common prefixes.
+
+.. code-block:: console
+
+	aws s3api list-objects --bucket scores --prefix 2017/score/ --delimiter / 
+
+	COMMONPREFIXES 2017/score/english/
+	COMMONPREFIXES 2017/score/maths/	
+	2017/score/summary.txt
+
+Restricting object access with pre-signed URL
+---------------------------------------------
+
+All objects and buckets are private by default. Pre-signed URLs are useful if you want your user to be able to upload a specific object to your bucket without being required to have AWS security credentials or permissions. When you create a pre-signed URL, you must provide your security credentials, bucket name, an object key, an HTTP method (PUT for uploading objects, GET for retreiving objects), and an expiration date and time. The pre-signed URLs are valid only for the specified duration.
+
+Share the pre-signed URL with users who need to access your S3 bucket to put or retrieve objects.
+
+Cross-Origin Resource Sharing
+-----------------------------
+
+`Cross-Origin Resource Sharing (CORS) <https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html>`_ defines a way for client web application that are loaded in one domain to interact with resources in a different domain. Consider the following examples:
+
+* You want to host a web font in your S3 bucket. A web page in a different domain may try to use this web font. Before the browser loads this web page, it will perform a CORS check to make sure that the domain from which the page is being loaded is allowed to access resources from your S3 bucket.
+
+* Javascript in one domain's web pages (http://www.example.com)
+
 
 
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
@@ -198,7 +298,6 @@ In the following diagram are the steps of how the DNS request process occurs:
 
 `Locking Objects Using Amazon S3 Object Lock <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html>`_
 
-`Cross-Origin Resource Sharing (CORS) <https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html>`_ 
 
 `New – AWS Transfer for SFTP – Fully Managed SFTP Service for Amazon S3 <https://aws.amazon.com/blogs/aws/new-aws-transfer-for-sftp-fully-managed-sftp-service-for-amazon-s3/>`_
 

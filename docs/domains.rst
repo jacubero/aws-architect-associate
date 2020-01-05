@@ -238,7 +238,7 @@ Elastic Block Store
 
 The EBS volume types offer different tradeoff in performance. SSD are more expensive and offer more perform better in IOPS, meaning random reads and writes. HDD are cheaper and perform better for sequential reads and writes.
 
-.. figure:: /domains_d/ENSperformance.png
+.. figure:: /domains_d/EBSperformance.png
     :align: center
 
     EBS volume types performance  

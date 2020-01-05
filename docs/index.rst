@@ -15,6 +15,8 @@ Contents:
 *********
 
 .. toctree::
+   :name: Table of Contents
+   :numbered:
    :maxdepth: 2
 
    Preface <preface>

@@ -42,6 +42,8 @@ Amazon S3 stores the data as objects within buckets. An object consists of data 
 Object Storage Classes
 ----------------------
 
+`Amazon S3 Storage Classes <https://aws.amazon.com/s3/storage-classes/>`_
+
 Consider the type of data, the resiliency requirements and usage pattern in order to decide which object storage class is best suited to your needs.
 
 The first and default option is **Amazon S3 Standard** designed for the active data or hot workloads, it provides milliseconds access and has the highest cost of the 3 classes. If you don't know what your access patterns are or you need frequent retrieval, start with S3 Standard. Some common use cases are Big Data analysis, Content distribution and Web site hosting.
@@ -296,6 +298,9 @@ Managing access
 
 `Access control in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-overview.html>`_
 
+Access policies
+^^^^^^^^^^^^^^^
+
 By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and user-based policies.
 
 * Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies.
@@ -341,6 +346,94 @@ By default, all S3 resources (buckets, objects, and related sub-resources) are p
 
 You may choose to use resource-based policies, user policies, or some combination of these to manage permissions to your S3 resources. Both bucket policies and user policies are written in JSON format and not easily distinguishable by looking at the policy itself, but by looking at what the policy is attached to, it should help you figure out which type of policy it is. The `AWS Policy Generator <https://awspolicygen.s3.amazonaws.com/policygen.html>`_ is a tool that enables you to create policies that control access to AWS products and resources.
 
+Access Control Lists
+^^^^^^^^^^^^^^^^^^^^
+
+ACLs are coarse grained and you can only apply rules at the bucket or object level. They are much more limited in the fact that you can only use ACLs to grant access to other AWS accounts and not IAM users in the same account where the bucket resides.
+
+.. figure:: /simplest_d/ACL.png
+   :align: center
+
+   ACL expanded view
+
+Data at rest encryption
+-----------------------
+
+For data at rest protection in S3 you have 2 options: Server-Side Encryption and Client-Side Encryption. 
+
+When using server-side encryption, your request S3 to encrypt your object saving it on disks in its data centers and decrypt it when you download the object. With server side encryption there are a few ways in which you can choose to implement the encryption. You have 3 server-side encryption options for your S3 objects:
+
+* SSE-S3 with keys that are managed by S3.
+
+* SSE-KMS with keys that are managed by AWS KMS.
+
+* SSE-C with keys that you manage.
+
+Additionally using Default Encryption, you can encrypt all your objects with SSE-S3 or SSE-KMS.
+
+Client side encryption happens before your daa is uploaded. You an encrypt your data before uploading into your S3 bucket.
+
+Data Transfer
+-------------
+
+You may need a variety of tools to move or transfer data in and out the cloud, depending on your data size and time to transfer. These are the options:
+
+* **AWS Direct Connect** is a dedicated network connection from your on-premises data center to AWS for higher throughput an secure data transfer without traversing Internet.
+
+* **AWS Storage Gateway**, either with or without AWS Direct Connect. This is a virtual appliance that lets you connect to your bucket as an NFS mount point.
+
+* **Third-party connectors (ISV connectors)**. Amazon partners can help you move your data to the cloud. The simplest way to do that may be via a connector embedded in your backup software. With this approach, your backup catalog stays consistent, so you maintain visibility and control across jobs that span disk, tape and cloud.
+
+* You can stream data into S3 via **Amazon Kinesis Firehose**, a fully managed streaming service. Because it captures and automatically loads streaming data into S3 and Amazon Redshift, you get near real-time analytics with the business intelligence tools you're already using.
+
+* **Amazon Kinesis Video Streams** makes it easy to securely stream video from connected devices to AWS for analytics, machine learning, and other processing. Kinesis Video Streams automatically provisions and elastically scales all the infrastructure needed to ingest streaming video data from millions of devices. Kinesis Video Streams uses S3 as the underlying data store, which means your data is stored durably and reliably. You can set and control retention periods for data stored in your streams.
+
+* **Amazon Kinesis Data Streams** enables you to build custom applications that process or analyze streaming data for specialized needs. Kinesis Data Streams can continously capture and store TBs of data per hour from hundreds of thousands of sources such as website clickstreams, financial transactions, social media feeds, IT logs, and location-tracking events. You can also emit data from Kinesis Data Streams to other AWS services such as S3, Amazon Redshift, EMR, AWS Lambda.
+
+* **Amazon S3 Transfer Acceleration** is used for fast, easy, and secure transfers of files over long distances. It takes advantage of CloudFront's globally distributed edge locations, routing data to S3 over an optimized network path. Transfer Acceleration works well for customers who either transfer data to a central location from all over the world, or who transfer significant amounts of data across continents regularly. It can also help yu better utilize your available bandwidth when uploading to S3.
+
+* For large data migrations where transferring over a network would be too time consuming or costly, use **AWS Snowball, Snowball Edge or Snowmobile**. These are for petabyte-scale and exabyte-scale data transport that use secure appliances to transfer large amounts of data into and out of AWS. 
+
+Bear in mind that you can also use these methods for exporting your data. `Cloud Data Migration <https://aws.amazon.com/cloud-data-migration/>`_.
+
+.. code-block:: console
+	:caption: Create a bucket and upload data to Amazon S3 using the CLI
+
+	c:\mydata> aws s3 mb s3://myappbucket6353 --region us-east-1
+	make_bucket: myappbucket6353
+
+	c:\mydata> aws s3 ls
+	2013-07-11 17:08:50 mybucket
+	2013-07-24 14:55:44 myappbucket6353
+
+	c:\mydata> aws s3 cp c:\mydata s3://myappbucket6353 --recursive 
+	upload: myDir/test1.txt to s3://myappbucket635/myDir/test1.txt
+	upload: myDir/test2.txt to s3://myappbucket635/myDir/test1.txt
+	upload: test3.txt to s3://myappbucket635/test3.txt
+
+	c:\mydata> aws s3 ls s3://myappbucket6353
+	                           PRE myDir/
+	2013-07-25 17:06:27         88 test3.txt
+
+Amazon S3 Select
+----------------
+
+S3 Select is a new S3 capability designed to pull out only the data you need from an object using a SQL expression, dramatically improving the performance and reducing the cost of applications that need to access data in S3. Most applications have to retrieve the entire objetct and then filter ut only the required data for further analysis. S3 Select enables applications to offload the heavy lifting of filtering and accessing data inside objects to the S3 service. By reducing the volume of daa that has to be loaded and processed by your applications, S3 Select can improve the performance of most applications that frequently access data from S3 by up to 400%.
+
+Amazon S3 Select works like a GET request as it is an API call. But where Amazon S3 Select is different is we are asking for data within an object that matches a set of criteria, rather than just asking to get an entire object. You can use Amazon S3 Select through the available Presto connector, with AWS Lambda, or from any other application using the S3 Select SDK for Java or Python. In the query, you use an standard SQL expression.
+
+Amazon S3 Select works on objects stored in delimited test (CSV, TSV) or JSON format. It also works with objects that are compressed with GZIP, and server-side encrypted objects. You can specify the format of the results as either delimited test (CSV, TSV) or JSON, and you can determine how the records in the result will be delimited. To retreive the information you need, you pass SQL expressions to S3 in the request. Amazon S3 Select supports a subset of SQL as listed in bale below. 
+
+.. figure:: /simplest_d/select.png
+   :align: center
+
+   SQL queries with Amazon S3 Select
+
+`Selecting Content from Objects <https://docs.aws.amazon.com/AmazonS3/latest/dev/selecting-content-from-objects.html>`_
+
+There are a few ways you can use Amazon S3 Select. You can perform SQL queries using AWS SDKs, the SELECT Object Content REST API, the AWS CLI, or the Amazon S3 console. When using the Amazon S3 console, it limits the amount of data returned to 40 MB.
+
+
 
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_
@@ -375,8 +468,6 @@ To estimate the cost of using S3, you need to consider the following:
 
 Amazon S3 Glacier
 *****************
-
-`Amazon S3 Storage Classes <https://aws.amazon.com/s3/storage-classes/>`_
 
 `Coming Soon – S3 Glacier Deep Archive for Long-Term Data Retention <https://aws.amazon.com/about-aws/whats-new/2018/11/s3-glacier-deep-archive/>`_
 

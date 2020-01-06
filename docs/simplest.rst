@@ -301,7 +301,7 @@ Managing access
 Access policies
 ^^^^^^^^^^^^^^^
 
-By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and user-based policies.
+By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and user-based policies. 
 
 * Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies.
 
@@ -433,7 +433,56 @@ Amazon S3 Select works on objects stored in delimited test (CSV, TSV) or JSON fo
 
 There are a few ways you can use Amazon S3 Select. You can perform SQL queries using AWS SDKs, the SELECT Object Content REST API, the AWS CLI, or the Amazon S3 console. When using the Amazon S3 console, it limits the amount of data returned to 40 MB.
 
+Securing your data in Amazon S3
+===============================
 
+In the decision process for determining access to your bucket and objects, S3 starts with a default deny to everyone. When you create a bucket, the owner is granted access, and as the owner you can then allow access to other users, groups, roles and resources. When determining the authorization of access to your resource in S3, it is always a union of user policies, resource policies and ACLs. In accordance with the principle of least-privilege decisions default to DENY, and an explicit DENY always trumps an ALLOW. 
+
+.. figure:: /simplest_d/access.png
+   :align: center
+
+   Access decision process
+
+For example, assume there is an IAM policy that grants a user access to a bucket. Additionally, there is a bucket policy defined with an explicit DENY for the user to the same bucket. When the user tries to access the bucket, the access is denied.
+
+Keep in mind that if no policy or ACLs specifically grants ALLOW access to a resource the entity will be denied access by default. Only if no policy or ACLs specifies a DENY an one or more policies or ACLs specify an ALLOW will be the request be allowed.
+
+Policies
+--------
+
+A policy is an entity in AWS that, when attached to an identity or resource, defines the permissions. AWS evaluates these policies when a principal, such as a user, makes a request. Permissions in the policies determine whether the request is allowed or denied. Policies are stored in AWS as JSON documents attaches to principals as identity-based policies, or to resources as resource-based policies. 
+
+The language elements that are used in a policy are the following:
+
+* **Resources**. The Resource element specifies the buckets or objects that the statement covers. Buckets and objects are the S3 resources for which you can allow or deny permissions. In a policy, you use the Amazon Resource Name (ARN) to identify the resource. For example, your resource could be just the bucket or it could be a bucket and objects, a bucket and subset of objects or even a specific object.
+
+* **Actions**. For each resource, S3 support a set of operations. You identify resource operations you want to allow or deny by using action keywords. You specify a value using a namespace that identifies the service, for example s3, followed by the name of the action. The name must match an action that is supported by the service. The prefix and the action name are case insensitive. You can use wilcards * to allow all operations for a service.
+
+* **Effect**. This is what the effect will be when the user requests the specific action, this can be either allow or deny. If you do not explicitly grant allow access to a resource, access in implcitly denied. You can also explicitly deny access to a resource, which you might do in order to make sure that a user cannot access it, even if a different policy grants access. For example, you may want to explicitly deny the ability to delete objects in a bucket.
+
+* **Principal**. Use the pricipal element to specify the user (IAM user, federated user, or assumed-role user), AWS account, AWS service, or other principal entity that is allowed or denied access to a resource. You specify a principal only in a resource policy, for example a bucket policy. It is the user, account, role, service, or other entity who is the recipient of this permission. When using an IAM policy, the user, group or role to which the policy is attached is the implicit principal.
+
+* **Conditions**. You can optionally add a Condition element (or Condition block) to specify conditions for when a policy is in effect. In the Condition element, you build expressions in which you can use condition operators (equal, less than, etc.) to match the condition in the policy against values in the request. Condition values can include date, time, the IP address of the requester, the ARN of the request source, the user name, user ID, and the user agent of the requester. Some services let you specify additional values in conditions; for examples S3 lets you write condition suing items such as object tags (s3:RequestObjectTag) to grant or deny the appropriate permission to a set of objects. 
+
+`Bucket Policy Examples <https://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html>`_ 
+
+`Example IAM Identity-Based Policies <https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_examples.html>`_ 
+
+There are some additional elements that can be used in policies: NotPrincipal, NotAction, and NotResource. 
+
+You can use the **NotPrincipal** element to specify and exception to a list of principals. For example, you can deny access to all principals except the one named in the NotPrincipal element. 
+
+Although you can use the NotPrincipal with an Allow, when you use NotPrincipal in the same policy statement as "Effect":"Allow", the permissions specified in the policy statment will be granted to all principals excepts the one(s) specified, including anonymous (unauthenticated) users. It is recommended not yo use NotPrincipal in the same policy statement as "Effect":"Allow".
+
+When creating a policy, combining "Deny" and "NotPrincipal" is the only time that the order in which AWS evaluated principals makes a difference. AWS internally validates the principals from the "top down", meaning that AWS checks the account first and then the user. If an assumed-role user (someone who is using a role rather than an IAM user) is being evaluated, AWS looks ata the account first, then the role, and finally the assumed-role user. The assumed-role user is identified by the role session name that is specified when the user assumes the role. Normally, this order does not have any impact on the results of the policy evaluation. However, when you use both "Deny" and "NotPrincipal", the evaluation order requires you to explicitly include the ARNs for the entities associated with the specified principal. For example, to specify a user, you must explicitly include the ARN for the user's account. To specify an assumed-role user, you must also include both the ARN for the role and the ARN for the account containing the role.
+
+The **NotAction** is an advanced policy element that explicitly matches everything except the expecified list of actions and it can be used with both the Allow and Deny effect. Using NotAction can result in a shorter polciy by listing only a few actions that should not match, rather then including a long list of actions that will match. When using NotAction, you should keep in mind that actions specified in this element are the only actions that are limited. This means that all of the actions or services that are not listed, are allowed if you use the Allow effect, or are denied if you use the Deny effect.
+
+You can use the NotAction element in a statement with "Effect":"Allow" to provide access to all of the actions in an AWS service, except for the actions specified in NotAction. You can also use it with the Resource element to provide access to one or more resources with the exception of the action specified in the NotAction element. 
+
+Be careful using the NotAction and "Effect":"Allow" in the same statement or in a different statement within a policy. NotAction matches all services and actions that are not explicitly listed, and could result in granting users more permissions that you intended.
+
+You can also use the NotAction element in a statement with "Effect":"Deny" to deny access to all of the listed resources except for the actions specified in the NotAction element. This combination does not allow the listed items, but instead explicitly denies the actions not listed. You must still allos actions that you want to allow.
 
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_

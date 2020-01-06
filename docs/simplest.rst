@@ -301,9 +301,27 @@ Managing access
 Access policies
 ^^^^^^^^^^^^^^^
 
-By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and user-based policies. 
+By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and IAM policies. 
 
-* Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies.
+* IAM policies are assigned to IAM users, groups, or roles. They provide fine grained control over access and can be administered as part of a role based access configuration. These type of policies are applied at the IAM role, user, and group level to control access to S3 and its resources. It answers the question "What can this user do in AWS?", not only in S3.
+
+.. code-block:: JSON
+
+	{
+	    "Version": "2012-10-17",
+	    "Statement": [
+	        {
+	            "Action": [
+	                "s3:GetObject",
+	                "s3:ListBucket"
+	            ],
+	            "Effect": "Allow",
+	            "Resource": "arn:aws:s3:::<bucket_name>/<key_name>",
+	        }
+	    ]
+	}
+
+* Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies. Bucket policies are very similar to IAM policies, but he major difference is you need to define a Principal in the policy and it is embedded in a bucket in S3 versus created in AWS IAM and assigned to a user, group or role.
 
 .. code-block:: JSON
 
@@ -322,24 +340,6 @@ By default, all S3 resources (buckets, objects, and related sub-resources) are p
 	            		"arn:aws:iam::123456789012:user/testuser"
 	            	]
 	            }
-	        }
-	    ]
-	}
-
-* Access policies which are attached to users in your account are called user policies. 
-
-.. code-block:: JSON
-
-	{
-	    "Version": "2012-10-17",
-	    "Statement": [
-	        {
-	            "Action": [
-	                "s3:GetObject",
-	                "s3:ListBucket"
-	            ],
-	            "Effect": "Allow",
-	            "Resource": "arn:aws:s3:::<bucket_name>/<key_name>",
 	        }
 	    ]
 	}
@@ -476,13 +476,42 @@ Although you can use the NotPrincipal with an Allow, when you use NotPrincipal i
 
 When creating a policy, combining "Deny" and "NotPrincipal" is the only time that the order in which AWS evaluated principals makes a difference. AWS internally validates the principals from the "top down", meaning that AWS checks the account first and then the user. If an assumed-role user (someone who is using a role rather than an IAM user) is being evaluated, AWS looks ata the account first, then the role, and finally the assumed-role user. The assumed-role user is identified by the role session name that is specified when the user assumes the role. Normally, this order does not have any impact on the results of the policy evaluation. However, when you use both "Deny" and "NotPrincipal", the evaluation order requires you to explicitly include the ARNs for the entities associated with the specified principal. For example, to specify a user, you must explicitly include the ARN for the user's account. To specify an assumed-role user, you must also include both the ARN for the role and the ARN for the account containing the role.
 
-The **NotAction** is an advanced policy element that explicitly matches everything except the expecified list of actions and it can be used with both the Allow and Deny effect. Using NotAction can result in a shorter polciy by listing only a few actions that should not match, rather then including a long list of actions that will match. When using NotAction, you should keep in mind that actions specified in this element are the only actions that are limited. This means that all of the actions or services that are not listed, are allowed if you use the Allow effect, or are denied if you use the Deny effect.
+**NotAction** is an advanced policy element that explicitly matches everything except the expecified list of actions and it can be used with both the Allow and Deny effect. Using NotAction can result in a shorter polciy by listing only a few actions that should not match, rather then including a long list of actions that will match. When using NotAction, you should keep in mind that actions specified in this element are the only actions that are limited. This means that all of the actions or services that are not listed, are allowed if you use the Allow effect, or are denied if you use the Deny effect.
 
 You can use the NotAction element in a statement with "Effect":"Allow" to provide access to all of the actions in an AWS service, except for the actions specified in NotAction. You can also use it with the Resource element to provide access to one or more resources with the exception of the action specified in the NotAction element. 
 
 Be careful using the NotAction and "Effect":"Allow" in the same statement or in a different statement within a policy. NotAction matches all services and actions that are not explicitly listed, and could result in granting users more permissions that you intended.
 
 You can also use the NotAction element in a statement with "Effect":"Deny" to deny access to all of the listed resources except for the actions specified in the NotAction element. This combination does not allow the listed items, but instead explicitly denies the actions not listed. You must still allos actions that you want to allow.
+
+**NotResource** is an advanced policy element that explicitly matches everything except the specified list of resources. Using NotResource can result in a shorter policy by listing only a few resources that should not match, rather thatn including a long list of resources that will match. When using NotResource, you should keepn in mind that resources specified in this element are the only resources that are limited. This, in turn, means that all of the resources, including the resources in all other services, that are not listed, are allowed if you use the Allow efffect, or are denied if you use the Deny effect. Statements must include either the Resource or a NotResource element that specifies a resource using an ARN.
+
+Be careful using the NotResource and "Effect":"Allow" in the same statement or in a different statement within a policy. NotResource allows all services and resources that are not explicitly listed, and could result in granting users more permissions that you intended. Using the NotResource element and "Effect":"Deny" in the same statement denies services ans resources that are not explicitly listed.
+
+Normally, to explicitly deny access to a resource you would write a policy that uses "Effect":"Deny" and that includes a Resource element that lists each folder individually.
+
+Cross account policies
+^^^^^^^^^^^^^^^^^^^^^
+
+One option you can use is to ensure that account that created the object adds the grant that gives the ``bucket-owner-full-control`` permission on the object so the bucjet owner can set permissions as needed. You can do this by adding a condition in the policy. Additionally, you can deny the ability to upload objects unless that account grants ``bucket-owner-full-control`` permissions.
+
+In the example below, when Jane uploads an object to the images bucket, she includes the grant ``bucket-owner-full-control`` permission. If she did not include this grant, the upload would fail. Noew when Joe tries to GET the new object uploaded by Jane with the additional permisssions, he is successful.
+
+.. figure:: /simplest_d/crossaccount.png
+   :align: center
+
+   Access decision process
+
+`Identity and Access Management in Amazon S3 <https://docs.aws.amazon.com/AmazonS3/latest/dev/s3-access-control.html>`_
+
+Multiple policies
+^^^^^^^^^^^^^^^^^
+
+You can attach more than 1 policy to an entity. If you have multiple permissions to grant to an entity, you can put them in separate policies, or your can put them all in one policy. Generally, each statement in a policy includes information about a single permission. If your policy includes multiple statements, a logical OR is applied across the statements at evaluation time. Similarly, if multiple policies are applicable to a request, a logical OR is applied across the policies at evaluation time.
+
+Users often have multiple policies that apply to them (but aren't necessarily attached to them). For example, an IAM user could have policies attached to them, and other policies attached to the groups of which they are a member. In addition, they might be accessing an S3 bucket that has its own bucket policy (resource-based policy). All applicable policies are evaluated and the result is always that access is either granted or denied.
+
+
 
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_

@@ -303,7 +303,7 @@ Access policies
 
 By default, all S3 resources (buckets, objects, and related sub-resources) are private, only the resource owner, and AWS account that created it, can access the resource. The resource owner can optionally grant access permissions to others by writing and access policy. By default, any permission that is not granted Allow access is an implicit Deny. There are 2 types of access policies: resource-based and IAM policies. 
 
-* IAM policies are assigned to IAM users, groups, or roles. They provide fine grained control over access and can be administered as part of a role based access configuration. These type of policies are applied at the IAM role, user, and group level to control access to S3 and its resources. It answers the question "What can this user do in AWS?", not only in S3.
+* IAM policies are assigned to IAM users, groups, or roles. They provide fine grained control over access and can be administered as part of a role based access configuration. These type of policies are applied at the IAM role, user, and group level to control access to S3 and its resources. It answer the question *What can this user do in AWS?*, not only in S3.
 
 .. code-block:: JSON
 
@@ -321,7 +321,7 @@ By default, all S3 resources (buckets, objects, and related sub-resources) are p
 	    ]
 	}
 
-* Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies. Bucket policies are very similar to IAM policies, but he major difference is you need to define a Principal in the policy and it is embedded in a bucket in S3 versus created in AWS IAM and assigned to a user, group or role.
+* Access policies which are attached to your resources (buckets and objects) are referred to as resource-based policies. For example: bucket policies and ACLs are resource-based policies. Bucket policies are very similar to IAM policies, but he major difference is you need to define a Principal in the policy and it is embedded in a bucket in S3 versus created in AWS IAM and assigned to a user, group or role. Amazon S3 Bucket policies answer the question *Who can access this S3 bycket?* You can also grant cross account access using bucket policies without having to create IAM roles. You may find that your IAM policies bump up against the size limit (up to 2 kb for users, 5 kb for groups, and 10 kb for roles), and you can then use bucket policies instead. Amazon supports bucket policies of up to 20 kb. Another reason you may want to use bucket policies it that you may just want to keep access policies within Amazon S3 rather than using IAM policies cerated in the IAM console.
 
 .. code-block:: JSON
 
@@ -346,32 +346,27 @@ By default, all S3 resources (buckets, objects, and related sub-resources) are p
 
 You may choose to use resource-based policies, user policies, or some combination of these to manage permissions to your S3 resources. Both bucket policies and user policies are written in JSON format and not easily distinguishable by looking at the policy itself, but by looking at what the policy is attached to, it should help you figure out which type of policy it is. The `AWS Policy Generator <https://awspolicygen.s3.amazonaws.com/policygen.html>`_ is a tool that enables you to create policies that control access to AWS products and resources.
 
+Additionally, when trying to understand if the application of your policies will work as expected, AWS has a `Policy Simulator <https://policysim.aws.amazon.com/>`_ you can use to determine if your policies will work as expected.
+
 Access Control Lists
 ^^^^^^^^^^^^^^^^^^^^
 
-ACLs are coarse grained and you can only apply rules at the bucket or object level. They are much more limited in the fact that you can only use ACLs to grant access to other AWS accounts and not IAM users in the same account where the bucket resides.
+As a general rule, it is recommended to use S3 bucket policies or IAM policies for access control. Amazon S3 ACLs is a legacy access control mechanism that predates IAM. A S3 ACL is a sub-resource that's attached to every S3 bucket and object. If defines which AWS accounts or groups are granted access and the type of access. When you create a bucket or an object, Amazon S3 creates a default ACLs that grants the resource owner full control over the resource. ACLs are much more limited in the fact that you can only use ACLs to grant access to other AWS accounts and not IAM users in the same account where the bucket resides.
 
 .. figure:: /simplest_d/ACL.png
    :align: center
 
    ACL expanded view
 
-Data at rest encryption
------------------------
+Be very careful to ensure you do not enable public access unless it is required. If you do have a publicly accessible bucket, the S3 console displays a prominent indicator with a warning showing that Everyone means everyone on the Internet.
 
-For data at rest protection in S3 you have 2 options: Server-Side Encryption and Client-Side Encryption. 
+S3 has a set of predefined groups that can be used to grant access using ACLs. It is recommended that you do not use the Authenticated Users and All Users in ACLs when granting access permissions to your bucket unless you are sure you want to open your bucket to being publicly accessible.
 
-When using server-side encryption, your request S3 to encrypt your object saving it on disks in its data centers and decrypt it when you download the object. With server side encryption there are a few ways in which you can choose to implement the encryption. You have 3 server-side encryption options for your S3 objects:
+* **Authenticated Users** group represents all AWS accounts in the world, not just yours. Utilizing this group to grant access could allow any AWS authenticated user in the world access to your data.
 
-* SSE-S3 with keys that are managed by S3.
+* **All users** group is similar to the Authenticated Users group in that it is not limited to just your AWS account. The requess can be signed (authneticated) or unsigned (anonymous). Unsigned requests omit the Authentication header in the request. It is highly recommended that you never grant the All Users group ``WRITE``, ``WRITE_ACP``, or ``FULL_CONTROL`` permissions. For example, ``WRITE`` permissions allow anyone to store objects in your bucket, for which you are billed. It also allows others to delete objects that you might want to keep.
 
-* SSE-KMS with keys that are managed by AWS KMS.
-
-* SSE-C with keys that you manage.
-
-Additionally using Default Encryption, you can encrypt all your objects with SSE-S3 or SSE-KMS.
-
-Client side encryption happens before your daa is uploaded. You an encrypt your data before uploading into your S3 bucket.
+* **Log delivery** group. When granted ``WRITE`` permission to your bucket, it enables the S3 log delivery group to write server access logs.
 
 Data Transfer
 -------------
@@ -393,6 +388,10 @@ You may need a variety of tools to move or transfer data in and out the cloud, d
 * **Amazon S3 Transfer Acceleration** is used for fast, easy, and secure transfers of files over long distances. It takes advantage of CloudFront's globally distributed edge locations, routing data to S3 over an optimized network path. Transfer Acceleration works well for customers who either transfer data to a central location from all over the world, or who transfer significant amounts of data across continents regularly. It can also help yu better utilize your available bandwidth when uploading to S3.
 
 * For large data migrations where transferring over a network would be too time consuming or costly, use **AWS Snowball, Snowball Edge or Snowmobile**. These are for petabyte-scale and exabyte-scale data transport that use secure appliances to transfer large amounts of data into and out of AWS. 
+
+`AWS Snowball Edge Overview <https://www.youtube.com/watch?v=bxSD1Nha2k8&feature=emb_logo>`_
+
+`Using AWS Snowball Edge and AWS DMS for Database Migration <https://www.youtube.com/watch?v=6Hw--HE8ILg&feature=emb_logo>`_
 
 Bear in mind that you can also use these methods for exporting your data. `Cloud Data Migration <https://aws.amazon.com/cloud-data-migration/>`_.
 
@@ -511,7 +510,58 @@ You can attach more than 1 policy to an entity. If you have multiple permissions
 
 Users often have multiple policies that apply to them (but aren't necessarily attached to them). For example, an IAM user could have policies attached to them, and other policies attached to the groups of which they are a member. In addition, they might be accessing an S3 bucket that has its own bucket policy (resource-based policy). All applicable policies are evaluated and the result is always that access is either granted or denied.
 
+Best practices
+--------------
 
+Some best practices to use in securing your S3 data to follow in your setup are the following:
+
+* Use bucket policies to restrict deletes.
+
+* For additional security, enable MFA delete, which requires additional authentication to:
+
+	* Change the versioning state of your bucket.
+
+	* Permanently delete an object version. 
+
+Note that to enable MFA delete with Amazon S3 you will need root credentials. When using MFA you will require an approved AWS authentication device.
+
+Data at rest encryption
+-----------------------
+
+For data at rest protection in S3 you have 2 options: Server-Side Encryption and Client-Side Encryption. 
+
+Server-Side Encryption
+^^^^^^^^^^^^^^^^^^^^^^
+
+When using server-side encryption, your request S3 to encrypt your object saving it on disks in its data centers and decrypt it when you download the object. With server side encryption there are a few ways in which you can choose to implement the encryption. You have 3 server-side encryption options for your S3 objects:
+
+* Amazon S3-Managed Keys (**SSE-S3**). This method uses keys that are managed by S3. Each object is encrypted with a unique key. Additionally a master key, which is rotated regularly, encrypts each unique key. This method uses AES-256 algorithm to encrypt your data. This option can also be used when setting the default encryption option.
+
+* AWS KMS-Managed keys (**SSE-KMS**) is similar to SSE-S3, but with some additional benefits along with some additional charges for using service. In this model, the AWS Key Management Service (AWS KMS) is utilized to fully manage the keys and encryption and decryption. AWS KMS encrypts your objects similar to the way SSE-S3 does. There is a unique per-object data key, which is encrypted with customer master keys (CMK) in KMS. This scheme is called envelop encryption. You use AWS KMS via the Encryption Keys section in the IAM console or via AWS KMS APIs to centrally create encryption keys, define the policies that control how keys can be used, and audit key usage to prove they are being used correctly. The first time you add an SSE-KMS-encrypted object to a bucket in a region, a default CMK is created for you automatically. This key is used for SSE-KMS-encryption unless you select a CMK that you created separately using AWS KMS. Creating your own CMK gives you more flexibility, including the ability to create, rotate, disable, and define access controls, and to audit the encryption keys used to protect your data. Using SSE-KMS also adds a layer of security in that any user that attempts to access an object that is SSE-KMS encrypted will also require access to the KMS key to decrypt the object. You can configure access to the KMS encryption keys using AWS IAM. This option can also be used when setting the default encryption option.
+
+You should be aware that when using AWS KMS there some limits on requests per second. AWS KMS throttles API requests at different limits depending on the API operation. Throttling means that AWS KMS rejects an otherwise valid request because the request exceeeds the limit for the number of requests per second, `AWS KMS Limits <https://docs.aws.amazon.com/kms/latest/developerguide/limits.html>`_. When a request is throttled, AWS KMS returns a ThrottlingException error.
+
+* Customer provided keys (**SSE-C**). In this model, you manage the encryption keys and S3 manages the encryption, as it writes to disks, and decryption, when you access your objects. Therefore, you don't need to maintain any code to perform data encryption and decryption. The only thing you do is manage the encryption keys you provide. When you upload and object, S3 uses the encryption key you provide to apply AES-256 encryption to your data and then removes the encryption key from memory. When you retrieve an object, you must provide the same encryption key as part of your request, S3 first werifies that the encryption key you provided matches, and then decrypts the object before returning the object data to you.
+
+It is important to note that S3 does not store the encryption key you provide. Instead, AWS store a randomly salted HMAC value of the encryption key in order to validate future requests. The salted HMAC value cannot be used to derive the value of the encryption key or to decrypt the contents of the encrypted object. That means that if you lose the encryption key, you lose the object. 
+
+Client-Side Encryption
+^^^^^^^^^^^^^^^^^^^^^^
+
+Client side encryption happens before your data is uploaded into your S3 bucket. In this case, you manage the encryption process, the encyption keys, and related tools. There are 2 options for client-side encryption:
+
+* AWS KMS managed customer master key (**CSE-KMS**). You don'y have to worry about providing any encryption keys to S3 encryption client. Instead, you provide only an AWS KMS customer master key ID, and the client does the rest.
+
+* Customer managed master encryption keys (**CSE-C**). You use your own client-side master key. When using your client-side master keys, your unencrypted data is never sent to AWS. It is important that you safely manage your encryption keys. If you lose them, you don't be able to decrypt your data.
+
+.. Note:: Default Encryption.
+
+	**Default Encryption** is an option that allows you to enable automatically encrypt of all new objects written to your Amazon S3 bucket using either SSE-SE or SSE-KMS. This property does not affect existing objects in your bucket.
+
+AWS Config
+----------
+
+AWS Coonfig is a service that enables you to assess,
 
 
 `Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_

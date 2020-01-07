@@ -190,7 +190,14 @@ The causes for security breaches include:
 
 * Poor or limited authentication.
 
-AWS has a shared security model, which means that AWS shares security responsibilities with customers. In this model, AWS is responsible for the security of everything from the hypervisor level to the operating system.
+AWS has a `Shared Responsibility Model <https://aws.amazon.com/es/compliance/shared-responsibility-model/>`_, which means that AWS shares security responsibilities with customers. In this model, AWS is responsible for the security of everything from the hypervisor level to the operating system.
+
+.. figure:: /appendix_d/shared.png
+	:align: center
+
+	AWS shared security model
+
+AWS managed services move the line of responsibility higher.
 
 AWS helps to reduce security risks in numerous ways:
 
@@ -199,13 +206,6 @@ AWS helps to reduce security risks in numerous ways:
 * Provides the AWS Identity Access Management (IAM), service to centrally manage users and credentials, which helps customers reduce or eliminate the existence of "rogue servers".
 
 * Leverages our roster of 30 plus compliance certifications and accreditations to help our customers build secure, compliance-ready environment.
-
-.. figure:: /appendix_d/shared.png
-	:align: center
-
-	AWS shared security model
-
-AWS managed services move the line of responsibility higher.
 
 Software: causes for failure
 ----------------------------

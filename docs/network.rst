@@ -41,6 +41,10 @@ Connecting networks
 Load balancing on AWS
 *********************
 
+Elastic Load Balancing (ELB)
+============================
+
+`AWS re:Invent 2018: [REPEAT 1] Elastic Load Balancing: Deep Dive and Best Practices (NET404-R1) <https://www.youtube.com/watch?v=VIgAT7vjol8&feature=youtu.be>`_
 
 High availability
 *****************

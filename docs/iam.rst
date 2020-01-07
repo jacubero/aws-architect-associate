@@ -24,6 +24,10 @@ Identities in AWS exist in these forms:
 
 * **Web Identity Federation**: Users with web identities from Amazon.com or other Open ID provier have role assigned using Security Token System (STS).
 
+`Secure Access to AWS Services Using AWS Identity and Access Management (IAM) Roles <https://www.youtube.com/watch?v=wY7FOFaPNuE&feature=emb_logo>`_ 
+
+`How to Enable Multi-Factor Authentication (MFA) for Your AWS User Account <https://www.youtube.com/watch?v=A3AObXBJ4Lw&feature=emb_logo>`_
+
 Organizing my users
 *******************
 

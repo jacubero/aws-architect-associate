@@ -613,6 +613,62 @@ You can verify if you are meeting your security needs with various AWS tools:
 
 	* Using *AWS TrustedAdvisor* technology, the S3 console now includes a bucket permissions check. A new column, called Access, shows any buckets that have public access. If you click on the bucket where it shows public access ou can then see which policy is granting public access as well by going to the Permissions tab. 
 
+For Amazon S3 there are 3 checks you might want to look at: Amazon S3 bucket permissions, bucket logging, and bucket versioning.
+
+Amazon Macie
+------------
+
+Amazon Macie is a security service that uses machine learning to automatically discover, classigy, and protect sensitive data in AWS. It will search your Amazon S3 bucket for personally identifiable information (PII), personal health information (PHI), access keys, credit card information and other sensitive data and alert you if you have insecure data. It uses S3 CloudTrail Events to see all of the requests that are sent to your Amazon S3 bucket and uses ML to determine patterns and will alert if there is anything suspicious or if the patterns change.
+
+Amazon Macie can answer the following questions:
+
+* What data do I have in the cloud?
+
+* Where is it located?
+
+* How is data being shared and stored?
+
+* How can I classify data in near-real time?
+
+* What personally identifiable information or personal health information is possibly exposed?
+
+* How do I build workflow remediation for my security and compliance needs?
+
+Amazon S3 Storage Management
+============================
+
+Bucket options
+--------------
+
+
+
+Lifecycle policies
+------------------
+
+Object tags
+-----------
+
+Amazon S3 inventory
+-------------------
+
+Cross-region replication
+------------------------
+
+Amazon CloudWatch request metrics
+---------------------------------
+
+Event notifications
+-------------------
+
+Storage class analysis
+----------------------
+
+AWS CloudTrail data events
+--------------------------
+
+
+
+
 `Using Versioning <https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html>`_
 
 `Locking Objects Using Amazon S3 Object Lock <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html>`_

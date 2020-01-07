@@ -368,6 +368,12 @@ S3 has a set of predefined groups that can be used to grant access using ACLs. I
 
 * **Log delivery** group. When granted ``WRITE`` permission to your bucket, it enables the S3 log delivery group to write server access logs.
 
+`Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_
+
+`Using Amazon S3 Block Public Access <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html>`_
+
+`How Do I Block Public Access to S3 Buckets? <https://docs.aws.amazon.com/AmazonS3/latest/user-guide/block-public-access.html>`_
+
 Data Transfer
 -------------
 
@@ -434,6 +440,8 @@ There are a few ways you can use Amazon S3 Select. You can perform SQL queries u
 
 Securing your data in Amazon S3
 ===============================
+
+`AWS re:Invent 2018: [Repeat] Deep Dive on Amazon S3 Security and Management (STG303-R1) <https://www.youtube.com/watch?v=x25FSsXrBqU&feature=youtu.be&t=989+%28>`_
 
 In the decision process for determining access to your bucket and objects, S3 starts with a default deny to everyone. When you create a bucket, the owner is granted access, and as the owner you can then allow access to other users, groups, roles and resources. When determining the authorization of access to your resource in S3, it is always a union of user policies, resource policies and ACLs. In accordance with the principle of least-privilege decisions default to DENY, and an explicit DENY always trumps an ALLOW. 
 
@@ -561,16 +569,49 @@ Client side encryption happens before your data is uploaded into your S3 bucket.
 AWS Config
 ----------
 
-AWS Coonfig is a service that enables you to assess,
+Once you have completed AWS Config setup, you can use the AWS Config built in rules for Amazon S3.
 
+* ``s3-bucket-logging-enabled``. Checks whether logging is enabled for your S3 buckets.
 
-`Amazon S3 Block Public Access – Another Layer of Protection for Your Accounts and Buckets <https://aws.amazon.com/blogs/aws/amazon-s3-block-public-access-another-layer-of-protection-for-your-accounts-and-buckets/>`_
+* ``s3-bucket-public-read-prohibited``. Checks that your S3 buckets do not allow public read access. If a S3 bucket policy or bucket ACL allows public read access, the bucket is noncompliant. 
 
-`AWS re:Invent 2018: [Repeat] Deep Dive on Amazon S3 Security and Management (STG303-R1) <https://www.youtube.com/watch?v=x25FSsXrBqU&feature=youtu.be&t=989+%28>`_
+* ``s3-bucket-public-write-prohibited``. Checks that your S3 buckets do not allow public write access. If a S3 bucket policy or bucket ACL allows public write access, the bucket is noncompliant. 
 
-`Using Amazon S3 Block Public Access <https://docs.aws.amazon.com/AmazonS3/latest/dev/access-control-block-public-access.html>`_
+* ``s3-bucket-ssl-requests-only``. Checks that your S3 buckets have policies that require requests to use SSL. 
 
-`How Do I Block Public Access to S3 Buckets? <https://docs.aws.amazon.com/AmazonS3/latest/user-guide/block-public-access.html>`_
+* ``s3-bucket-versioning-enabled``. Checks whether versioning is enabled for your S3 buckets. Optionally, the rule checks if MFA delete is enabled in your S3 buckets. 
+
+AWS CloudTrail
+--------------
+
+AWS CloudTrail is the API logging service in AWS that provide fine grained access tracking for your Amazon S3 buckets and objects. For each request, CloudTrail captures and logs who made the API call, when it was made, what resources were affected. By default, CloudTrail logs capture bucket level operations. You can additionally capture object level actions when S3 Data Events are enabled
+
+.. figure:: /simplest_d/bucketlevel.png
+
+.. figure:: /simplest_d/objectlevel.png
+
+CloudTrail also integrates with CloudWatch and you can utilize CloudWatch alarms to notify you of certain events or to take actions based on your configuration. When utilizing CloudTrail, the Amazon S3 data events are delivered to CloudWatch Events within seconds so you can configure your account to take immediate action on a specified activity to improve your security posture. Additionally, CloudTrail logs are delivered to CloudWatch logs and S3 within 2-5 minutes.
+
+CloudTrail logging can be enabled at the bucket or prefix level. You can filter your logging based on reads or writes or include both.
+
+Additionally, AWS CloudTrail allows you to automatically add your new and existing S3 buckets to S3 Data Events. S3 Data Events allow you to record API actions on S3 objects and receive detailed information such as the AWS account, IAM user role, and IP address of the caller, time of the API call, and other details. Previously, you had to manually add individual S3 buckets in your account to track S3 object-level operations, and repeat the process for each new S3 bucket. Now, you can automatically log Amazon S3 Data Events for all of your new and existing buckets with a few clicks. 
+
+When enabling CloudTrail for S3 bucket you will need to make sure your destination bucket has the proper permissions to allow CloudTrail to deliver the log files to your bucket. CloudTrail will automatically attach the required permissions if you create a bucket as part of creating or updating a trail in the CloudTrail console or create a bucket with the AWS CLI create-subscription and update-subscription commands.  
+
+If you specified an existing S3 bucket as the storage location for log file delivery, you must attach a policy to the bucket that allows CloudTrail to write the bucket. `Amazon S3 Bucket Policy for CloudTrail <https://docs.aws.amazon.com/awscloudtrail/latest/userguide/create-s3-bucket-policy-for-cloudtrail.html>`_. As a best practice, it is recommended to use a dedicated bucket for CloudTrail logs.
+
+Security inspection
+-------------------
+
+You can verify if you are meeting your security needs with various AWS tools:
+
+* To verify if objects in your bucket are encrypted, you can use *Amazon S3 Inventory*.
+
+* To know if any of your buckets are publicly accessible, there are 2 ways: 
+
+	* *AWS TrustedAdvisor*, which can check your S3 bucket permissions and list the buckets the have open access. Set a *CloudWatch* alarm to alert you should any buckets fail the check.
+
+	* Using *AWS TrustedAdvisor* technology, the S3 console now includes a bucket permissions check. A new column, called Access, shows any buckets that have public access. If you click on the bucket where it shows public access ou can then see which policy is granting public access as well by going to the Permissions tab. 
 
 `Using Versioning <https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html>`_
 

@@ -72,11 +72,23 @@ It is agent-based, API-driven, and delivered as a service. This makes it easy fo
 AWS Config
 **********
 
-AWS Config is a service that enables customers to assess, audit, an evaluate the configurations of AWS resources. AWS Config continuously monitors and records AWS resource configurations and allows customers to automate the evaluation of recorded configurations against desired configurations.
+AWS Config is a service that enables customers to assess, audit, an evaluate the configurations of AWS resources. AWS Config continuously monitors and records AWS resource configurations and allows customers to automate the evaluation of recorded configurations against desired configurations and notify you if something is not compliant. 
 
-With Config, customers can review changes in configurations and relationships between AWS resources, dive into detailed resource configuration histories, and determine the overall compliance against the configurations specified in their internal or best-practices guidelines. Config enable customers to simplify compliance auditing, security analysis, change management, and operational troubleshooting.
+With Config, customers can review changes in configurations and relationships between AWS resources, dive into detailed resource configuration histories, and determine the overall compliance against the configurations specified in their internal or best-practices guidelines. This enables customers to simplify compliance auditing, security analysis, change management, and operational troubleshooting.
 
 In addition, AWS Config can compare configuration changes against best-practices configuration rules, which are available from AWS. Any deviations can generate notification or automated remediation events that trigger actions using services like AWS Lambda. Config can also be used to track resource inventory of the environment.
+
+When you set up AWS Config, you complete the following:
+
+* Specify the resource types that you want AWS Config to record.
+
+* Set up an S3 bucket to receive a configuration snapshot on request and configuration history.
+
+* Set up an SNS topic to send configuration stream notifications.
+
+* Grant AWS Config the permissions it needs to access S3 bucket and the SNS topic.
+
+* Specify the rules that you want AWS Config to use to evaluate compliance information for the recorded resource types.
 
 Cloud Migration
 ***************

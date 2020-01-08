@@ -586,9 +586,9 @@ AWS CloudTrail
 
 AWS CloudTrail is the API logging service in AWS that provide fine grained access tracking for your Amazon S3 buckets and objects. For each request, CloudTrail captures and logs who made the API call, when it was made, what resources were affected. By default, CloudTrail logs capture bucket level operations. You can additionally capture object level actions when S3 Data Events are enabled
 
-.. figure:: /simplest_d/bucketlevel.png
+.. image:: /simplest_d/bucketlevel.png
 
-.. figure:: /simplest_d/objectlevel.png
+.. image:: /simplest_d/objectlevel.png
 
 CloudTrail also integrates with CloudWatch and you can utilize CloudWatch alarms to notify you of certain events or to take actions based on your configuration. When utilizing CloudTrail, the Amazon S3 data events are delivered to CloudWatch Events within seconds so you can configure your account to take immediate action on a specified activity to improve your security posture. Additionally, CloudTrail logs are delivered to CloudWatch logs and S3 within 2-5 minutes.
 
@@ -637,19 +637,178 @@ Amazon Macie can answer the following questions:
 Amazon S3 Storage Management
 ============================
 
-Bucket options
---------------
+Among the different options that are available to configure on buckets and objects are the following: Versioning, Server access logging, object-level logging, Static website hosting, default encryption, object tags, transfer acceleration, events notification, requester pays. 
 
+Versioning
+----------
 
+`Using Versioning <https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html>`_
 
-Lifecycle policies
-------------------
+Be enabling versioning, you can create a data protection mechanism for your Amazon S3 bucket. With versioning enabled on your bucket, you are able to protect your objects from accidental deletion or overwrites. Versioning is applied at the bucket level and all the objects in your bucket will have this feature applied. There is no performance penalty for versioning and it is considered a best practice. Once enabled you have also essentially created a recycle bin for your bucket.
+
+Rather than a hard delete on an object, when versioning is enabled it creates a delete marker. You can then remove this delete marker and you have your origional object back. Objects cannot be partially updated, so tulizing versioning still does not allow you to just update a portion of the object.
+
+To efficiently control your storage capacity and keep it to only the proper amount required, you can utilize lifecycle policies to move versions of objects to the appropriate storage class as well as expire old versions if needed, providing you with an automatic cleanup process for your data.
+
+Server access logging
+---------------------
+
+In order to track requests for access to your bucket, you can enable access logging. Each access log record provides details about a single access request, such as the requester, bucket name, request time, request action, response status, and error code, if any. Access log information can be useful in security and access audits. It can also help you learn about your customer base and understand your Amazon S3 bill. There is no extra charge for enabling server across logging on an Amazon S3 bucket; however, any log files the system delivers to you will accrue the usual charges for storage.
+
+By default, logging is disabled. To enable access logging, you must do the following:
+
+1. Turn on the log delivery by adding logging configuration on the bucket for which you want S3 to deliver access logs.
+
+2. Grant the Amazon S3 Log Delivery Group write permission on the bucket where you want the access logs saved.
+
+If you use the Amazon S3 console to enable logginf on a bucket, the console will both enable logging on the source bucket and update the ACL on the target bucket to grant write permission to the Log Delivery Group 
+
+Object-level logging
+--------------------
+
+To help ensure security if your data, you need the ability to audit and monitor access and operations, you can do that by enabling object-level logging with AWS CloudTrail integration. AWS CloudTrail logs capture bucket level and object level requests. For each request, the log includes who made the API call, when it was made, what resources were affected. You can use a CloudTrail log to understand your end users' behavior and tune access policies for tighter access control. 
+
+AWS CloudTrail Data Events allows you to log object level activity such as puts, gets, and deletes, the logs includes account, IAM user, IP address, and more. This can be configured with CloudWatch Events to take action when changes are made. For example, if any object ACL is changed, you can automatically ahe the change reverted as needed.
+
+Static website hosting
+----------------------
+
+Enabling this option allows you to host static websites using just your S3 bucket, no additional servers are required. On a static website, individual webpages include static content. They might also contain client-side scripts. By contrast, a dynamic website relies on server-side processing, including server-side scripts such as PHP, JSP, or ASP.NET. Amazon S3 does not support server-side scripting. To host a static website, you configure and Amazon S3 bucket for website hosting, and then upload your website content to the bucket. The website is then available at the AWS Region-specific website endpoint of the bucket: ``<bucket-name>.s3-website-<AWS-region>.amazonaws.com``.
+
+There are several ways you can manae your bucket's website configuration. You can use the AWS Management Console to manage configuration without writing any code or you can programmatically create, update, an delete the website configuration by using the AWS SDKs.
 
 Object tags
 -----------
 
+You can organizate your data by serveral dimensions:
+
+* *Location*, by bucket and prefixes.
+
+* *Nature of the data*. You can take advantage of object tagging to apply more granular control.
+
+Amazon S3 tags are key-value pairs that can be created with the console, CLI or via APIs. The key name value you create is case sensitive and you can have up to 10 tags assigned to an object. With object tags, you can control access, lower coste with lifecycle policies, analyze your data with storage class analytics, and monitor performance with CloudWatch metrics.
+
+Here is an example of setting access permission using tags. If you want to give a user permission to GET objects in your bucket that have been tagged as Project X, you can use a condition as seen in the example to allow them access to any object or bucket tagged with Project X.
+
+This simplifies some of your security by being able to easily allow and deny users access to specific objects and buckets using policies and tags. 
+
+.. code-block:: JSON
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::Project-bucket/*"
+            "Condition": {
+                "StringEquals": {
+                    "s3:RequestObjectTag/Project": "X"
+        }
+    ]
+}	
+
+Transfer acceleration
+---------------------
+
+Transfer acceleration helps increase your transfer speeds. Enabling Transfer acceleration provides you with a new URL to use with your application.
+
+Event notifications
+-------------------
+
+Events will enable you to receive notifications based on events that occur in your bucket. The S3 notification feature enables you to receive notifications when certain events happen in your bucket, for example: you can receive a notification when someone uploads new data to your bucket. 
+
+To enable notifications, you must first add a notification configuration identifying the events you want Amazon S3 to publich, and the destinations where you want S3 to send the event notifications. S3 events integrate with SNS, SQS and AWS Lambda to send notifications.
+
+Requester pays
+--------------
+
+A bucket owner can configure a bucket to be a Requester Pays bucket. With Requester Pays buckets, the requester instead of the bucket owner pays the cost of the request and the data download from the bucket. The bucket owner always pays the cost of storing data. You might, for example, use Requester Pays buckets when making availale large data sets, such as zip code directories, reference data, geospatial information, or web crawling data.
+
+Object Lifecycle policies
+-------------------------
+
+To manage your objects so they are stored cost effectively throughout their lifecycle, you can configure lifecycle rules. A lifecycle configuration or lifecycle policy, is a set of rules that define the actions that S3 applies to a group of objects. A lifecycle rule can apply to all or a subset of objects in a bucket based on the filter element that you specify in the lifecycle rule. A lifecycle configuration can have up to 1000 rules. These rules also have a status element where it can be either enabled or disabled. If a rule is disabled, S3 doesn't perform any of the actions defined in the rule. Each rule defines an action. The actions can be either a transition of objects to another storage class or an expiration of objects.
+
+Automate transitions
+^^^^^^^^^^^^^^^^^^^^
+
+You can automate the tiering process from one storage class to another. There are some considerations you should be aware of:
+
+* There is no automatic transition of objects less than 128 KB in size to S3 Standard - IA or S3 One Zone - IA.
+
+* Data must remain on its current storage class for at least 30 days before it can be automatically moved to S3 Standard - IA or S3 One Zone - IA.
+
+* Data can be moved from any storage class directly to Amazon Glacier.
+
+Action types
+^^^^^^^^^^^^
+
+You can direct S3 to perform specific actions in an object's lifetime by specifying one or more of the following predefined actions in a lifecycle rule. The effect of these actions depends on the versioning state of your bucket.
+
+1. **Transition**. You can tell S3 to transition objects to another S3 storage class. A transition can move objects to the S3 Standard - IA or S3 One Zone - IA or Amazon Glacier storage classes based on the object age you specify.
+
+2. **Expiration**. Expiration deletes objects after the time you specify. When an object reaches the end of its lifetime, S3 queues it for removal and removes it asynchronously. 
+
+In addition, S3 provides the following actions that you can use to manage noncurrent object versions in a version-enabled bucket:
+
+* On a versioning-enabled bucket, if the current object version is not a delete marker, S3 adds a delete marker with a unique version ID. Theis makes the current version noncurrent, and delete makerr the current version.
+
+* On a versioning-suspended bucket, the expiration action causes S3 to create a delete marker with null as the version ID. This delete marker replaces any object version with a null version ID in the version hierarchy, which effectively deletes the object.
+
+You can also combine actions for a completely automated lifecycle.
+
+Parameters
+^^^^^^^^^^
+
+You can set lifecycle configuration rules based on the bucket, the object or object tags.
+
+Versions
+^^^^^^^^
+
+You can configure your lifecycle configuration rules to take an action on a particular version of an object, either the current version or any previous versions. 
+
+Transitioning objects
+^^^^^^^^^^^^^^^^^^^^^
+
+From S3 Standard you can transition to any of other storage classes (Standard-IA, One Zone-IA and Glacier) using lifecycle configuration rules, but there are some constraints:
+
+* S3 does not support transition of objects less than 128 KB.
+
+* Objects must be stored for at least 30 days before you can transition to S3 Standard-IA or to One Zone-IA. S3 doesn't transition objects within the first 30 days because newer objects are often accessed more frequently or deleted sooner than is suitable for S3 Standard-IA or to S3 One Zone-IA storage.
+
+* If you are transitioning noncurrent objects in version-enabled buckets, for example a particular version of an object, you can transition only objects that are least 30 days noncurrent to S3 Standard-IA or One Zone-IA storage.
+
+From S3 Standard-IA you can transition to S3 One Zone-IA or to Amazon Glacier using lifecycle configuration rules, but there is a constraint:
+
+* Objects must be stored at least 30 days in the S3 Standard-IA storage class before you can transition them to the S3 One Zone-IA class.
+
+You can only transition from S3 One Zone-IA to Glacier using lifecycle configuration rules.
+
+You cannot transition from Glacier to any storage class. When objects are transitioned to Glacier using lifecycle configurations, the objects are visible and available only through S3, not through Glacier. You can access them using the S3 console or the S3 API but not through Glacier console or Glacier API in this scenario.  
+
+.. figure:: /simplest_d/transition.png
+   :align: center
+
+   Lifecycle configuration: Transitioning objects
+
 Amazon S3 inventory
 -------------------
+
+In order to help you manage your data you may need to get a list of objects and their associated metadata. S3 has a LIST API that can provide this function, but a new and less costly alternative is the Amazon S3 Inventory service. You can use it to audit and report on the replication and encryption status of your objects for business, compliance, and regulatory needs. Amazon S3 provides a CSV or ORC file output of your objects and their corresponding metadata on a daily or weekly basis for an S3 bucket or a shared prefix.
+
+You can configure what object metadata to include in the inventory, whether to list all object versions or only current versions, where to store the inventory list flat-file output, and whether to generate the inventory on a daily or weekly basis. Amazon S3 inventory costs half of what it costs to run the LIST API, and itis readily available when you need it since it's scheduled. The inventory report objects can also be encrypted using either SSE-S3 or SSE-KMS.
+
+You have object level encryption status field in the report to give you this visibility or audits and reporting for compliance. You can query the S3 inventory report directly from Amazon Athena, Redshift Spectrum, or any Hive tools.
+
+The inventory report can live in the source bucket or can be directed to another destination bucket. 
+
+The source bucket contains the objects that are listed in the inventory and contains the configuration for the inventory. 
+
+The destination bucket contains the flat file list and the ``manifest.json`` file that lists all the flat file inventory lists that are stored in the destination bucket. Additionally, the destination bucket for the inventory report must have a bucket policy configured to grant S3 permission to verify ownership of the bucket and permission to write files to the bucket, it m,
+  
 
 Cross-region replication
 ------------------------
@@ -657,8 +816,6 @@ Cross-region replication
 Amazon CloudWatch request metrics
 ---------------------------------
 
-Event notifications
--------------------
 
 Storage class analysis
 ----------------------
@@ -669,12 +826,11 @@ AWS CloudTrail data events
 
 
 
-`Using Versioning <https://docs.aws.amazon.com/AmazonS3/latest/dev/Versioning.html>`_
 
 `Locking Objects Using Amazon S3 Object Lock <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html>`_
 
 
-`New – AWS Transfer for SFTP – Fully Managed SFTP Service for Amazon S3 <https://aws.amazon.com/blogs/aws/new-aws-transfer-for-sftp-fully-managed-sftp-service-for-amazon-s3/>`_
+`New - AWS Transfer for SFTP - Fully Managed SFTP Service for Amazon S3 <https://aws.amazon.com/blogs/aws/new-aws-transfer-for-sftp-fully-managed-sftp-service-for-amazon-s3/>`_
 
 `Multipart Upload Overview <https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html>`_
 

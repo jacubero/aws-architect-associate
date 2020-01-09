@@ -694,21 +694,21 @@ This simplifies some of your security by being able to easily allow and deny use
 
 .. code-block:: JSON
 
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:GetObject"
-            ],
-            "Resource": "arn:aws:s3:::Project-bucket/*"
-            "Condition": {
-                "StringEquals": {
-                    "s3:RequestObjectTag/Project": "X"
-        }
-    ]
-}	
+	{
+	    "Version": "2012-10-17",
+	    "Statement": [
+	        {
+	            "Effect": "Allow",
+	            "Action": [
+	                "s3:GetObject"
+	            ],
+	            "Resource": "arn:aws:s3:::Project-bucket/*"
+	            "Condition": {
+	                "StringEquals": {
+	                    "s3:RequestObjectTag/Project": "X"
+	        }
+	    ]
+	}	
 
 Transfer acceleration
 ---------------------
@@ -807,23 +807,66 @@ The inventory report can live in the source bucket or can be directed to another
 
 The source bucket contains the objects that are listed in the inventory and contains the configuration for the inventory. 
 
-The destination bucket contains the flat file list and the ``manifest.json`` file that lists all the flat file inventory lists that are stored in the destination bucket. Additionally, the destination bucket for the inventory report must have a bucket policy configured to grant S3 permission to verify ownership of the bucket and permission to write files to the bucket, it m,
-  
+The destination bucket contains the flat file list and the ``manifest.json`` file that lists all the flat file inventory lists that are stored in the destination bucket. Additionally, the destination bucket for the inventory report must have a bucket policy configured to grant S3 permission to verify ownership of the bucket and permission to write files to the bucket, it must be in the same region as the source bucket it is listing, and it can be the same as the source bucket. Also the destination bucket can be in another AWS account. When creating any filters for your inventory report, it should be noted that tags cannot be used in the filter.
+
+You can set up an Amazon S3 event notification to receive notice when the manifest checksum file is created, which indicates that an inventory list has been added to the destination bucket.
+
+.. figure:: /simplest_d/fields.png
+   :align: center
+
+   Fields that are contained in the Inventory report
 
 Cross-region replication
 ------------------------
 
-Amazon CloudWatch request metrics
----------------------------------
+Cross-region replication (CRR) is a bucket-level feature that enables automatic, asynchronous replication of objects across buckets in different AWS regions. To activate this feature, you add a replication configuration to your source bucket. To configure, you provide information such as the destination bucket where you want objects replicated to. The destination bucket can be in either the same account or another AWS account. Once enabled you will only replicate new PUTs or new object creation. Any existing objects in your bucket will need to be manually copied to the destination. 
 
+You can request S3 to replicate all or a subset of objects with specific key name prefixes. Deletes and lifecycle actions are not replicated to the destination. If you delete an object in the source, it will not be deleted in the destination bucket. Additionally, any lifecycle policies you have on the source bucket will only be applied to that bucket. If you wish to enable lifecycle policies on the destination bucket, you will have to do so manually. 
+
+To ensure security, S3 encrypts all data in transit accross AWS regions using SSL/TLS. In addition to the secure data transmission, CRR can support the replication of server side encrypted data. If you have SSE objects, either SSE-S3 or SSE-KMS, then CRR will replicate these keys to the remote region. 
+
+You might configure CRR on the bucket for various reasons. Some common use cases are:
+
+* *Compliance requirements*. Although, by default, S3 stores your data across multiple geographically distant AZs, compliance requirements might dictate that you store data at even further distances. CRR allows you to replicate data between distant AWS regions to satisfy these compliance requirements.
+
+* *Minimize latency*. Your customers might be in 2 geographic locations. To minimize latency in accessing objects, you can maintain object copies in AWS regions that are geographically closer to your users.
+
+* *Operational reasons*. You might have compute clusters in 2 different regions that analyze the same set of objects. You might choose to maintain object copies in those regions.
+
+* *Data protection*. You might have a need to ensure your data is protected, ensuring you have multiple copies of your most important data for quick recovery or business continuity reasons.
+
+There are some requirements you should be aware of for using and configuring CRR:
+
+* The source and destination buckets must have versioning enabled.
+
+* The source and destination buckets must be in different AWS Regions.
+
+* S3 must have the proper permissions to replicate objects from the source bucket to the destination bucket on your behalf.
+
+You can now overwrite ownership when replication to another AWS account. CRR supports SSE-KMS encrypted objects for replication. You can choose a different storage class for your destination bucket. You can replicate to any other AWS region in the world for compliance or business needs or for costs considerations. You can have bi-directional replication. This means you can replicate source to destination and destination back to source. You will have independent lifecycle policies on the source and destination buckets.
+
+If you want to prevent malicious delete of the secondary copy, you can take advantage of the ownership overwrite feature. You can also choose to replicate to another AWS account with CRR. When choosing another AWS account as the destination, you can enable ownership overwrite and S3 will replicate your data and change the ownership of the object to the owner of the destination bucket.
+
+Trigger-based events
+--------------------
+
+You can automate function based on events. You can use notifications when objects are created via PUT, POST, COPY, DELETE or a multipart upload. You can also filter the event notification on prefixes and suffixes of your objects, so you can ensure you only get the event notification you want and not just on the whole bucket. For example, you can choose to receive notifications on object names that start with *"images/"*. You can then trigger a workflow from an event notification sent to SNS, SQS or Lambda. The benefits of this feature are:
+
+* *Simplicity*. Notifications make it simple to focus on applications by attaching new functionality driven by events. There is no need to manage fleets of EC2 instances to process a queue.
+
+* *Speed*. For example, if you need processing to occur quickly when new objects arrive in your bucket. On average, notifications are sent in less that 1 second.
+
+* *Integration*. Use services to connect storage in S3 with workflows. You can architect an application in a new way, where blocks of code or workflows are invoked by changes in your data. 
+
+Monitoring and analyzing Amazon S3
+==================================
 
 Storage class analysis
 ----------------------
 
-AWS CloudTrail data events
---------------------------
+You might ask yourself, which part of my data is cold or hot? What is the right lifecycle policy for my data? Let's look at ways that you can save storage costs by leveraging storage class analysis. Storage class analysis allows you get some intelligence around object access patterns that will give you some guidance aroung the optimal transition time to a different storage class. 
 
-
+Storage class analysis delivers a daily-updataed report of object access patterns in your S3 console that helps you visualize how much of your data is hot, warm, or cold. Then, after about a month of observation, Storage class analysis presents you with recommendations for lifecycle policy settings designed to reduce TCO.
 
 
 

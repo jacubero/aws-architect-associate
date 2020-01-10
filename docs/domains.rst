@@ -48,7 +48,7 @@ This an attachable storage that connects to one EC2 instance at a time.
 
 Think of EBS volumes as durable, attachable storage for your EC2 instances. These are the 4 types of EBS volumes.
 
-.. figure:: /domains_d/EBStypes.png
+.. figure:: /domains_d/EBS-types.png
    :align: center
 
     Types of EBS volumes
@@ -76,7 +76,7 @@ This is similar to EBS because you mount it as a disk in your EC2 instances.
 
 * It is compatible with Linux-based AMIs for Amazon EC2. It is not currently supported for Windows.
 
-.. figure:: /domains_d/efs.png
+.. figure:: /domains_d/efsarch.png
     :align: center
 
     Amazon EFS architecture
@@ -151,14 +151,14 @@ High Availability
 
 Decoupling ensures that if one tier or component fails, the others are not impacted because they are decoupled.
 
-.. figure:: /domains_d/tightly.png
+.. figure:: /domains_d/tightlyarch.png
     :align: center
 
     Example of tightly-coupled system
 
 This a tightly-coupled system: The web server takes requests and then sends an email over the email service. When the email service goes down, the web server is forced to become unoperational. The email service going down can be a perfectly normal event: may you bring down the email server to upgrade it to a new version of the email service, or to upgrade the HW or may it can be a failure of the email service. Regardless, the impact of failures is large in tightly coupled systems.
 
-.. figure:: /domains_d/decoupled.png
+.. figure:: /domains_d/decoupledarch.png
     :align: center
 
     Example of decoupled system
@@ -170,14 +170,14 @@ Scalability
 
 Another benefit from decoupling is scalability. In this system, a web server is calling a logging service. If the web server sends a high volume of requests to the logging service, it can overwhelm it and caused it to become overloaded.
 
-.. figure:: /domains_d/overload.png
+.. figure:: /domains_d/overloadarch.png
     :align: center
 
     Example of a overloaded system
 
 We can solve this problem by decoupling the web server from the logging server using SQS queue. The logging service can scale out when the volume of requests goes up. When the volume of requests goes down, the logging service can scale down. The scale down is important to keep our costs down when we are not using the extra servers.
 
-.. figure:: /domains_d/notoverloaded.png
+.. figure:: /domains_d/notoverloadedarch.png
     :align: center
 
     Example of a decoupled system preventing from overloading
@@ -189,7 +189,7 @@ Identity of components
 
 Suppose we have an external client making requests to web server inside a VPC. The request and the response goes over the public Internet. If the web server goes offline, the client will have an error. If we have some automation implemented so that we replace the web server with another server which is based on the same image. The problem is that the new server has a new IP address assigned by the VPC. This means that the client is not able to it up to the IP is propagated to the client through DNS.
 
-.. figure:: /domains_d/newIP.png
+.. figure:: /domains_d/newIParch.png
     :align: center
 
     System with the new web server with a different IP
@@ -211,7 +211,7 @@ Fault tolerance
 
 The more loose your system is coupled, the more easily it scales and the more fault-tolerant it can be.
 
-.. figure:: /domains_d/fault.png
+.. figure:: /domains_d/faultarch.png
     :align: center
 
     Tightly-coupled systems versus Loosely-coupled systems  

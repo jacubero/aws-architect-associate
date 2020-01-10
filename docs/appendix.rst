@@ -19,6 +19,7 @@ AWS Shield Standard
 AWS Shield is a managed DDoS protection service that safeguards applications running on AWS. There are 2 tiers of AWS Shield: Standard and Advanced.
 
 .. figure:: /appendix_d/standard.png
+   :align: center
 
 	AWS Shield Standard
 
@@ -30,6 +31,7 @@ AWS Shield Advanced
 ===================
 
 .. figure:: /appendix_d/advanced.png
+   :align: center
 
 	AWS Shield Advanced
 
@@ -102,7 +104,8 @@ When building solutions to coordinate tasks in a distributed environment, the de
 
 By using Amazon SWF you can easily manage your application tasks and how to coordinate them.
 
-.. figure:: /appendix_d/ecommerce.png
+.. figure:: /appendix_d/ecommerceSWF.png
+   :align: center
 
 	An e-commerce application workflow
 
@@ -127,7 +130,8 @@ Overview
 
 Domain is a collection of related workflows. A workflow starter is any application that can initiate workflow executions. Workflows are collections of actions and actions are tasks or workflow steps. Decider implements the workflow coordination logic. Activity workers implements actions. Workflow history is the detailed, complete and consistent record of every event that occur since the workflow execution started. Additionally, in the course of its operations SWF interacts with a number of different types of programmatic actors. Actors can be workflow starters, deciders or activity workers. These actors communicate with SWF through its API. You can develop these actors in any programming language.
 
-.. figure:: /appendix_d/swfcomponents.png
+.. figure:: /appendix_d/swf-components.png
+   :align: center
 
 	SWF key components
 
@@ -173,7 +177,8 @@ The process that SWF follows is the following:
 
 7. This process repeats itself for each activity in your workflow.
 
-.. figure:: /appendix_d/swfprocess.png
+.. figure:: /appendix_d/swf-process.png
+   :align: center
 
 	SWF process
 
@@ -184,17 +189,17 @@ Use Cases
 
 In general, customers have used SWF to build applications for video encoding, social commerce, infrastructure provisioning, mapreduce pipelines, business process management, and several other use cases.
 
-
-
 Cloud Migration
 ***************
 
 .. figure:: /appendix_d/options.png
+   :align: center
 
 	Migration options
 
 .. figure:: /appendix_d/tools.png
-
+   :align: center
+   
 	Migration tools
 
 Cloud Economics

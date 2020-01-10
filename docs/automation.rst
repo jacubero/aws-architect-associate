@@ -40,7 +40,7 @@ AWS Elastic Beanstalk is a PaaS with the following features:
 
 The steps to deploy and update your servers are based only on the creation of your application. After that, you upload the versions to BeanStalk, then launch all the needed environments in the cloud according to the needs of your application. After that, you can manage your environment, and if you need to write a new version, you just update the version.
 
-.. figure:: /automation_d/updates.png
+.. figure:: /automation_d/deployupdates.png
 
 	Deployment and updates
 

@@ -111,7 +111,7 @@ There are 3 components required for auto-scaling:
 
 One common configuration to have dynamic Auto Scaling is to create CloudWatch alarms based on performance information from your EC2 instances or a load balancer. When a performance threshold is breached, a CloudWatch alarm triggers an Auto Scaling event which either scales out or scales in EC2 instances in the environment. 
 
-.. figure:: /elasticity_d/alarm.png
+.. figure:: /elasticity_d/CloudWatchalarm.png
 
 	Sample CloudWatch alarm
 

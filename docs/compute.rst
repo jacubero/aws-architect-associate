@@ -135,7 +135,7 @@ Using Reserved Instances can have a significant impact on savings compared to on
 
 While using RIs, in certain cases, customers can take advantage of regional benefits. Regional benefits can simplify reserved instance optimization by allowing a reserved instance to be applied for the whole AWS Region, rather than just a specific Availability Zone, which can simplify capacity planning.
 
-.. figure:: /intro_d/regional.png
+.. figure:: /compute_d/regional.png
 	:align: center
 
 	Regional RIs simplify optimization
@@ -158,7 +158,7 @@ Convertible RIs give customers the ability to modify reservations across familie
 
 The only time customers cannot convert RIs is between the time the request to exchange is submitted and the time the request to exchange is fulfilled. Typically requests take only a matter of hours to fulfill but could take a up to 2 days.
 
-.. figure:: /intro_d/convertible.png
+.. figure:: /compute_d/convertible.png
 	:align: center
 
 	Standard and convertible RI payments
@@ -246,7 +246,7 @@ The appropriate user names for connecting to a newly created Amazon EC2 instance
 
 * For a Fedora AMI, the user name is ``ec2-user``.
 
-* For a SUSE AMI, the user name is ``ec2-user`` or ``root`.
+* For a SUSE AMI, the user name is ``ec2-user`` or ``root``.
 
 
 `Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
@@ -254,14 +254,6 @@ The appropriate user names for connecting to a newly created Amazon EC2 instance
 
 `Resource Locations <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resources.html>`_
 
-
-Security groups operate at the instance level.
-
-Security groups disallow all traffic unless there are specific allow rules for the traffic in the security group. They only provide for allow rules.
-
-Security groups evaluate all the rules on the group before deciding how to handle traffic.
-
-Changes to a security group take place immediately.
 
 For all new AWS accounts, 20 instances are allowed per region. However, you can increase this limit by requesting it via AWS support.
 

@@ -56,7 +56,7 @@ Amazon Glacier is suitable for archiving data where data access in frequent. Arc
 
 S3 Standard, S3 Standard-IA and Glacier replicates its data across at least to 3 different AZs within a single region. If you do not need this resiliency, S3 One Zone-IA is stored in 1 AZ. If this AZ is destroyed, you will lose your data.
 
-.. figure:: /simplest_d/classes.png
+.. figure:: /simplest_d/storageclasses.png
    :align: center
 
    Comparing Object Storage Classes
@@ -586,9 +586,9 @@ AWS CloudTrail
 
 AWS CloudTrail is the API logging service in AWS that provide fine grained access tracking for your Amazon S3 buckets and objects. For each request, CloudTrail captures and logs who made the API call, when it was made, what resources were affected. By default, CloudTrail logs capture bucket level operations. You can additionally capture object level actions when S3 Data Events are enabled
 
-.. image:: /simplest_d/bucketlevel.png
+.. image:: /simplest_d/bucket-level.png
 
-.. image:: /simplest_d/objectlevel.png
+.. image:: /simplest_d/object-level.png
 
 CloudTrail also integrates with CloudWatch and you can utilize CloudWatch alarms to notify you of certain events or to take actions based on your configuration. When utilizing CloudTrail, the Amazon S3 data events are delivered to CloudWatch Events within seconds so you can configure your account to take immediate action on a specified activity to improve your security posture. Additionally, CloudTrail logs are delivered to CloudWatch logs and S3 within 2-5 minutes.
 
@@ -791,7 +791,7 @@ You can only transition from S3 One Zone-IA to Glacier using lifecycle configura
 
 You cannot transition from Glacier to any storage class. When objects are transitioned to Glacier using lifecycle configurations, the objects are visible and available only through S3, not through Glacier. You can access them using the S3 console or the S3 API but not through Glacier console or Glacier API in this scenario.  
 
-.. figure:: /simplest_d/transition.png
+.. figure:: /simplest_d/classestransition.png
    :align: center
 
    Lifecycle configuration: Transitioning objects
@@ -813,7 +813,7 @@ The destination bucket contains the flat file list and the ``manifest.json`` fil
 
 You can set up an Amazon S3 event notification to receive notice when the manifest checksum file is created, which indicates that an inventory list has been added to the destination bucket.
 
-.. figure:: /simplest_d/fields.png
+.. figure:: /simplest_d/inventoryfields.png
    :align: center
 
    Fields that are contained in the Inventory report
@@ -884,22 +884,10 @@ Amazon CloudWatch metrics for Amazon S3 can help you understand and improve the 
 
 **Daily storage metrics** for buckets are reported once per day for bucket size and number of objects and metrics, it is included at no additional cost.
 
-.. list-table:: Enunciados de los exámenes de las oposiciones de años anteriores.
-    :widths: 80 20
-    :header-rows: 1
-    :stub-columns: 1
+.. figure:: /simplest_d/dailymetrics.png
+   :align: center
 
-    * - Metric Name
-
-      - Value
-
-    * - BucketSizeBytes
-
-      - Count
-
-    * - NumberOfObjects
-
-      - Count
+   Daily storage metrics
 
 Additionally you can enable **Request metrics**. There is an additional cost for these metrics. You can receive 13 metrics the are available at 1-minute intervals. Once enabled, these metrics are reported for all object operations.
 

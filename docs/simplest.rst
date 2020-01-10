@@ -866,8 +866,175 @@ Storage class analysis
 
 You might ask yourself, which part of my data is cold or hot? What is the right lifecycle policy for my data? Let's look at ways that you can save storage costs by leveraging storage class analysis. Storage class analysis allows you get some intelligence around object access patterns that will give you some guidance aroung the optimal transition time to a different storage class. 
 
-Storage class analysis delivers a daily-updataed report of object access patterns in your S3 console that helps you visualize how much of your data is hot, warm, or cold. Then, after about a month of observation, Storage class analysis presents you with recommendations for lifecycle policy settings designed to reduce TCO.
+Storage class analysis delivers a daily-updataed report of object access patterns in your S3 console that helps you visualize how much of your data is hot, warm, or cold. Then, after about a month of observation, Storage class analysis presents you with recommendations for lifecycle policy settings designed to reduce TCO. it does this by monitoring object access patterns over that period of time, and populates a series of visualizations in your S3 console.
 
+By using Amazon S3 Storage class analysis you can analyze storage access patterns to help you decide hwn to transition the right data to the right storage class. It will provide a visualization of your data access patterns over time, measure the object age where data is infrequently accessed, and enable you to deep dive by bucket, prefix or object tag. Storage class analysis also provides daily visualizations of your storage usage in the AWS Management console. You can optionally export files that include a daily report of usage, retrieved bytes, and GETs by object age to a S3 bucket to analyze using the BI tools of your choice, such as Amazon QuickSight. 
+
+.. figure:: /simplest_d/quicksight.png
+   :align: center
+
+   Storage class analysis QuickSight dashboard
+
+Amazon CloudWatch metrics
+-------------------------
+
+Amazon CloudWatch metrics for Amazon S3 can help you understand and improve the performance of applications that use S3. There are 2 types of CloudWatch metrics for Amazon S3, storage metrics and request metrics.
+
+**Daily storage metrics** for buckets are reported once per day for bucket size and number of objects and metrics, it is included at no additional cost.
+
+.. figure:: /simplest_d/daily.png
+   :align: center
+
+   Daily storage metrics
+
+Additionally you can enable **Request metrics**. There is an additional cost for these metrics. You can receive 13 metrics the are available at 1-minute intervals. Once enabled, these metrics are reported for all object operations.
+
+.. figure:: /simplest_d/requestmetrics.png
+   :align: center
+
+   Request metrics
+
+Amazon CloudWatch logs
+----------------------
+
+Amazon CloudWatch logs is a feature of CloudWatch tht you can use specifically to monitor log data. Integration with Amazon CloudWatch logs enables CloudTrail to send events containing API activity in your AWS account to a CloudWatch Logs log group. CloudTrail events that are sent to CloudWatch Logs an trigger alarms according to the metric filters you define. You can optionally configure CloudWatch alarms to send notifications or make changes to the resources that you are monitoring based on log stream events that your metric filters extract. 
+
+Using Amazon CloudWatch Logs, you can also track CloudTrail events alongside events from the OS, applications, or other AWS services that are sent to CloudWatch Logs. For example, you may want to be alerted if someone changes or deletes a bucket policy, lifecycle rule or other configuration.
+
+Optimizing performance in Amazon S3
+===================================
+
+When using Amazon S3 it is important to consider the following best practices:
+
+* Faster uploads over long distances with Amazon S3 Transfer Acceleration.
+
+* Faster uploads for large objects with Amazon S3 multipart upload.
+
+* Optimize GET performance with Range GET and CloudFront.
+
+* Distribute key name for high RPS workload.
+
+* Optimize list with Amazon S3 inventory.
+
+High requests per second
+------------------------
+
+In some cases, you may not need to overly concerned about what your key names are, as S3 can handle thousands of requests per second (RPS) per prefix. This is not to say that prefix naming should not be taken into consideration, but rather that you may or may not fall into the category of high request rates of over 1000 RPS on a given prefix in your bucket.
+
+However, if you will regularly performing over 1000 RPS, then you should take care with your key naming scheme to avoid hot spots which could lead to poor performance. The 2 most common schemes which can lead to hotspoting are daa based kays and monotonically increased numbers. These schemes do not partition well due to the sameness at the begin of the key. Objects in S3 are distributed across S3 infrastructure according to the object's full name (that is, its key). The object keys are stored in S3's indexing layer. S3 splits the indexing layer into partitions and stores keys within those partitions based on the prefix. S3 will also split these partitions automatically to handle an increase in traffic. What is important to understand is that your key name alone does not necessarily show you what partition your object is stored in, as S3 is automatically partitioning objects broadly across its infrastructure for performance. When the automatic partitioning is occurring you may see a temporary increase in 503 - Slow Down responses. These should be handled like any other 5xx response, using exponential backoff retries and jitter. By using exponential backoff retries and jitter, you are able to reduce the requests per second such that they no longer exceed the maximum RPS rate. Once the partitioning in complete, the 503s will no longer be sent and you will be able to go at the higher rate.
+
+With this in mind, you should also ensure that when you have a known expectation of a high RPS event you should request a pre-partitioning of your prefixes to ensure the optimal performance. You can contact AWS support to pre-partition your workload. You will need to provide the kay naming scheme and expected requests to PUT, GET, DELETE, LIST and AWS can then partition for you in advance in the event. As this generally takes a few days, it is recommended that you open a case at least 1-2 weeks in advance.
+
+To avoid hot-spotting, avoid using sequential key names when you are expecting greater than 1000 RPS. It is recommended to place a random hash value at the left most part of the key. One of the easiest ways to do this is to take the MD5 or an equivalent hashing scheme like CRC of the original key name, and then take the first 3 to 4 characters of the hash and prepend that to the key. You can see in the following example that this naming scheme makes it harder to list objects that are related to each other.
+
+.. code-block:: console
+
+awsexamplebucket/232a-2013-26-05-15-00-00/cust1234234/animation1.jpg
+awsexamplebucket/7b54-2013-26-05-15-00-00/cust3857422/video2.jpg 
+awsexamplebucket/91c-2013-26-05-15-00-00/cust1248473/photo3.jpg   
+
+To help with that, you can use a small set of prefixes to organize your data. Deciding where the random value such as the hash should be placed can be confusing. A recommendation is to place the hash after the more static portion of your key name, but before values such as dates and monotonically increasing numbers. 
+
+.. code-block:: console
+
+awsexamplebucket/animations/232a-2013-26-05-15-00-00/cust1234234/photo1.jpg
+awsexamplebucket/videos/7b54-2013-26-05-15-00-00/cust3857422/video2.jpg 
+	awsexamplebucket/photos/91c-2013-26-05-15-00-00/cust1248473/photo3.jpg   
+
+Even with good partitioning, bad traffic that heavily hits one prefix can still create hot partitions, which can be confusing if you have already pre-partitioned the bucket. An example of this cloud be a bucket that has keys that are UUIDs. In theory, this can be good for bucket partitioning, but if you copy these keys between buckets, or from the bucket to local hosts, it will list the keys alphabetically causing all the requests to hit "000", then "001", "002", etc. potentially creating a hotspot.
+
+High troughput
+--------------
+
+The most common design pattern used by customers for performance optimization is parllelization. Parallezation can be achieved in 2 ways: one is to have multiple connections to upload your data and the other is multipart uploads. You should also take into consideration the network throughput of the hosts and devices along the network path when you are uploading data. For example, if you are using EC2, you may want to choose netwoek optimized best network performance when using parallel uploads or downloads.
+
+Multipart uploads
+-----------------
+
+`Multipart Upload Overview <https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html>`_
+
+The multipart upload API enables you to upload large objects in a set of parts and you can also upload those parts in parallel. Multipart uploading is a three-step process:
+
+1. You initiate the upload and you upload the object parts.
+
+2. After you have uploaded all the parts, you let S3 know the multipart upload is complete. 
+
+3. Upon receiving the complete multipart upload request, S3 contructs the object from the uploaded parts, and you can then access the object just as you would any other object in your bucket.
+
+In general, when your object size reaches 100 MB, you should consider using multipart uploads instead of a single object upload. Also consider using multipart upload when uploading objects over a spotty network, this way you only need to retry the parts that were interrupted, this increasing the resiliency for your application. Using multipart upload provides a few advantages. The following are some examples:
+
+* **Improved throughput**. You can upload parts in parallel to improve throughput.
+
+* **Quick recovery from any network issues**. A smaller part size minimizes the impact of restarting a failed upload due to a network error.
+
+* **Pause and resume object uploads**. You can upload object parts over time. Once you initiate a multipart upload there is no expiry; you must explicitly complete or abort the multipart upload.
+
+* **Begin an upload before you know the final object size**. You can upload an object as you are creating it.
+
+You should also remember to use ``AbortImcompleteMultipartUpload`` action in case your upload doesn't complete to avoid unwanted storage costs of abandoned multipart uploads. You can configure the ``AbortImcompleteMultipartUpload`` in the lifecycle rules configuration of your bucket in the S3 console. This directs S3 to abort multipart uploads that don't complete within a specified number of days after being initiated. When a multipart upload is not completed within the time frame, it becomes eligible for an abort operation and S3 aborts the multipart upload and deletes the parts associated with the multipart upload.
+
+There are also some tools that can be used in S3 for multipart uploads such as TransferManager which is part of S3 SDK for Java. TransferManager provides a simple API for uploading content to S3, and makes extensive use of S3 multipart uploads to achieve enhanced throughput, performance and reliability. When possible, TransferManager attempts to use multiple threads to upload multiple parts of a single upload at once. When dealing with large content size and high bandwidth, this can have a significant increase on throughput.
+
+Amazon CloudFront
+-----------------
+
+You can consider using Amazon CloudFront in conjunction with Amazon S3 to achieve faster downloads.
+
+Transfer acceleration
+---------------------
+
+With Transfer acceleration, as the data arrives at an edge location, data is routed to S3 over an optimized network path. Each time you use Transfer acceleration to upload and object, AWS will check whether Transfer acceleration is likely to be faster than a regular S3 transfer. If AWS determines that Transfer acceleration us not likely to be faster than a regular S3 transfer of the same object to the same destination AWS region, AWS will not charge for that use of Transfer acceleration for that transfer, and may bypass Transfer acceleration for that upload. You can test and see if Amazon S3 Transfer acceleration will provide you a benefit by going to `Amazon S3 Transfer Acceleration - Speed Comparison <http://s3speedtest.com/accelerate-speed-comparsion.html>`_. 
+
+A possible use case is: Let's say you transfer data on a regular basis across continents or have frequent uploads from distributed locations. Transfer Acceleration can, route your data to the closest edge location, so it travels a shorter distance on the public internet and majority of the distance on an optimized network on the Amazon backbone. Moreover, Transfer Acceleration is that it uses standard TCP and HTTP/HTTPS so it does not require any FW exceptions or custom software installation.
+
+When using Transfer Acceleration, additional transfer charges may apply.
+
+Optimize List with Inventory
+----------------------------
+
+You can help optimize getting this list by using Amazon S3 inventory. If using the LIST API, this may take some time to parse through all the objects and add time to running the process for your application. By using Amazon S3 inventory, you can have your application parse through the flat file which inventory has produced helping decrease the amount of time required to list your objects.
+  
+Amazon S3 Cost and Billing
+==========================
+
+Amazon S3 charges
+-----------------
+
+AWS always bills the owner of the S3 bucket for Amazon S3 fees, unless the bucket was created as a Request Pays bucket. To estimate the cost of using S3, you need to consider the following:
+
+* **Storage** (Gbs per month). You pay for storing objects in your Amazon S3 buckets. The rate you're charged depends on your object's size, how long you stored the objects during the month and the storage class. You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
+
+* **Requests**. You pay for the number and type of requests. GET requests incur charges at different rates than other requests, such as PUT and COPY requests.
+
+* **Management**. You pay for the storage management features. For example: S3 inventory, analytics, and object tagging, that are enabled on your account's buckets.
+
+* **Data transfer**. You pay for the amount of data transferred in and out of the Amazon S3 region, except for the following:
+
+* Data transfer into Amazon S3 from the Internet.
+
+* Data transfer out to an Amazon EC2 instance, when the instance is in the same AWS Region as the S3 bucket.
+
+* Data transfer out to Amazon CloudFront.
+
+You also pay a fee for any data transferred using Amazon S3 Transfer Acceleration.
+
+When using the S3 Standard-IA, S3 One Zone-IA or Amazon Glacier, there are some additional charges that you can incur for retrieval. These storage classes have a minimum storage time commitment to avoid additional charges. You pay for deleting an object stored before the minimum storage commitment has passed. 
+
+* Amazon S3 Standard-IA and S3 One Zone-IA have a 30 day minimum storage requirement.
+
+* Amazon Glacier has a 90 day minimum storage requirement.
+
+Bills
+-----
+
+In your AWS console in the Bills section you can see some detailed cost information for S3 for each region where you have data stored.
+
+From the AWS console dashboard, you will be able to easily see the monthly cost per service.
+
+Cost explorer
+-------------
+
+You can enable cost explorer from the AWS console dashboards. Once enabled, it will take 24 hours for the information to populate, and you can have the graphically view of your monthly costs per service.
 
 
 `Locking Objects Using Amazon S3 Object Lock <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lock.html>`_
@@ -875,25 +1042,13 @@ Storage class analysis delivers a daily-updataed report of object access pattern
 
 `New - AWS Transfer for SFTP - Fully Managed SFTP Service for Amazon S3 <https://aws.amazon.com/blogs/aws/new-aws-transfer-for-sftp-fully-managed-sftp-service-for-amazon-s3/>`_
 
-`Multipart Upload Overview <https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html>`_
-
 `AWS re:Invent 2018: [REPEAT 2] Best Practices for Amazon S3 and Amazon Glacier (STG203-R2) <https://www.youtube.com/watch?time_continue=16&v=rHeTn9pHNKo&feature=emb_logo>`_ 
 
-Cost Factors
-============
-
-To estimate the cost of using S3, you need to consider the following:
-
-* **Storage** (Gbs per month). The number and size of objects stored in your S3 buckets as well as the type of storage (storage class). You can reduce the costs by storing less frequently accessed data at slightly lower levels of redundancy then the Amazon S3 standard storage. It is important to note that each class has different rates.
-
-* **Requests**. The number and type of requests. GET requests incur charges at different rates than other requests, such as PUT and COPY requests.
-
-* **Data transfer**. The amount of data transferred out of the Amazon S3 region. Transfer into Amazon S3 is free. Transfer out from Amazon S3 to Amazon CloudFront or the same region is free of charge as well.
 
 Amazon S3 Glacier
 *****************
 
-`Coming Soon – S3 Glacier Deep Archive for Long-Term Data Retention <https://aws.amazon.com/about-aws/whats-new/2018/11/s3-glacier-deep-archive/>`_
+`Coming Soon - S3 Glacier Deep Archive for Long-Term Data Retention <https://aws.amazon.com/about-aws/whats-new/2018/11/s3-glacier-deep-archive/>`_
 
 `Object Lifecycle Management <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html>`_
 

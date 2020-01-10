@@ -637,7 +637,7 @@ Amazon Macie can answer the following questions:
 Amazon S3 Storage Management
 ============================
 
-Among the different options that are available to configure on buckets and objects are the following: Versioning, Server access logging, object-level logging, Static website hosting, default encryption, object tags, transfer acceleration, events notification, requester pays. 
+Among the different options that are available to configure on buckets and objects are the following: Versioning, Server access logging, object-level logging, Static website hosting, default encryption, object tags, Transfer Acceleration, events notification, requester pays. 
 
 Versioning
 ----------
@@ -706,14 +706,16 @@ This simplifies some of your security by being able to easily allow and deny use
 	            "Condition": {
 	                "StringEquals": {
 	                    "s3:RequestObjectTag/Project": "X"
+	                    }
+	             }
 	        }
 	    ]
 	}	
 
-Transfer acceleration
+Transfer Acceleration
 ---------------------
 
-Transfer acceleration helps increase your transfer speeds. Enabling Transfer acceleration provides you with a new URL to use with your application.
+Transfer Acceleration helps increase your transfer speeds. Enabling Transfer Acceleration provides you with a new URL to use with your application.
 
 Event notifications
 -------------------
@@ -870,7 +872,7 @@ Storage class analysis delivers a daily-updataed report of object access pattern
 
 By using Amazon S3 Storage class analysis you can analyze storage access patterns to help you decide hwn to transition the right data to the right storage class. It will provide a visualization of your data access patterns over time, measure the object age where data is infrequently accessed, and enable you to deep dive by bucket, prefix or object tag. Storage class analysis also provides daily visualizations of your storage usage in the AWS Management console. You can optionally export files that include a daily report of usage, retrieved bytes, and GETs by object age to a S3 bucket to analyze using the BI tools of your choice, such as Amazon QuickSight. 
 
-.. figure:: /simplest_d/quicksight.png
+.. figure:: /simplest_d/quicksightdash.png
    :align: center
 
    Storage class analysis QuickSight dashboard
@@ -882,10 +884,22 @@ Amazon CloudWatch metrics for Amazon S3 can help you understand and improve the 
 
 **Daily storage metrics** for buckets are reported once per day for bucket size and number of objects and metrics, it is included at no additional cost.
 
-.. figure:: /simplest_d/daily.png
-   :align: center
+.. list-table:: Enunciados de los exámenes de las oposiciones de años anteriores.
+    :widths: 80 20
+    :header-rows: 1
+    :stub-columns: 1
 
-   Daily storage metrics
+    * - Metric Name
+
+      - Value
+
+    * - BucketSizeBytes
+
+      - Count
+
+    * - NumberOfObjects
+
+      - Count
 
 Additionally you can enable **Request metrics**. There is an additional cost for these metrics. You can receive 13 metrics the are available at 1-minute intervals. Once enabled, these metrics are reported for all object operations.
 
@@ -929,22 +943,22 @@ To avoid hot-spotting, avoid using sequential key names when you are expecting g
 
 .. code-block:: console
 
-awsexamplebucket/232a-2013-26-05-15-00-00/cust1234234/animation1.jpg
-awsexamplebucket/7b54-2013-26-05-15-00-00/cust3857422/video2.jpg 
-awsexamplebucket/91c-2013-26-05-15-00-00/cust1248473/photo3.jpg   
+	awsexamplebucket/232a-2013-26-05-15-00-00/cust1234234/animation1.jpg
+	awsexamplebucket/7b54-2013-26-05-15-00-00/cust3857422/video2.jpg 
+	awsexamplebucket/91c-2013-26-05-15-00-00/cust1248473/photo3.jpg   
 
 To help with that, you can use a small set of prefixes to organize your data. Deciding where the random value such as the hash should be placed can be confusing. A recommendation is to place the hash after the more static portion of your key name, but before values such as dates and monotonically increasing numbers. 
 
 .. code-block:: console
 
-awsexamplebucket/animations/232a-2013-26-05-15-00-00/cust1234234/photo1.jpg
-awsexamplebucket/videos/7b54-2013-26-05-15-00-00/cust3857422/video2.jpg 
+	awsexamplebucket/animations/232a-2013-26-05-15-00-00/cust1234234/photo1.jpg
+	awsexamplebucket/videos/7b54-2013-26-05-15-00-00/cust3857422/video2.jpg 
 	awsexamplebucket/photos/91c-2013-26-05-15-00-00/cust1248473/photo3.jpg   
 
 Even with good partitioning, bad traffic that heavily hits one prefix can still create hot partitions, which can be confusing if you have already pre-partitioned the bucket. An example of this cloud be a bucket that has keys that are UUIDs. In theory, this can be good for bucket partitioning, but if you copy these keys between buckets, or from the bucket to local hosts, it will list the keys alphabetically causing all the requests to hit "000", then "001", "002", etc. potentially creating a hotspot.
 
-High troughput
---------------
+High throughput
+---------------
 
 The most common design pattern used by customers for performance optimization is parllelization. Parallezation can be achieved in 2 ways: one is to have multiple connections to upload your data and the other is multipart uploads. You should also take into consideration the network throughput of the hosts and devices along the network path when you are uploading data. For example, if you are using EC2, you may want to choose netwoek optimized best network performance when using parallel uploads or downloads.
 
@@ -980,10 +994,10 @@ Amazon CloudFront
 
 You can consider using Amazon CloudFront in conjunction with Amazon S3 to achieve faster downloads.
 
-Transfer acceleration
+Transfer Acceleration
 ---------------------
 
-With Transfer acceleration, as the data arrives at an edge location, data is routed to S3 over an optimized network path. Each time you use Transfer acceleration to upload and object, AWS will check whether Transfer acceleration is likely to be faster than a regular S3 transfer. If AWS determines that Transfer acceleration us not likely to be faster than a regular S3 transfer of the same object to the same destination AWS region, AWS will not charge for that use of Transfer acceleration for that transfer, and may bypass Transfer acceleration for that upload. You can test and see if Amazon S3 Transfer acceleration will provide you a benefit by going to `Amazon S3 Transfer Acceleration - Speed Comparison <http://s3speedtest.com/accelerate-speed-comparsion.html>`_. 
+With Transfer Acceleration, as the data arrives at an edge location, data is routed to S3 over an optimized network path. Each time you use Transfer Acceleration to upload and object, AWS will check whether Transfer Acceleration is likely to be faster than a regular S3 transfer. If AWS determines that Transfer Acceleration us not likely to be faster than a regular S3 transfer of the same object to the same destination AWS region, AWS will not charge for that use of Transfer Acceleration for that transfer, and may bypass Transfer Acceleration for that upload. You can test and see if Amazon S3 Transfer Acceleration will provide you a benefit by going to `Amazon S3 Transfer Acceleration - Speed Comparison <http://s3speedtest.com/accelerate-speed-comparsion.html>`_. 
 
 A possible use case is: Let's say you transfer data on a regular basis across continents or have frequent uploads from distributed locations. Transfer Acceleration can, route your data to the closest edge location, so it travels a shorter distance on the public internet and majority of the distance on an optimized network on the Amazon backbone. Moreover, Transfer Acceleration is that it uses standard TCP and HTTP/HTTPS so it does not require any FW exceptions or custom software installation.
 
@@ -1076,7 +1090,7 @@ It works by storing objects in 2 access tiers: one tier that is optimized for fr
 
 The S3 Intelligent-Tiering charges a per object monitoring fee to monitor and place an object in the optimal access tier. As a result, on a relative basis, the object fee is less when the objects are larger and thus the amount you can save is potentially higher. In the following image, you can see an example of the potential cost savings for objects stored in S3 Standard versus S3 Intelligent-Tiering. For these calculations, we assumed 10 PB of data, in US-East-1 AWS Region, and a minimum object size of 128 KB.
 
-.. image:: /simplest_d/comparison.png
+.. image:: /simplest_d/intelligent.png
 
 Choosing regions for your architectures
 ***************************************

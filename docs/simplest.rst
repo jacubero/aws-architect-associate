@@ -39,6 +39,8 @@ It is intentionally built with a minimum feature set focusing on simplicity and 
 
 Amazon S3 stores the data as objects within buckets. An object consists of data and optionally any metadata that describes that file.
 
+.. _secStorageClasses:
+
 Object Storage Classes
 ----------------------
 
@@ -1271,8 +1273,85 @@ You can apply lifecycle policies to a S3 bucket by using the AWS CLI, but you mu
 Zero day lifecycle policies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Lifecycle policies are commonly used across an entire Amazon S3 bucket to transition objects based on age, but there may be scenarios in which you might want to transition single or multiple objects to Glacier based on workflow operations or other status changes. 
+Lifecycle policies are commonly used across an entire Amazon S3 bucket to transition objects based on age, but there may be scenarios in which you might want to transition single or multiple objects to Glacier based on workflow operations or other status changes. Currently, an API call does not exist that moves a single object of a certain age to Amazon Glacier, but you can achieve this by using tags.
 
+You can write a zero-day lifecycle policy with a tag filter that moves only a single object or a subset of objects to Glacier based on the tag value in the lifecycle policy. Only the objects that match the tag filter in your policy are moved on that day.
+
+.. code-block:: XML
+
+	<LifecycleConfiguration>
+	  <Rule>
+	    <Filter>
+	       <Tag>
+	       	<Key>flaming</Key>
+	       	<Value>cars</Value>
+	       </Tag>
+	    </Filter>
+	    <Transition>
+	      <Days></Days>
+	      <StorageClass>GLACIER</StorageClass>
+	    </Transition>
+	  </Rule>
+	</LifecycleConfiguration>
+
+Creating a Lifecycle policy 
+---------------------------
+
+The simplest method for creating a lifecycle policy is to use the Amazon S3 console. Use this console to:
+
+* Configure your prefix or tag filter.
+
+* Configure the transition of data to S3-Standard-IA or Amazon Glacier.
+
+* Define when objects within Amazon S3 expire.
+
+After saving the rule, it is applied to the objects specified in the lifecycle policy. You also can set lifecycle configuration on a bucket programmatically by using AWS SDKs or the AWS CLI. 
+
+Glacier backup SW integration
+-----------------------------
+
+A widely adopted use-case for Glacier storage is backup. Several popular backup SW solutions and storage gateway products have built-in integration with S3 and Glacier and their lifecycle capabilities. For example, Commvault, an enterprise-grade backup SW solution, can be featured in a hybrid model in which files are archived and analyzed onsite. However, the metadata from those files are stored in S3. Commvault natively talks to S3, which simplifies moving data into AWS. From there, lifecycle policies move data into Amazon Glacier. Commvault also supports the Amazon Glacier-native API, which could be enabled for customers wishing to utilize Vault Lock compliance capabilities.
+
+In addition to Commvault, there are several ISVs that support integration with Glacier including Veritas NetBackup, Arq Backup, Cloudberry, Synology, Qnap, Duplicati, Ingenious, Rubrik, Cohesity, Vembu, and Retrospect. 
+
+Amazon Glacier durability and security
+======================================
+
+Durability with traditional storage
+-----------------------------------
+
+In a common storage architecture, we can have a single data center with RAID arrays. This setup provides a minimum level of data protection but leaves your data in a highly vulnerable position. The lack of geographic redundancy exposes your data to concurrent failures that could be caused by natural or man-made catastrophic events.
+
+To rectify this scenario, an additional DR site is necessary in a different geographic region, which would double your data storage costs and the effort to maintain the environment. An additional DR site dos provide additional durability, but the data may not be synchcronously redundant.
+
+AWS uses the Markov model to calculate the 11 9s of durability that Glacier and S3 are designed to provide. In general, a well-administered single-datacenter solution that supports multiple concurrent failures using a single copy of tape can deliver 4 9s of durability. Furthermore, a multiple-data center solution with 2 copies of tape in separate geographic regions can deliver 5-6 9s of durability.
+
+Amazon Glacier durability
+-------------------------
+
+With a single upload to Glacier, your objects are reliably stored across multiple AZs. This scenario provide tolerance against concurrent failures across disks, nodes, racks, networks, and WAN providers. In addition to Amazon's default 3-AZ durability model, customers may optionally duplicate their data in another geographic region.
+
+Amazon Glacier security
+-----------------------
+
+Encryption features
+^^^^^^^^^^^^^^^^^^^
+
+Data stored in Glacier is encrypted by default, and only vault owners have access to resources created on Glacier. Access to resources can be controlled via IAM policies or vault access policies.
+
+Glacier automatically encrypts data at rest by using AES 256-bit encryption and supports SSL data transfers. Furthermore, if data that is uploaded into Glacier is already encrypted, that data is re-encrypted at rest automatically by default.
+
+Objects that transition from S3 to Glacier also supports SSE-SE. Users can upload objects to SE with SSE and later transition them to Glacier. With SSE enabled, encryption is applied to objects in S3, objects transitioned to Glacier, and objects restored from Glacier to S3. If SSE is not enabled during upload, objects transitioned to Glacier are encrypted, but objects stored in S3 will not be encrypted. 
+
+Auditing and logging
+^^^^^^^^^^^^^^^^^^^^
+
+With AWS CloudTrail logging enabled, API calls made to Amazon Glacier are tracked in log files that are stored to a specified S3 bucket. Using the information collected by CloudTrail, you can determine requests made to Glacier, the source IP of the request, the time of the request, and who made the request. By default, CloudTrail log files are encrypted, and you can define lifecycle rules to archive or delete log files automatically. You can also configure SNS notifications to alert you when new log files are generated if you must act quickly.
+
+Vault Lock and Vault access policies
+------------------------------------
+
+A Vault Lock policy specifies a retention requirement in days from the data of archive creation. Until the retention date has passed, the archive is locked against changes or deletion that functions like a WORM storage device.  
 
 
 `Amazon S3 Glacier pricing (Glacier API only) <https://aws.amazon.com/glacier/pricing/>`_
@@ -1281,7 +1360,6 @@ Lifecycle policies are commonly used across an entire Amazon S3 bucket to transi
 
 `Amazon S3 Glacier API Permissions: Actions, Resources, and Conditions Reference <https://docs.aws.amazon.com/amazonglacier/latest/dev/glacier-api-permissions-ref.html>`_
 
-.. _secStorageClasses:
 
 Storage classes
 ===============

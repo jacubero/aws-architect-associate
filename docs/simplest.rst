@@ -3,11 +3,11 @@ The simplest architectures
 
 `AWS Storage Services Overview <https://d1.awsstatic.com/whitepapers/AWS%20Storage%20Services%20Whitepaper-v9.pdf>`_
 
-* **Block storage** is data organized as an array of unrelated blocks. Host file system places data on disk. AWS provides block storage with Amazon EBS.
+* **Block storage** is data organized as an array of unrelated blocks. Host file system places data on disk. Amazon EBS and EC2 instance storage provide active computing or database workloads.
 
-* **File storage** is unrelated data blocks managed by a file (serving) system. Native file system places data on disk. For example NTFS for Microsoft storage. Data stored in a file system contains attributes such as permissions, file owner and they are stored as metadata in the file system. AWS provides file storage with Amazon EFS.
+* **File storage** is unrelated data blocks managed by a file (serving) system. Native file system places data on disk. For example NTFS for Microsoft storage. Data stored in a file system contains attributes such as permissions, file owner and they are stored as metadata in the file system. File systems are provided in AWS Storage Gateway and Elastic File System (EFS).
 
-* **Object storage**. It is a flat system which stores data as objects which encapsulates the attributes, metadata, and other properties. It stores the data, data attributes, metadata, and object IDs as objects. It provides API access to data. It is metadata driven, policy-based, etc. It allows you to store ilimitedless amount of data and scales easily. Content type, permissions and the file owner are stored as metadata in a file system. There are more metadata that can be stored as object. You can create custom metadata named values that can be used for such things as analytics. AWS provides object storage with Amazon S3.
+* **Object storage**. It is a flat system which stores data as objects which encapsulates the attributes, metadata, and other properties. It stores the data, data attributes, metadata, and object IDs as objects. It provides API access to data. It is metadata driven, policy-based, etc. It allows you to store ilimitedless amount of data and scales easily. Content type, permissions and the file owner are stored as metadata in a file system. There are more metadata that can be stored as object. You can create custom metadata named values that can be used for such things as analytics. Object storage is offerd via Amazon S3 and Amazon Glacier.
 
 Each storage option has a unique combination of performance, durability, cost and interface.
 
@@ -53,6 +53,8 @@ As your data ages and it's accessed less, you can use **Amazon S3 Standard - IA*
 **Amazon S3 One Zone - IA** is ideal for customers who want a lower-cost option for infrequently accessed data, require similar milliseconds access but don't require the same durability and resiliency as the previous classes. It costs less than the previous classes as it stores data in only 1 AZ. It has the same associated retrieval cost as Amazon S3 Standard - IA. It is a good choice for example for storing secondary backup copies of on-premises data, or easily recreated data, or storage use of Amazon S3 Cross Region replication target from another AWS S3 Region.
 
 Amazon Glacier is suitable for archiving data where data access in frequent. Archive data is not available for real-time access. You must restore the objects before you can access them. It is storage service designed for long-term archival storage and asynchronous retrieval from minutes to hours. For example you can leverage Amazon Glacier for storing long-term backup archives. The cost of storage for Amazon Glacier is less than the other storage classes and has also an additional cost for data retrieval. There are 3 retrieval options ranging in time from minutes to hours.
+
+`Coming Soon - S3 Glacier Deep Archive for Long-Term Data Retention <https://aws.amazon.com/about-aws/whats-new/2018/11/s3-glacier-deep-archive/>`_
 
 S3 Standard, S3 Standard-IA and Glacier replicates its data across at least to 3 different AZs within a single region. If you do not need this resiliency, S3 One Zone-IA is stored in 1 AZ. If this AZ is destroyed, you will lose your data.
 
@@ -498,7 +500,7 @@ Be careful using the NotResource and "Effect":"Allow" in the same statement or i
 Normally, to explicitly deny access to a resource you would write a policy that uses "Effect":"Deny" and that includes a Resource element that lists each folder individually.
 
 Cross account policies
-^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 One option you can use is to ensure that account that created the object adds the grant that gives the ``bucket-owner-full-control`` permission on the object so the bucjet owner can set permissions as needed. You can do this by adding a condition in the policy. Additionally, you can deny the ability to upload objects unless that account grants ``bucket-owner-full-control`` permissions.
 
@@ -712,6 +714,8 @@ This simplifies some of your security by being able to easily allow and deny use
 	    ]
 	}	
 
+`Object Tagging <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-tagging.html>`_
+
 Transfer Acceleration
 ---------------------
 
@@ -729,8 +733,12 @@ Requester pays
 
 A bucket owner can configure a bucket to be a Requester Pays bucket. With Requester Pays buckets, the requester instead of the bucket owner pays the cost of the request and the data download from the bucket. The bucket owner always pays the cost of storing data. You might, for example, use Requester Pays buckets when making availale large data sets, such as zip code directories, reference data, geospatial information, or web crawling data.
 
+.. _secObjectLifecyclepolicies:
+
 Object Lifecycle policies
 -------------------------
+
+`Object Lifecycle Management <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html>`_
 
 To manage your objects so they are stored cost effectively throughout their lifecycle, you can configure lifecycle rules. A lifecycle configuration or lifecycle policy, is a set of rules that define the actions that S3 applies to a group of objects. A lifecycle rule can apply to all or a subset of objects in a bucket based on the filter element that you specify in the lifecycle rule. A lifecycle configuration can have up to 1000 rules. These rules also have a status element where it can be either enabled or disabled. If a rule is disabled, S3 doesn't perform any of the actions defined in the rule. Each rule defines an action. The actions can be either a transition of objects to another storage class or an expiration of objects.
 
@@ -791,10 +799,14 @@ You can only transition from S3 One Zone-IA to Glacier using lifecycle configura
 
 You cannot transition from Glacier to any storage class. When objects are transitioned to Glacier using lifecycle configurations, the objects are visible and available only through S3, not through Glacier. You can access them using the S3 console or the S3 API but not through Glacier console or Glacier API in this scenario.  
 
+Amazon S3 supports a waterfall model for transitioning between storage classes, as shown in the following diagram.
+
 .. figure:: /simplest_d/classestransition.png
    :align: center
 
    Lifecycle configuration: Transitioning objects
+
+`Transitioning Objects Using Amazon S3 Lifecycle <https://docs.aws.amazon.com/AmazonS3/latest/dev/lifecycle-transition-general-considerations.html>`_
 
 Amazon S3 inventory
 -------------------
@@ -862,6 +874,8 @@ You can automate function based on events. You can use notifications when object
 
 Monitoring and analyzing Amazon S3
 ==================================
+
+.. _secStandardClassAnalysis:
 
 Storage class analysis
 ----------------------
@@ -1050,9 +1064,222 @@ You can enable cost explorer from the AWS console dashboards. Once enabled, it w
 Amazon S3 Glacier
 *****************
 
-`Coming Soon - S3 Glacier Deep Archive for Long-Term Data Retention <https://aws.amazon.com/about-aws/whats-new/2018/11/s3-glacier-deep-archive/>`_
+Amazon Glacier overview
+=======================
 
-`Object Lifecycle Management <https://docs.aws.amazon.com/AmazonS3/latest/dev/object-lifecycle-mgmt.html>`_
+Definition
+----------
+
+At its core, Amazon Glacier is an economical, highly durable storage service optimized for infrequently used or cold data. It is widely used for workloads such as buckup, preservation archival, regulatory compliance, or as a tier for historical data in a data-lake architecture.
+
+With Amazon Glacier, customers can store their data cost-effectively for months, years, or even decades. It enables customers to offload the administrative burdens of operating and scaling storage to AWS, so they don't have to worry about capacity planning, HW provisioning, data replication, HW failure detection and recovery, or time-consuming HW and tape-media migrations.
+
+Amazon Glacier is designed to deliver 11 9s of durability, and provides comprehensive security and compliance capabilities that help meet the most stringent regulatory requirements such as SEC-17A4. For data-lake architectures, Amazon Glacier provides data filtering functionality, allowing you to run powerful analytics directly on your archive data at rest. Amazon Glacier provides several data retrieval options that allow access to archives in as little as a few minutes to several hours.
+
+Amazon Glacier data model
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The Amazon Glacier data model is composed of vaults and archives. The concept is similar to Amazon S3's bucket and object model. An archive can consist of any data such as photos, videos, or documents. You can upload a single file as an archive or aggregae multiple files into a TAR or ZIP file, and upload it as one archive, via either the Amazon S3 or the Amazon Glacier native API.
+
+When storing data via Amazon Glacier-native API, a single archive can be as large as 40 TB, and an unlimited number of archives can be stored in Amazon Glacier. Each archive is assigned a unique archive ID at the time of creation, and the contents are immutable and cannot be modified. Amazon Glacier archives support only upload, download, and delete operations. Unlike Amazon S3 objects, the ability to overwrite or modify an existing archive is not supported via the Amazon Glacier-native API.
+
+A vault is a container for storing archives. When creating a vault in Amazon Glacier, you specify a name and AWS region for your vault, and that generates a unique address for each vault resource. The general for is ``http://<region-specific endpoint>/<account-id>/vaults/<vault-name>``. For example:
+
+.. code-block:: console
+
+	https://glacier.us-west-2.amazonaws.com/123456789/vaults/myvault
+
+An AWS account can create vaults in any of the supported regions, and you can store an unlimited number of archives in a vault. You can create up to 1000 vaults per account, per region.
+
+Amazon Glacier entry points
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Currently, there are 3 methods for sending data to Amazon Glacier:
+
+1. You can run commands in the AWS CLI by using the Amazon Glacier native API, or automate your uploads via the Amazon Glacier SDK. 
+
+2. You can transfer data directly by using direct AWS data ingestion tools or 3rd party software (for instance Commvault or NatApp).
+
+3. You can upload an object to an Amazon S3 bucket and use Amazon S3 lifecycle policies to transition your data to Amazon Glacier when specifed conditions are met.
+
+To direct transfer data into Amazon Glacier, AWS Direct Connect, AWS Storage Gateway, and the AWS Snow Family are some of the options availale that allow movemtn of data into and out of Amazon Glacier. Uploads can be performed using REST-based SDKs, the AWS management console, the Amazon Glacier API, and the AWS CLI.
+
+Benefits
+--------
+
+Core benefits for customers who use Amazon Glacier are its unmatched durability (11 9s), availability and scalability (data is automatically distributed across a minimum of 3 physical facilities that are geographically separated), comprehensive security and compliance capabilities, query and analytics features, flexible management capabilities, and a large software ecosystem.
+
+Security and compliance
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Amazon Glacier's comprehensive security capabilities begin with AES 256-bit server-side encryption with built-in key management and key protection. Customers also have the option of managing their own keys by encrypting their data before uploading to Amazon Glacier, but AES256 server-side encryption is always on and cannot be disabled.
+
+Amazon Glacier supports many security standards and compliance certifications including PCI-DSS, HIPAA/HOTECH, FedRAMP, SEC Rule 17-a-4, EU Data Protection Directive, and FISMA, helping to satisfy compliance requirements for virtually evey regulatory agency aroung the globe. Amazon Glacier integrates with AWS CloudTrail to log, monitor, and retain storage API call activities for auditing. 
+
+Query in place
+^^^^^^^^^^^^^^
+
+Anyone who knows SQL can use Amazon Athena to analyze vast amounts of unstructures data in Amazon S3 on-demand. You can use Amazon Glacier Select to conduct filter in place operations for data-lake analytics.
+
+Flexible management
+^^^^^^^^^^^^^^^^^^^
+
+Amazon Glacier and Amazon S3 offer a flexible set of storage management and administration capabilities. If you are a storage administrator, you can classify, report, and visualizae data usage trends to reduce costs and improve service levels.
+
+Via the Amazon S3 API, objects can be tagged with unique, customizable metadata so that customers can add key-value tags that support data-management functions including lifecycle policies. The Amazon S3 inventory tool delivers daily reports about objects and their metadata for maintenance, compliance, or analytics operations. Amazon S3 can also analyze object access patterns to build lifecycle policies that automate tiering, deletion, and retention.
+
+As Amazon S3 works with AWS Lambda, you can log activities, define alerts, and automate workflows, all without managing any additional infrastructure. 
+
+Large ecosystem
+^^^^^^^^^^^^^^^
+
+In addition to integration with most AWS services, the Amazon S3 and Amazon Glacier ecosystem includes tens of thousands of consulting, systems integrators, and Independent Software Vendors (ISV) partners. This means that you can easily use Amazon S3 and Amazon Glacier with popular backup, restore, and archiving solutions (including Commvault, Veritas, Dell EMC, and IBM), popular DR solutions (including Zerto, CloudEndure, and CloudRanger), and popular on-premises primary storage environments (including NetApp, Dell EMC, Rubrik, and others)
+
+Amazon Glacier versus Tape solutions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Amazon Glacier is architected to deliver a tape-like customer experience, with features, performance, and a cost model that is similar in many ways to large-scale on-premises tape solutions, while eliminating the commn problems of media handling, complex technology refreshes, mass migrations, and capacity planning.
+
+Amazon Glacier features
+-----------------------
+
+Amazon Glacier comes with many built-in features that help customers effectively secure, manage, and gain insights from their vaults.
+
+Amazon Glacier supports **IAM permissions** that give you fine-grain controls over which users or resources have access to data stored in Amazon Glacier. In addition to this, you can attach **Vault Access Policies** to Amazon Glacier vaults that specify access and actions that can be peformed by a particular resource. Vault access policies can also be used to grant rad-only access to a 3rd party using a different AWS account.
+
+To satisfy compliance needs, Amazon Glacier's **Vault Lock** feature allows you to easily deploy and enforce WORM (immutability) on individual vaults via a lockable policy, per regulatory requirements such as SEC-17a4. Unlike normal access control policies, when locked, the Vault Lock policy becomes inmmutable for the life of the Vault. Vault Lock specifies archive retention time and provides the option for legal hold on archives for an indefinite period.
+
+For retrievals, Amazon Glacier allows you to retrieve up to 5% of your data daily each month free of charge. Via the Amazon Glacier-native API, **Ranged Retrievals** make it easier to remain within the 5% threshold. Using the ``RetreivalByteRange`` parameter, you can fetch only the data you need from a larger file, or spread the retrieval of a larger archive over a period of time. This feature allows yoy to avoid retrieving an entire archive unnecessarily.
+
+Data lifecycle management
+=========================
+
+Object lifecycle management
+---------------------------
+
+Object lifecycle management is a core feature of Amazon S3 that allows you to set rules objects in an Amazon S3 bucket (see :ref:`secObjectLifecyclepolicies`). Files that are uploaded via the Amazon S3 API may be transitioned to Amazon Glacier in as little as 0-days. These Amazon S3 objects are then moved to an Amazon Glacier Vault but continue to be managed by the parent Amazon S3 bucket and addressed via the originally specified Amazon S3 key name. In fact, the Amazon Glacier Vault used for lifecycle transitions is privately held by the Amazon S3 parent bucket and directly accessible by customers. This is why certain use-cases, such as utilizing the Amazon Glacier Vault Lock capability, still require usage of the Amazon Glacier-native API.
+
+In this example policy, objects that are older than 30 days are move to Amazon S3 Standard-IA, and objects that are older than 90 days are migrated to Amazon Glacier.
+
+.. code-block:: JSON
+
+	{
+	    "Rules": [
+	        {
+	            "Filter": {
+	                "Prefix": "logs/"
+	            },
+	            "Status": "Enabled",
+	            "Transitions": [
+	                {
+	                    "Days": 30,
+	                    "StorageClass": "STANDARD_IA"
+	                },
+	                {
+	                    "Days": 90,
+	                    "StorageClass": "GLACIER"
+	                }
+	            ],
+	            "Expiration": {
+	                "Days": 365
+	            },
+	            "ID": "example-id"
+	        }
+	    ]
+	}
+
+Classifying workloads
+---------------------
+
+To optimize data accesibility and storage costs, it is important to properly classify workloads before developing lifecycle policies.
+
+Selecting the right storage class
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When choosing the correct storage class for your workloads, ask several questions before indentifying the most appropriate storage class for your data.
+
+1. *How frequently is the data being accessed?* For example, you don't want to access data moved to Standard-IA more frequently than once a month, or you may not realize the financial benefits of storing data in this class.
+
+2. *How long will you store data?* For example, data stored in Standard-IA is required to be stored for 30 days minimum. Customers who delete objects prior to 30 days will be charged for 30 days capacity. 
+
+When determining whether your data should be moved to Amazon Glacier, the questions to ask are:
+
+1. *Do I need millisecond access to my data?*. If the answer is yes, for example, images that are retrieved for hosting on a live website, then Amazon Glacier is not a good fit.
+
+2. *How many retrieval requests are made?*. Amazon Glacier has 3 different retrieval options:
+
+	* **Expedited** retrieval times are from 1 to 5 minutes.
+
+	* **Standard** ranges from 3 to 5 hours.
+
+	* **Bulk** is from 5 to 12 hours.
+
+Amazon Glacier is a good option if the access frequency for Expedited retrievals is less than 3 per year, for Standard retrievals is less than 1 per month, and for Bulk retrievals is less than 4 per month.
+
+3. *How long will I store the data?*. Amazon Glacier is best suited for objects that will be stored periods greater than 90 days. Glacier has a 90-day minimum for the objects you store.
+
+Standard class analysis
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To assist customers with determining which datasets are best suited for Standard or Standard-IA, the storage class analysis feature is available as a part of Amazon S3 (see :ref:`secStandardClassAnalysis`)
+
+Differentiating Glacier and S3
+------------------------------
+
+One of the key differences between Amazon S3 and Amazon Glacier is the functionality of read operations. In Amazon S3, reads are "synchronous", meaning an HTTP GET operation will immediately return an object with millisecond latency. In Amazon Glacier, read operations are "asynchronous", meaning there are 2 steps to retrieve an object (or archive):
+
+1. Restore command is issued (where one of the previously mentioned retrieval methods is specified)
+
+2. An HTTP GET operation will only succeed after Glacier has restored the object to an online state.
+
+Lifecycle policy structure
+--------------------------
+
+You can generate lifecycle policies from the Amazon S3 console or write them manually in XML or JSON. An XML file of a lifecycle policy consists of a set of rules with predefined actions that Amazon S3 can perform on objects in your bucket. Each rule consists of the following elements:
+
+* A **filter** that identifies a subset of object the rule applies to, suchas a key name prefix, object tag, or a combination.
+
+* A **status** of whether the rule is in effect.
+
+* One or more lifecycle transitions or expirations actions to perform on filtered objects
+
+.. code-block:: XML
+
+	<LifecycleConfiguration>
+	  <Rule>
+	    <ID>example-id</ID>
+	    <Filter>
+	       <Prefix>logs/</Prefix>
+	    </Filter>
+	    <Status>Enabled</Status>
+	    <Transition>
+	      <Days>30</Days>
+	      <StorageClass>STANDARD_IA</StorageClass>
+	    </Transition>
+	    <Transition>
+	      <Days>90</Days>
+	      <StorageClass>GLACIER</StorageClass>
+	    </Transition>
+	    <Expiration>
+	      <Days>365</Days>
+	    </Expiration>
+	  </Rule>
+	</LifecycleConfiguration>
+
+You can apply lifecycle policies to a S3 bucket by using the AWS CLI, but you must first convert your XML code to JSON. Lifecycle policies also support specifying multiple rules, overlapping filters, tiering down storage classes, and version-enabled buckets.
+
+Zero day lifecycle policies
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Lifecycle policies are commonly used across an entire Amazon S3 bucket to transition objects based on age, but there may be scenarios in which you might want to transition single or multiple objects to Glacier based on workflow operations or other status changes. 
+
+
+
+`Amazon S3 Glacier pricing (Glacier API only) <https://aws.amazon.com/glacier/pricing/>`_
+
+`SQL Reference for Amazon S3 Select and S3 Glacier Select <https://docs.aws.amazon.com/amazonglacier/latest/dev/s3-glacier-select-sql-reference.html>`_
+
+`Amazon S3 Glacier API Permissions: Actions, Resources, and Conditions Reference <https://docs.aws.amazon.com/amazonglacier/latest/dev/glacier-api-permissions-ref.html>`_
 
 .. _secStorageClasses:
 

@@ -23,3 +23,10 @@ Purpose of this book
 ********************
 
 This book complements the material given in the course **Architecting on AWS** with additional information and illustrates how to obtain programmatically relevant data about AWS services.
+
+Resources for preparing the exam
+********************************
+
+`Practice questions <https://tutorialsdojo.com/aws-solutions-architect-associate-questions-with-explanations-part-1/>`_ 
+
+`Solutions Architect Associate Bootcamp <https://github.com/parallax/reinvent-2018/blob/master/aws-sa-exam.md>`_

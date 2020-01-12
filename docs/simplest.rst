@@ -1466,6 +1466,43 @@ Amazon Glacier's best feature is its ultra-low pricing, its key feature is the a
 Object targeting best practices
 -------------------------------
 
+When transitioning to Amazon Glacier, it is advised to target average object sizes because there is a 32-KB overhead cahrge for each object stored on Glacier regardless of object size. In practice, this means that if the objects in your Glacier vault have an average object size of 32 KB, you would in effect be paying twice: once for the 32-KB overhead charge and also for the standard storage charge. Therefore, it is good practice to target objects that are 1 MB and above for transitioning to Glacier. If your workloads tend to store small files, it is recommended to containerize small files using TAR, ZIP, or similar tools. 
+
+Glacier is designed for long-lived data and imposes a 90-day minimum retention requirement as well as upload fees that are 10 times those of S3. These fees and limitations are typically not material costs for large-scale long-term archival. But customers with very active small-file workloads may find S3 or S3-IA is a more appropriate storage solution.
+
+Ingesting data into Amazon Glacier
+==================================
+
+Unlike S3, the Amazon Glacier console does not provide an interface to upload archives directly from the AWS console. Use either lifecycle policies or the Amazon Glacier API, or direct uploads through 3rd party tools.
+
+Network ingestion options
+-------------------------
+
+In addition to uploading data via the Amazon Glacier API, data can be moved into Glacier by implementing a SSL tunnel over the public Internet using several 3rd party options. You can also transfer data using AWS Direct Connect. AWS Direct Connect is a high-performace dedicated bandwidth solution that connects on-premises sites directly to AWS. AWS Direct Connect is particularly useful in hybrid environments like on-premises video editing suites where I/O traffic is relatively high and there is a strong sensitivity to having consistent retrieval latency.
+
+AWS Snow family
+---------------
+
+The AWS Snow family is a collection of data transfer appliances that accelerates the transfer of large amounts of data in an out of AWS without using the Internet. Each Snowball appliance can transfer data tranfer than Internet speeds. The transfer is done by shipping the appliance directly to customers by using a regional carrier. The appliances are rugged shipping containers with tamper-proof electronic ink labels.
+
+With AWS Snowball, you can move batches of data between your on-premises data storage locations and S3. AWS Snowball has an 80-TB model available in all regions, and a 50-TB model available only in US. Snowball devices are encrypted at rest and are physically secured while in transit. Data transers are performed via the downloadable AWS Snowball client, or programmatically using the Amazon S3 REST API. It has 10G network interfaces (RJ45 and SFP+, fiber/copper).
+
+Snowball Edge is a more advanced appliance in the Snow family that comes with 100 TB of local storage with built-in local compute that is equivalent to an *m4.4xlarge* instance. Snowball Edge appliances can run AWS Lambda functions or perform local processing on the data while being shuttled between locations. AWS Snowball Edge has multiple interfaces that support S3, HDFS, and NFS endpoints that simplify moving your data to AWS. It has 10GBase-T, 10/25Gb SFP28, and 40Gb QSFP+ network interfaces.
+
+If your data migration needs are on an exabyte-scale, AWS Snowmobile is available as the transfer device for the large amounts of data. AWS Snowmobile is a 45-foot long rugged shipping container that has an internal capacity of 100 PB and 1 TB/s networking. AWS Snowmobile is designed to shuttle 100 PB of data in under a month and connects to NFS endpoints.
+
+Snow family appliances have many uses cases, including: Cloud migration, Disaster Recovery, Data Center decommissioning, and content distribution.
+
+AWS Storage Gateway
+-------------------
+
+AWS Storage Gateway is a hybrid storage service that enables your on-premises applications to seamlessly use AWS Cloud storage through conventional interfaces such as NFS, iSCSI or VTL. You can use this service for buckup and archiving, DR, cloud bursting, storage tiering, and migration. Your applications connect to the service through a gateway appliance by using standard storage protocols, such as NFS and iSCSI. The Storage Gateway connects to S3 and Glacier on the back-end, providing storage for files, volumes, and virtual tapes in AWS. The service includes a highly optimized data transfer mechanism, with bandwidth management, automated network resilience, and efficient data transfer. It also provides a local cache for low-latency on-premises access to your most active data.
+
+AWS Storage Gateway integrates seamlessly with Glacier through several pathways. Data can be written to an NFS mount point in S3, which can be tiered to Glacier or kept in S3 Standard or Standard-IA. For backup applications that are not already integrated with the Amazon S3 API, use the Virtual Tape Library Gateway mode, which mimics an Oracle/StorageTk L700 LTO tape library. The virtual tape shelf feature, will 'eject' a virtual tape from S3 into Glacier storage.
+
+For Volume and Tape Gateway configurations, the customers' files are stored in a gateway-proprietary format, thus egress must always be back through the Gateway. For customers wishing to use AWS Storage Gateway as a migration tool, where files can subsequently be accessed via the S3 API in native format, the AWS File Gateway solution supports this capability. 
+
+
 
 `SQL Reference for Amazon S3 Select and S3 Glacier Select <https://docs.aws.amazon.com/amazonglacier/latest/dev/s3-glacier-select-sql-reference.html>`_
 

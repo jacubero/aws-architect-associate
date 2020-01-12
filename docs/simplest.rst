@@ -1351,10 +1351,121 @@ With AWS CloudTrail logging enabled, API calls made to Amazon Glacier are tracke
 Vault Lock and Vault access policies
 ------------------------------------
 
-A Vault Lock policy specifies a retention requirement in days from the data of archive creation. Until the retention date has passed, the archive is locked against changes or deletion that functions like a WORM storage device.  
+A Vault Lock policy specifies a retention requirement in days from the data of archive creation. Until the retention date has passed, the archive is locked against changes or deletion that functions like a WORM storage device. Vault Lick supports a Legal Hold, which is intented to support the extension of WORM for archives subject to an ongoing legal event. Locking a policy means that the policy becomes immutable or cannot be chaned, and Glacier enforces the compliance controls specified in the policy for the specified vault.
 
+Amazon Vault Lock eliminates the need for customers to purchase expensive WORM storage drives that require periodic refreshes for record retention. Customers can now easily set up a Vault Lock policy with 7 years of record retention. Glacier enforces the retenton control that ensures that archives stored in the vault cannot be modified or deleted until the 7-year period expires.
+
+Differentiating Vault Lock and Vault access policies
+----------------------------------------------------
+
+A Vault Lock policy is not the same as a Vault access policy. While both policies govern access to your vault, vault lock policies cannot be changed once locked, and that provides strong enforcement for compliance controls. In addition, only one Vault Lock policy may be created for a vault, and it lasts for the life of a vault.
+
+For example, a vault lock policy can deny deleting archives from a vault for a time period to ensure records are retained in accordance with a law or regulation. In contrast, a vault access policy would be used to grant access to archives the are not compliance related and that are subject to frequent modification. Vault lock policies and vault access policies can be used together. For example, a vault lock policy could be created to deny deletes inside of a vault, while a vault access policy colud allow read only access to an auditor.
+
+Vault Lock example
+------------------
+
+.. code-block:: JSON
+
+	{
+	     "Version":"2012-10-17",
+	     "Statement":[
+	      {
+	         "Sid": "deny-based-on-archive-age",
+	         "Principal": "*",
+	         "Effect": "Deny",
+	         "Action": "glacier:DeleteArchive",
+	         "Resource": [
+	            "arn:aws:glacier:us-west-2:123456789012:vaults/examplevault"
+	         ],
+	         "Condition": {
+	             "NumericLessThan" : {
+	                  "glacier:ArchiveAgeInDays" : "365"
+	             }
+	         }
+	      }
+	   ]
+	}
+
+Shown here is an example if a Vault policy that is being initiated on a vault named BusinessCritial. The "Effect" for the policy is set to "Deny", which will affect any actions specified in the policy. The "Principal" designated the user or group that this policy applies to, which in this case is set to "Everyone", which is denoted by the star symbol in quotes.
+
+The DeleteArchive action is specified and a date condition specifies a range of 365 days or fewer for archives in the BusinessCritical vault. This means that the vault policy denies anyone who attempsts to delete archives that are less than 365 days old. Glacier compares the archive creation date and the current date to determine the archive age. If an archive has a calculated age of less than 1 year, any detele request attempt will be declined. Note that if you are uploading older datasets, they will adopt a new date-created when they are uploaded. Therefore, your Vaul Lock retention policy should be adjusted accordingly.
+
+Two-step process
+----------------
+
+Because locking a vault is immutable and cannot be altered once a vault is locked, it is important to understand the two-step locking process. To lock a vault, follow these steps:
+
+1. Initiate the lock by attaching a Vault Lock policy to your vault, which sets the lock to an in progress state and generates a lock ID.
+
+2. Use the lock ID to complte the process before the lock ID's 24-hour expiration.
+
+When you select the ``InitiateVault`` Lock operation, the vault locking process begins ans allows you to work in test mode. The test mode enables you to test the effectiveness of your vault lock policy. The unique lock ID that is generated expires after 24 hours, which gives ample time for testing. If you are not satisfied with the policy, you can use ``AbortVaultLock``operation to delete an in progress policy or modify your policy before locking it down.
+
+After you have thoroughly tested your Vault Lock policy, you can complete the vault lock by using the ``CompleteVaultLock`` operation. To perform the final commit on the vault, supply the most recent lock ID. After the ``CompleteVaultLock`` operation is run, no changes can be made to the vault lock policy.
+
+Vault tags
+----------
+
+You can assign tags to your Glacier vaults for easier cost and resource management. Tags are key-value pairs that you associate with your vaults. By assigning tags, you can manage vault resources and organize data, which is useful when constructing AWS reports to determine usage and costs. Create a tag by defining a key and value that can be customized to meet your needs. For example, you can create a set of tags that defines the owner, purpose, and environment for the vaults you create.
+
+The maximum number of tags that you can assign to a vault is 50. Keys and vaules are case-sensitive. Note that these tags are applied to the Amazon Glacier Vault resource, not to individual archives like Amazon S3 object tags.
+
+You can also use a Legal Hold tag as a condition in Vault Lock policy statements. Suppose that you have a time-based retention rule that an archive can only be deleted if it is less than a 1 year old. At the same time, suppose that you need to place a legal hold on your archives to prevent deletion or modification for an indefinite duration during a legal investigation. In this case, the legal hold takes precedence over the time-based retention rule specified in the Vault Lock policy. To accomodate this scenario, the following example policy has 1 statement with 2 conditions: The first condition will DENY deletion of archives that are less than 365 days old and the second condition will also DENY deletion of archives as long as the vault level hold tag is set to true.
+
+.. code-block:: JSON
+
+	{
+	     "Version":"2012-10-17",
+	     "Statement":[
+	      {
+	        "Sid": "no-one-can-delete-any-archive-from-vault",
+	        "Principal": "*",
+	        "Effect": "Deny",
+	        "Action": [
+	          "glacier:DeleteArchive"
+	        ],
+	        "Resource": [
+	          "arn:aws:glacier:us-west-2:123456789012:vaults/examplevault"
+	        ],
+	        "Condition": {
+	          "NumericLessThan": {
+	            "glacier:ArchiveAgeInDays": "365"
+	          },
+	          "StringLike": {
+	            "glacier:ResourceTag/LegalHold": [
+	              "true",
+	              ""
+	            ]
+	          }
+	        }
+	      }
+	   ]
+	}
+
+A vault lock policy written in this manner prevents deletion or modification of archives in a vault for up to 1 year or until the legal hold tag value is set to false.
+
+Optimizing costs on Amazon Glacier
+==================================
+
+Amazon Glacier pricing model
+----------------------------
+
+Amazon Glacier's best feature is its ultra-low pricing, its key feature is the ability to store more data for less. In addition to storage costs, Amazon Glacier pricing is segmented into several pricing categories:
+
+* **Retrieval pricing**. Volume-based and transaction-based fees that are based on expedited, standard, or bulk retrieval methods.
+
+* **Request pricing**, which is based on the number of archive upload requests or lifecycle transitions from S3.
+
+* **Data transfer pricing**, which is based on data transferred out of Amazon Glacier.
+
+* **Amazon Glacier Select pricing**, which is charged separately by Amazon and is based on the amount of data scanned and number of Glacier Select requests.
 
 `Amazon S3 Glacier pricing (Glacier API only) <https://aws.amazon.com/glacier/pricing/>`_
+
+Object targeting best practices
+-------------------------------
+
 
 `SQL Reference for Amazon S3 Select and S3 Glacier Select <https://docs.aws.amazon.com/amazonglacier/latest/dev/s3-glacier-select-sql-reference.html>`_
 

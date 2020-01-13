@@ -973,11 +973,13 @@ Multipart uploads
 
 The multipart upload API enables you to upload large objects in a set of parts and you can also upload those parts in parallel. Multipart uploading is a three-step process:
 
-1. You initiate the upload and you upload the object parts.
+1. You initiate the upload: ``InitiateMultipartUpload(partSize) -> uploadId``
 
-2. After you have uploaded all the parts, you let S3 know the multipart upload is complete. 
+2. Upload the object parts: ``UploadPart(uploadId,data)``
 
-3. Upon receiving the complete multipart upload request, S3 contructs the object from the uploaded parts, and you can then access the object just as you would any other object in your bucket.
+3. Complete the multipart upload: ``CompleteMultipartUpload(uploadId) -> objectId`` 
+
+Upon receiving the complete multipart upload request, S3 contructs the object from the uploaded parts, and you can then access the object just as you would any other object in your bucket.
 
 In general, when your object size reaches 100 MB, you should consider using multipart uploads instead of a single object upload. Also consider using multipart upload when uploading objects over a spotty network, this way you only need to retry the parts that were interrupted, this increasing the resiliency for your application. Using multipart upload provides a few advantages. The following are some examples:
 
@@ -1502,12 +1504,172 @@ AWS Storage Gateway integrates seamlessly with Glacier through several pathways.
 
 For Volume and Tape Gateway configurations, the customers' files are stored in a gateway-proprietary format, thus egress must always be back through the Gateway. For customers wishing to use AWS Storage Gateway as a migration tool, where files can subsequently be accessed via the S3 API in native format, the AWS File Gateway solution supports this capability. 
 
+Migrating with AWS Storage Gateway and Snowball
+-----------------------------------------------
 
+AWS Storage Gateway can plug into an existing on-premises environment and combine with AWS Snowball to perform data migrations. Suppose you have a customer who is archiving data to an LTO tape and accessing the data using NAS devices. The customer can migrate their data from the NAS devices to AWS by connecting them to multiple AWS Snowball devices.
+
+When the data transfer is complete, the AWS Snowball devices are shipped to AWS where the data is copied in S3 Standard. AWS Lambda functions can be run against the data to verify that the data that was transferred to each AWS Snowball device matches the data that was transferred from on-premises. After verification, an AWS Storage Gateway is deployed at the data center. It is mounted to the S3 bucket via AWS Direct Connect through NFS and data is written back to the on-premise file servers.
+
+Migrating to AWS enables real-time access because all data is accessible via AWS Storage Gateway or S3 Standard. You can then transition the data to Standard-IA or Glacier using lifecycle policies.
+
+There are 10 steps to replace tape backup with AWS Storage Gateway:
+
+1. Go to AWS console to select type of Storage Gateway and hypervisor.
+
+2. Deploy new Tape Gateway appliance in your environment.
+
+3. Provision local disk for cache and upload buffer. The minimum required space for these 2 disks is 150 GiB.
+
+4. Connect and activate your Tape Gateway appliance.
+
+5. Create virtual tapes in seconds.
+
+6. Connect Tape Gateway to backup application.
+
+7. Import new tapes into backup application.
+
+8. Begin backup jobs.
+
+9. Archive tapes for storage on Amazon Glacier. In the backup applications you need to eject (also called export by some backup applications).
+
+10. Retrieve tape on gateway for recovery.
+
+Multipart uploads
+-----------------
+
+For large archives, you can use the multipart upload in Glacier-Native API to increase reliability in throughput. It allows uploading or copying objects that are 5 GB in size or greater.
+
+With multipart uploads, a single object becomes a set of parts. Each part is a contiguous portion of the object's data. You can upload these object parts independently and in any order. If transmission of any part fails, you can retransmit that part without affecting other parts. After all parts of your object are uploaded, Glacier assembles these parts and creates the object. In general, when your object size reaches 100 MB, you should consider using multipart uploads instead of uploading the object in a single operation. Multipart uploading is a three-step process:
+
+1. You initiate the upload: ``InitiateMultipartUpload(partSize) -> uploadId``
+
+2. Upload the object parts: ``UploadPart(uploadId,data)``
+
+3. Complete the multipart upload: ``CompleteMultipartUpload(uploadId) -> archiveId`` 
+
+Data access on Amazon Glacier
+=============================
+
+Amazon Glacier retrieval 
+------------------------
+
+Features
+^^^^^^^^
+
+Amazon Glacier provides 3 retrieval methods that may be specified when retrieving Glacier archives.
+
+**Expedited* retrievals are often used in situations when access to an archive is urgent. You can retrieve a single file from an archive from 1 to 5 minutes.
+
+**Standard** retrievals grants access to archives in about 3-5 hours, which is a good fit for DR situations or when thre is not an immediate need for an archive. 
+
+**Bulk** retrievals grant access to archives from 5 to 12 hours. This tier is primarily for batch processing workloads, such as log files analysis, video transcoding, or large data lakes that require background processing. You can use bulk retrievals to comb through data slowly and pull back PBs of data at a low cost that can be processed by elastic compute or sport instances.
+
+Performance
+^^^^^^^^^^^
+
+Glacier reads are asynchronous: first, the appliation issues a restore job request and specifies one of 3 retrieval methods to be used, then after the specified time period has passed and file is restored, then the application can issue a GET to retrieve the file.
+
+For expedited retrievals, the 1-5-minute restore time is guidance for objects that are up to 250 MB in size. However, larger objects can take longer to restore. For example, a 1-GB object can be restored in 10 minutes or less, given optimal network conditions. Like S3, Glacier's HTTP transaction layer  is designed to push back in the event of high loading. If your workload requires guaranteed responsiveness and HA for expedited retrievals, Amazon Glacier's Provisioned Capacity Units are an optional solution. 
+
+For Standard retrievals, restore times will be 3-5 hours, even for a PB of data or more. And the bulk retrievals, this option can be used to restore multiple PBs of data in less than 12 hours. 
+
+Amazon Glacier restore options
+------------------------------
+
+When an archive is restored through the Glacier-Native API, you are given 24 hours to get the archive from staging storage before you must issue a new restore job. However, via S3-restore, an arbitrary TTL may be specified in days, where a temporary copy of the asset is retained in the S3 bucket in the Reduced Redundancy Storage class. In the case of S3 restores, customers pay for the incremental S3 storage.
+
+If you must restore a PB-scale workload, contact your AWS account team to explore some helpful options. Scripts are available to spread bulk requests over a specified duration to ensure that you are using bulk retrievals in the most efficient manner. Bulk retrievals are often used in datasets that will be processed, so it is important to ensure that your data is being restored at the right speed for the application that will be processing the data.
+
+Provisioned capacity units
+--------------------------
+
+Provisioned capacity units (PCUs) are a way to reserve I/O capacity for Glacier expedited retrievals and guarantees that restore requests will not be throttled. Performance guidance for PCUs is that 1 PCU can deliver up to 3 expedited retrievals and up to 250 MB in 5 minutes, and provide up to 150 MB/s of retrieval throughput for a best-case sequential read. Note that there is no maximum file size restriction for Glacier Expedited retrievals. A large file, however, will take somewhat longer to restore. For example, most 25 GB archive retrievals should complete in under 10 minutes.
+
+Without PCUs, expedited retrieval requests are accepted only if capacity is available at the time the request is made. It's possible that your workload will see performance variability or API-level pushback. PCUs are not guaranteed to improve Glacier performance, but PCUs will reduce variability, and may improve performance if the system is under heavy load. It's important to note, however, that when you enable provisioned capacity units in Glacier, all I/O retrieval requests are routed through provisioned units. None of your Glacier I/O will go through the traditional I/O pool. Consequently you must ensure that you have provisioned enough units to handle your workload peaks.
+
+Each provisioned capacity unit can generally be modeled as providing the equivalent to two LTO6 tape drives. If you are using Glacier as part of an active workflow and you expect deterministic retrieval performance, consider using provisioned capacity units to meet your performance needs.
+
+Glacier Select
+--------------
+
+Glacier Select allows you to directly filter delimited Glacier objects using simple SQL expressions without SQL having to retrieve the full object. Glacier Select allows tou to accelerate bulk ad hoc analytics while reducing overall cost.
+
+Glacier Select operates like a GET request and integrates with the Amazon Glacier SDK and AWS CLI. Glacier Select is also available as an added option in the S3 restore API command.
+
+Use cases
+^^^^^^^^^
+
+Glacier Select is a suitable solution for pattern matching, auditing, big data integration, and many other use cases.
+
+To use Amazon Glacier Select, archive objects that are queried must be formatted as uncompressed delimited files. You must have a S3 bucket with write permissions that resides in the same region as your Glacier vault. Finally, you must have permissions to call the Get Job Output command from a command line.
+
+Query structure
+^^^^^^^^^^^^^^^
+
+An Amazon Glacier Select request is similar to a restore request. The key difference is that there are ``SELECT`` statements inside the expression inside the expression, and a derivative object produced. The restore request must specify an Glacier Select request and also choose the restore option of standard, expedited, or bulk. The query returns results based on the timeframe of the specified retrieval tier.
+
+You can add a description and specify parameters. If your query has header information, you can also specify the input serialization of the objects. Use the expression taf to define your ``SELECT`` statement and the ``OutputLocation`` tag to specify the bucket location for the results. For example, the following JSON file runs the query ``SELECT * FROM object``. Then, it sends the query results to the S3 location ``awsexamplebucket/outputJob``:
+
+.. code-block:: JSON
+
+	{
+	    "Type": "SELECT",
+	    "Tier": "Expedited",
+	    "Description": "This is a description",
+	    "SelectParameters": {
+	        "InputSerialization": {
+	            "CSV": {
+	                "FileHeaderInfo": "USE"
+	            }
+	        },
+	        "ExpressionType": "SQL",
+	        "Expression": "SELECT * FROM object",
+	        "OutputSerialization": {
+	            "CSV": {}
+	        }
+	    },
+	    "OutputLocation": {
+	        "S3": {
+	            "BucketName": "awsexamplebucket",
+	            "Prefix": "outputJob",
+	            "StorageClass": "STANDARD"
+	        }
+	    }
+	}
+
+SQL expressions supported by Amazon Glacier
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+With Glacier Select, you can specify all items in an expression with ``SELECT *``, or specify columns using a positional header and the ``WHERE`` filter. You can also specify name headers as well. Use these SQL filters to retrieve only a portion of an object.
+
+Row-level SQL expressions are support such as ``+,</>, LIKE, AND/OR, ISNULL, STRING, CASE, COUNT, MAX``. For full SQL capabilities including joins and windowing, tools such as Amazon Athena should be subsequently employed.
+
+.. figure:: /simplest_d/sql.png
+   :align: center
+
+   SQL expressions supported by Amazon Glacier
 
 `SQL Reference for Amazon S3 Select and S3 Glacier Select <https://docs.aws.amazon.com/amazonglacier/latest/dev/s3-glacier-select-sql-reference.html>`_
 
 `Amazon S3 Glacier API Permissions: Actions, Resources, and Conditions Reference <https://docs.aws.amazon.com/amazonglacier/latest/dev/glacier-api-permissions-ref.html>`_
 
+How Amazon Glacier Select works
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Glacier Select works when initiate a request job with the SQL parameters you specify. When the job request is received, Glacier returns an acknowledgment ID 200 to indicate that the request was received successfully. Glacier then processes the request ad writes the output to a S3 bucket with the specified prefix in the job request. SNS sends a notification to alert you when the job is complete.
+
+.. figure:: /simplest_d/selectworks.png
+   :align: center
+
+   How Amazon Glacier Select works
+
+Pricing model
+-------------
+
+Glacier Select pricing depends on the retrieval option you specify in your retrieval request job. You can specify standard, expedited, or bulk in your expression. The pricing for Glacier Select falls into 3 categories for each retrieval option: Data Scanned, Data Returned, and Request.
+
+Data Scanned is the size of the object that the SQL statement is run against. Data Returned is the data that returns as the result of your SQL query. Request is based on the initiation of the retrieval request.
 
 Storage classes
 ===============

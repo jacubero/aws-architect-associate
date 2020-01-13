@@ -227,7 +227,7 @@ See section :ref:`secAWSpricing`
 Staff productivity
 ==================
 
-As enterprises move to AWS, a few common pattersn emerge ata the IT staff level. Tactical, undifferentiated work previously required for traditional data centers, like provisioning resources, moves from manual to automated. This saves staff time and reduces time to market. This allows customers' resurces to move to more strategic work.
+As enterprises move to AWS, a few common patterns emerge at the IT staff level. Tactical, undifferentiated work previously required for traditional data centers, like provisioning resources, moves from manual to automated. This saves staff time and reduces time to market. This allows customers' resurces to move to more strategic work.
 
 As AWS maturity increases, customers learn how to further improve their businesses with AWS. They adopt new services and technologies, which can result in additional cost reductions and accelerated time to market.
 

@@ -1,29 +1,154 @@
 Adding a compute layer
 ######################
 
-.. _secEC2:
+Resources
+*********
 
-Adding Compute with Amazon EC2
-******************************
+Instances
+=========
 
-Amazon EC2 allows to create and run virtual machines on AWS cloud. AWS calls these virtual machines *instances*. AWS provides various configurations of CPU, memory, storage, and networking capacity for your instances, known as *instance types*.
+Inside AWS physical servers, there are hypervisors on which guest virtual machines live, called Elastic Compute Cloud (EC2) instances. AWS provides various configurations of CPU, memory, storage, and networking capacity for your instances, known as *instance types*. In 2007, AWS provide only one instance type called M1, since then a lot of instances types have been launched by AWS (175 instances type since 2007 to 2018). This continued rapid pace of innovation has been possible thanks to the `AWS Nitro System <https://aws.amazon.com/ec2/nitro/>`_.
 
 .. figure:: /compute_d/ec2.png
    :align: center
 
 	 Amazon EC2
 
-Launching Amazon EC2 instances with Amazon Machine Images (AMIs)
-================================================================
+Amazon EC2 instance types
+-------------------------
+
+An exammple of an API name of an EC2 instance type is ``M5d.xlarge``.  The first character (in this example ``M``) identifies the instance family. Each instance family is designed for an specific workload needs in terms of CPU, memory, storage and network performance. Amazon EC2 families define different ratios among CPU, memory, storage and network performance. Below you an find the current instance families together with the letters associated with them, and the meaning of each of the letters:
+
+* **General Purpose**: ``A`` : ARM, ``T``: Turbo(Burstable), ``M``: Most Scenarios.
+
+* **Compute Optimized**: ``C``: Compute.
+
+* **Memory Optimized**: ``R``: Random-access memory, ``X``: Extra-large memory (approx 4 TB DRAM), ``U``: High memory (purpose built to run large in-memory databases), ``z``: High frequency.
+
+* **Accelerated Computing**: ``P``: GPU optimized for machine learning, ``G``: GPU optimized for graphics, ``F``: FPGA, ``Inf``: Inferentia chips.
+
+* **Storage Optimized**: ``I``: I/O (NVMe local), ``D``: Dense storage (48 TB local), ``H``: HDD (16 TB local).
+
+The second character represents the instance generation (in this example ``5``). Sometimes, there is an additional characters between the instance generation and the dot. This characters can be one of the following:
+
+* **a**: AMD CPUs.
+
+* **e**: Extra Capacity (Storage or RAM).
+
+* **n**: Network optimized.
+
+* **d**: Direct-attached instance storage (NVMe).
+
+* **g**: ARM-based AWS Graviton CPUs.
+
+After the dot, you have the instance size (in this example ``xlarge``). From nano to large sizes the number of vCPUs is 2 and the number of GiB in memory starts from 0.5 and doubles in the immediate higher instance size. For instance sizes greater than ``large``, you should multiply the CPU and memory by the number that is before ``x``. If there is no number, ``1`` is considered. The instance size called ``metal`` corresponds with Bare metals instance and usually has the same amount of vCPU and memory as the biggest virtual instance size. The following table illustrates instance sizes characteristics:
+
+.. list-table:: Instance sizes characteristics.
+    :widths: 60 20 20
+    :header-rows: 1
+    :stub-columns: 1
+
+    * - Instance Size
+
+      - vCPU
+
+      - Memory (GiB)
+
+    * - nano
+
+      - 2
+
+      - 0.5
+
+    * - micro
+
+      - 2
+
+      - 1
+
+    * - small
+
+      - 2
+
+      - 2
+
+    * - medium
+
+      - 2
+
+      - 4
+
+    * - large
+
+      - 2
+
+      - 8
+
+    * - xlarge
+
+      - 4
+
+      - 16
+
+    * - 2xlarge
+
+      - 8
+
+      - 32
+
+    * - :math:`\cdots`
+
+      - :math:`\cdots`
+
+      - :math:`\cdots`
+
+    * - :math:`y`xlarge
+
+      - :math:`y \times 2`
+
+      - :math:`y \times 8`
+
+.. figure:: /compute_d/types.png
+   :align: center
+
+	 Amazon EC2 instance types nomenclature
+
+`Amazon EC2 instance types <https://aws.amazon.com/ec2/instance-types/>`_ 
+
+`Introducing Elastic Fabric Adapter <https://aws.amazon.com/about-aws/whats-new/2018/11/introducing-elastic-fabric-adapter/>`_
+
+`EC2 Instance Types & Pricing <http://ec2pricing.net/>`_
+
+Amazon Machine Images (AMIs)
+----------------------------
+
+AMI is the software required to launch an EC2 instance. There are 3 different types:
+
+* **Amazon maintained** AMIs which offer a broad set of Linux and Windows images.
+
+* **Marketplace maintained** AMIs managed and maintained by AWS Marketplace partners.
+
+* **Your machine images** are AMIs you have created from Amazon EC2 instances. You can maintain them as private in your account, shared with other accounts and even made them public to the community.  
+
+`Amazon Machine Images (AMI) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html>`_
 
 `How do I create an Amazon Machine Image (AMI) from my EBS-backed EC2 instance? <https://www.youtube.com/watch?time_continue=5&v=vSKWBBrEbNQ&feature=emb_logo>`_
 
-Launching Amazon EC2 instances with user data
-=============================================
+Processors and architectures
+----------------------------
 
+There are mainly 3 types of processors:
 
-Amazon EC2 and storing data
-===========================
+* **Intel** Xeon processors.
+
+* **AMD** EPYC processors.
+
+* AWS **Graviton** processor based on 64-bit Arm architecture.
+
+Additionally, there are multiple GPUs and FPGAs for compute acceleration.
+
+Storage
+=======
 
 Instance store
 --------------
@@ -36,6 +161,10 @@ The data in an instance store persists only during the lifetime of its associate
 
 * The instance terminates
 
+The data is not replicated by default and no snapshot is supported. There are SSD or HDD disks configurations.
+
+`Amazon EC2 Instance Store <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html>`_
+
 Amazon EBS
 ----------
 
@@ -43,7 +172,13 @@ Amazon EBS
 
 `Introduction to Amazon Elastic Block Store (EBS) <https://www.qwiklabs.com/focuses/370?parent=catalog>`_
 
-Amazon EBS provides 3 volume types: General purpose (SSD), Provisioned IOPS (SSD) and Magnetic.
+`Amazon Elastic Block Store (Amazon EBS) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html>`_
+
+`Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
+
+`Amazon EBS-“Optimized Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html>`_
+
+`New -“ Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
 
 Cost factors
 ^^^^^^^^^^^^
@@ -58,58 +193,74 @@ To estimate the cost of using EBS, you need to consider the following:
 
 * Outbound **Data transfer** is tiered and inbound data is free. 
 
-Amazon EFS
-----------
+Networking
+==========
 
-`Amazon Elastic File System - Scalable, Elastic, Cloud-Native File System for Linux <https://www.youtube.com/watch?v=AvgAozsfCrY&feature=emb_logo>`_
+**Virtual Private Cloud (VPC)** provision a logically isolated cloud where you can launch AWS resources into a virtual network. More information in :ref:`secVPC`.
 
-`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic File System (Amazon EFS) (STG301-R1) <https://www.youtube.com/watch?v=4FQvJ2q6_oA>`_
+You can use **security groups** and **ACLs** to restrict inboud and outbound traffic. **NAT Gateways** to allow an instance within a private subnet to talk to Internet. You can enable Flow Logs in any of the network interfaces, and allow you to monitor the traffic in and out these interfaces.
 
+Within a VPN, you can add VPC endpoints to provide private and secure connectivity to S3 and DynamoDB.
 
-Amazon EC2 instance types
-=========================
+Shared VPC allows multiple accounts to launch applications into a VPC.
 
-`Amazon EC2 instance types <https://aws.amazon.com/ec2/instance-types/>`_ 
+AWS privatelink allows you the ability to have an endpoint from any VPC to share services privately to any VPC and on-premises networks. You can also use AWS privatelinks to exchange data between a VPC and a SaaS solution (for instance: Salesforce, Heroku) using AWS Direct Connect.
 
-Amazon EC2 families
--------------------
+When you have many VPCs in your application, you can simplify the network with AWS Transit Gateway. It provides hub and spoke for managing VPCs. You essentially connect each of your VPCs to the AWS Transit Gateway, as well as the AWS Direct connect gateway and the customer gateway, all talking to each other via the AWS Transit Gateway. 
 
-* **General Purpose**: A1, T3, T3a, T2, M6g, M5, M5a, M5n, M4.
+Availability
+************
 
-* **Compute Optimized**: C5, C5n, C4.
+Regions and AZs
+===============
 
-* **Memory Optimized**: R5, R5a, R5n, R4, X1e, X1, High Memory, z1d.
+AWS global infrastructure provides an SLA of 99.99% availability on EC2. See :ref:`secGlobalInfrastructure`
 
-* **Accelerated Computing**: P3, P2, Inf1, G4, G3, F1.
+Placement groups
+================
 
-* **Storage Optimized** I3, I3en, D2, H1.
+Placement groups enable you to influence AWS selection of capacity for member instances, optimizing the experience for a workload. The selection could be to make the instances fall together or fall apart.
 
-Cost Factors
+**Cluster** placement groups. EC2 places instances closely in order to optimize the performance of inter-instance network traffic. The use case is when you want to minimize the latency among instances.
+
+**Spread** placement groups. EC2 places instances on distinct HW in order to help reduce correlated failures. A use case could be when deploying a NoSQL database cluster in EC2, spread placement will ensure the instances in your cluster are on distinct HW, helping to insulate a single HW failure to a single node.
+
+Elastic Load Balancing
+======================
+
+A Load Balancer is used to route incoming requests to multiple Amazon EC2 instances, containers, or IP addresses in your VPC. Elastic Load Balancing provides HA by utilizing multiple AZs.
+
+Auto Scaling
 ============
 
-To estimate the cost of using EC2, you need to consider the following:
+Amazon EC2 Auto scaling dynamically react to changing demans, optimizing cost. 
 
-* **Clock seconds/hours of server Time**. Resources incur charges when they are running. For example, from the time EC2 instances are launched until they are terminated, or from the time elastic IPs are allocated until the time they are de-allocated.
+Fleet management
+----------------
 
-* **Instance configuration**. Consider the physical capacity of the EC2 instance you choose. Instance pricing varies with the AWS region, OS, instance type and instance size.
+A common use case is to put the EC2 instances in an auto scaling group that allows to have a health check. If one of the health checks fail, it automatically brings up a new instance to replace it.
 
-* **Number of instances**. You can provision multiple instances to handle peak loads.
+Dynamic scaling
+---------------
 
-* **Load balancing**. An elastic load balancer can be used to distribute traffic among EC2 instances. The number of hours the ELB runs and the amount of data it processes contribute to the monthly cost.
+Another common use case is via an scaling policy that is monitoring a parameter (such as CPU utilization). If it detects a spike, it brings additional instances onboard and it will terminate those when that spike subsides.
 
-The product options are the following:
+Management
+**********
 
-* **Detailed monitoring**. You can use Amazon CloudWatch to monitor your EC2 instances. By default, basic monitoring is enabled and available at no additional cost. However, for a fixed monthly rate, you can opt for detailed monitoring, which includes 7 preselected metrics recorded once a minute. Partial months are charge on an hourly prorated basis, at a per instance-hour rate.
+Deployment
+==========
 
-* **Auto scaling** automatically adjusts the number of EC2 instances in your deployment according to conditions you define. This service is available at no additional charge beyond CloudWatch fees.
 
-* **Elastic IP addresses**. You can have one Elastic IP address associated with a running instance at no charge.
+Monitoring
+==========
 
-Operating systems and Software packages:
 
-* **Operating system** prices are included in the instance prices.
+Administration
+==============
 
-* **Software packages**. AWS has partnerships with Microsoft, IBM, etc. to simplify running certain commercial software packages on your EC2 instances, for example: MS SQL Server on Windows. For commercial software packages tht AWS does not provide, such as nonstandard OS, Oracle applications, Windows Server applications such as MS SharePoint and MS Exchange, you need to obtain a license from the vendors. You can bring your existing license to the cloud through specific vendor programs such as Microsoft License Mobility through Software Assurance Program.
+
+
 
 .. _secEC2pricing:
 
@@ -130,6 +281,8 @@ Reserved Instances
 ==================
 
 `Introduction to Amazon EC2 Reserved Instances <https://www.youtube.com/watch?time_continue=1&v=XrmdkRQZhUQ&feature=emb_logo>`_
+
+`Amazon EC2 Reserved Instances and Other Reservation Models <https://docs.aws.amazon.com/whitepapers/latest/cost-optimization-reservation-models/introduction.html>`_
 
 Using Reserved Instances can have a significant impact on savings compared to on-demand, in some cases up to 75%. Typically, Reserved Instances are used for workloads that need to run most or all of the time, such as production environments. The commitment level could be 1 year or 3 years. AWS services offering RIs are: Amazon EC2, ECS, RDS, DynamoDB, Redshift, ElastiCache, Reserved Transcode Slots and Reserved Queues (AWS Elemental MediaConvert). RI types are Standard, Convertible and Scheduled.
 
@@ -221,6 +374,11 @@ Amazon EC2 Spot instances integrate natively with a number of other AWS services
 Amazon EC2 dedicated options
 ============================
 
+`Amazon EC2 Dedicated Hosts <https://aws.amazon.com/ec2/dedicated-hosts/>`_
+
+`Introducing AWS License Manager <https://aws.amazon.com/about-aws/whats-new/2018/11/announcing-aws-license-manager/>`_
+
+`Changing the Tenancy of an Instance <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-instance.html#dedicated-change-tenancy>`_
 
 AWS tagging strategies
 ======================
@@ -228,6 +386,82 @@ AWS tagging strategies
 `AWS Tagging Strategies <https://aws.amazon.com/answers/account-management/aws-tagging-strategies/>`_
 
 * **Cost Allocation Tags** only eases the organization of your resource costs on your cost allocation report, to make it easier for you to categorize and track your AWS costs.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Launching Amazon EC2 instances with user data
+=============================================
+
+`Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_
+
+Amazon EC2 and storing data
+===========================
+
+
+Amazon EFS
+----------
+
+`Amazon Elastic File System - Scalable, Elastic, Cloud-Native File System for Linux <https://www.youtube.com/watch?v=AvgAozsfCrY&feature=emb_logo>`_
+
+`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic File System (Amazon EFS) (STG301-R1) <https://www.youtube.com/watch?v=4FQvJ2q6_oA>`_
+
+`Amazon EFS now Supports Access Across Accounts and VPCs <https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-efs-now-supports-access-across-accounts-and-vpcs/?nc1=h_ls>`_
+
+`Mounting EFS File Systems from Another Account or VPC <https://docs.aws.amazon.com/efs/latest/ug/manage-fs-access-vpc-peering.html>`_
+
+`Mounting File Systems Without the EFS Mount Helper <https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-old.html>`_
+
+`Using Microsoft Windows File Shares <https://docs.aws.amazon.com/fsx/latest/WindowsGuide/using-file-shares.html>`_
+
+`Mounting from an Amazon EC2 Instance <https://docs.aws.amazon.com/fsx/latest/LustreGuide/mounting-ec2-instance.html>`_
+
+
+Cost Factors
+============
+
+To estimate the cost of using EC2, you need to consider the following:
+
+* **Clock seconds/hours of server Time**. Resources incur charges when they are running. For example, from the time EC2 instances are launched until they are terminated, or from the time elastic IPs are allocated until the time they are de-allocated.
+
+* **Instance configuration**. Consider the physical capacity of the EC2 instance you choose. Instance pricing varies with the AWS region, OS, instance type and instance size.
+
+* **Number of instances**. You can provision multiple instances to handle peak loads.
+
+* **Load balancing**. An elastic load balancer can be used to distribute traffic among EC2 instances. The number of hours the ELB runs and the amount of data it processes contribute to the monthly cost.
+
+The product options are the following:
+
+* **Detailed monitoring**. You can use Amazon CloudWatch to monitor your EC2 instances. By default, basic monitoring is enabled and available at no additional cost. However, for a fixed monthly rate, you can opt for detailed monitoring, which includes 7 preselected metrics recorded once a minute. Partial months are charge on an hourly prorated basis, at a per instance-hour rate.
+
+* **Auto scaling** automatically adjusts the number of EC2 instances in your deployment according to conditions you define. This service is available at no additional charge beyond CloudWatch fees.
+
+* **Elastic IP addresses**. You can have one Elastic IP address associated with a running instance at no charge.
+
+Operating systems and Software packages:
+
+* **Operating system** prices are included in the instance prices.
+
+* **Software packages**. AWS has partnerships with Microsoft, IBM, etc. to simplify running certain commercial software packages on your EC2 instances, for example: MS SQL Server on Windows. For commercial software packages tht AWS does not provide, such as nonstandard OS, Oracle applications, Windows Server applications such as MS SharePoint and MS Exchange, you need to obtain a license from the vendors. You can bring your existing license to the cloud through specific vendor programs such as Microsoft License Mobility through Software Assurance Program.
+
+`How AWS Pricing Works <https://d0.awsstatic.com/whitepapers/aws_pricing_overview.pdf>`_
+
+`AWS Free Tier <https://aws.amazon.com/free/>`_
+
 
 Amazon EC2 considerations
 *************************

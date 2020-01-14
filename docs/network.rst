@@ -1,6 +1,8 @@
 Networking in AWS
 ########################################
 
+.. _secVPC:
+
 Amazon Virtual Private Cloud (VPC)
 **********************************
 

@@ -3,11 +3,11 @@ The simplest architectures
 
 `AWS Storage Services Overview <https://d1.awsstatic.com/whitepapers/AWS%20Storage%20Services%20Whitepaper-v9.pdf>`_
 
-* **Block storage** is data organized as an array of unrelated blocks. Host file system places data on disk. Amazon EBS and EC2 instance storage provide active computing or database workloads.
+* **Block storage** requires that the operating system has direct byte-level access to a storage device. A block device is a storage device that moves data in sequences of bytes or bits. Amazon EBS provides durable, block-level storage volumens that you can attacj to a running Amazon Ec2 instance.
 
-* **File storage** is unrelated data blocks managed by a file (serving) system. Native file system places data on disk. For example NTFS for Microsoft storage. Data stored in a file system contains attributes such as permissions, file owner and they are stored as metadata in the file system. File systems are provided in AWS Storage Gateway and Elastic File System (EFS).
+* **File storage** requires the network file system (NFS) protocol to abstract the operating system from storage devices. Data stored in a file system contains attributes such as permissions, file owner and they are stored as metadata in the file system. You can use an Elastic File System (EFS) file system as a common data source for workloads and applications running on multiple instances.
 
-* **Object storage**. It is a flat system which stores data as objects which encapsulates the attributes, metadata, and other properties. It stores the data, data attributes, metadata, and object IDs as objects. It provides API access to data. It is metadata driven, policy-based, etc. It allows you to store ilimitedless amount of data and scales easily. Content type, permissions and the file owner are stored as metadata in a file system. There are more metadata that can be stored as object. You can create custom metadata named values that can be used for such things as analytics. Object storage is offerd via Amazon S3 and Amazon Glacier.
+* **Object storage**. It is a flat system which stores data as objects which encapsulates the attributes, metadata, and other properties. It stores the data, data attributes, metadata, and object IDs as objects. It provides API access to data. It is metadata driven, policy-based, etc. It allows you to store ilimitedless amount of data and scales easily. Content type, permissions and the file owner are stored as metadata in a file system. There are more metadata that can be stored as object. You can create custom metadata named values that can be used for such things as analytics. Amazon S3 is designed to make web-scale computing easier by enabling you to store and retrieve any amount of data, at any time, from within Amazon EC2 or anywhere on the web.
 
 Each storage option has a unique combination of performance, durability, cost and interface.
 

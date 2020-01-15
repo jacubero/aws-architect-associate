@@ -46,7 +46,6 @@ After the dot, you have the instance size (in this example ``xlarge``). From nan
 .. list-table:: Instance sizes characteristics.
     :widths: 60 20 20
     :header-rows: 1
-    :stub-columns: 1
 
     * - Instance Size
 
@@ -134,6 +133,22 @@ AMI is the software required to launch an EC2 instance. There are 3 different ty
 
 `How do I create an Amazon Machine Image (AMI) from my EBS-backed EC2 instance? <https://www.youtube.com/watch?time_continue=5&v=vSKWBBrEbNQ&feature=emb_logo>`_
 
+The appropriate user names for connecting to a newly created Amazon EC2 instance are as follows:
+
+* For an Amazon Linux AMI, the user name is ``ec2-user``.
+
+* For a RHEL AMI, the user name is ``ec2-user`` or ``root``.
+
+* For an Ubuntu AMI, the user name is ``ubuntu`` or ``root``.
+
+* For a Centos AMI, the user name is ``centos``.
+
+* For a Debian AMI, the user name is ``admin`` or ``root``.
+
+* For a Fedora AMI, the user name is ``ec2-user``.
+
+* For a SUSE AMI, the user name is ``ec2-user`` or ``root``.
+
 Processors and architectures
 ----------------------------
 
@@ -168,30 +183,7 @@ The data is not replicated by default and no snapshot is supported. There are SS
 Amazon EBS
 ----------
 
-`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic Block Storage (Amazon EBS) (STG310-R1) <https://www.youtube.com/watch?v=BuJa6Vl8cn8>`_
-
-`Introduction to Amazon Elastic Block Store (EBS) <https://www.qwiklabs.com/focuses/370?parent=catalog>`_
-
-`Amazon Elastic Block Store (Amazon EBS) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html>`_
-
-`Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
-
-`Amazon EBS-“Optimized Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html>`_
-
-`New -“ Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
-
-Cost factors
-^^^^^^^^^^^^
-
-To estimate the cost of using EBS, you need to consider the following:
-
-* **Volumes**. Volumes storage for all EBS volume types is charged by the amount you provision in GB per month, until you release the storage.
-
-* **IOPS**. I/O is included in the price of general purpose volumes. Magnetic volumes are charged by the number of requests you make to your volume. Provisioned IOPS volumes are charged by the amount you provision in IOPS, multiplied by the percentage of days you provision for the month.
-
-* **Snapshot**. EBS provides the ability to back up snapshots of your data to S3 for durable recovery. If you opt for EBS snapshots, the added cost is per gigabyte-month of data stored.
-
-* Outbound **Data transfer** is tiered and inbound data is free. 
+See section :ref:`secEBS`.
 
 Networking
 ==========
@@ -245,21 +237,78 @@ Dynamic scaling
 
 Another common use case is via an scaling policy that is monitoring a parameter (such as CPU utilization). If it detects a spike, it brings additional instances onboard and it will terminate those when that spike subsides.
 
+Predictive scaling looks at the patterns of application cycles on your application and the set of applications that run on AWS and uses machine learning techniques to predict when you are going to need to scale ahead of demanda and when you need to scale down ahead of seeing drops in demand.
+
 Management
 **********
 
 Deployment
 ==========
 
+Launch templates
+----------------
 
-Monitoring
-==========
+When you launch an instance you can specify a lot of parameters: Instance type, EBS volume, AMI ID, Network interface, tags, user data, block device mapping, placement. Some of them are mandatory and others are not. 
 
+You can encapsulate all these parameters in a template, called **Launch template**. These templates can be useful to ensure a *consistent experience* in the organization. You can define *simple permissions*: the EC2 instances you want to launch, what are the AMIs I want them to use, what are the subnets and security group rules, and you can prevent to launch anything outside this template. Launch templates provides you with the ability to define *governance and best practices*, for instance, you can choose what can be overriden. These templates increase productivity, a common use case is using it in conjunction with Auto Scaling groups.
+
+Launching Amazon EC2 instances with user data
+---------------------------------------------
+
+`Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_
 
 Administration
 ==============
 
+AWS Systems Manager
+-------------------
 
+AWS Systems Manager allows you to operate cloud and on-premises Linux and Windows workloads safely at scale in the following way:
+
+* Stay patch and configuration compliant.
+
+* Automate across accounts and regions.
+
+* Connect to EC2 instances via browser and CLI.
+
+* Track SW inventory across accounts.
+
+* Install agents safely across instances with rate control.
+
+AWS Resource Access Manager
+---------------------------
+
+AWS Resource Access Manager allows you to securely share AWS resources with other accounts or AWS organizations. It offers the following features:
+
+* Reduces need to provision duplicate resources.
+
+* Efficiently uses resources across different departments.
+
+* AWS Identity and Access Management policies govern consumption of shared resources.
+
+* Integration with Amazon CloudWatch and AWS CloudTrail.
+
+* Supports resource sharing for License Manager Configs, Route 53 Resolver Rules, Subnets, and Transit Gateways.
+
+AWS License Manager
+-------------------
+
+AWS License Manager offers a simplified license management for on premises and cloud (even if it is AWS). It offers the following features:
+
+* More easily manage licenses from software vendors (SAP, Windows, Oracle).
+
+* Define licensing rules, discover usage, manage access.
+
+* Gain single view of license across AWS and on-premises.
+
+* Discover non-compliant software and help prevent misuse.
+
+* Seamless integration with AWS Systems Managet and AWS Organizations.
+
+* Free service for all customers.
+
+Monitoring
+==========
 
 
 .. _secEC2pricing:
@@ -275,7 +324,38 @@ Then, once customers have identified what is steady state and what is predictabl
 
 **Spot instances** are the most inexpensive and flexible way to access Amazon EC2 instances. 
 
-With all these pricing models, the key is striking a balance. Use RIs for predictable or always-on workloads, and On-Demand and Spot Instances for unpredictable workloads.
+With all these pricing models, the key is striking a balance. Use RIs for known, steady-state, predictable or always-on workloads. On-Demand, for unknown spiky workloads. Scale using Spot Instances for faul-tolerant, flexible, stateless workloads.
+
+Cost Factors
+============
+
+To estimate the cost of using EC2, you need to consider the following:
+
+* **Clock seconds/hours of server Time**. Resources incur charges when they are running. For example, from the time EC2 instances are launched until they are terminated, or from the time elastic IPs are allocated until the time they are de-allocated.
+
+* **Instance configuration**. Consider the physical capacity of the EC2 instance you choose. Instance pricing varies with the AWS region, OS, instance type and instance size.
+
+* **Number of instances**. You can provision multiple instances to handle peak loads.
+
+* **Load balancing**. An elastic load balancer can be used to distribute traffic among EC2 instances. The number of hours the ELB runs and the amount of data it processes contribute to the monthly cost.
+
+The product options are the following:
+
+* **Detailed monitoring**. You can use Amazon CloudWatch to monitor your EC2 instances. By default, basic monitoring is enabled and available at no additional cost. However, for a fixed monthly rate, you can opt for detailed monitoring, which includes 7 preselected metrics recorded once a minute. Partial months are charge on an hourly prorated basis, at a per instance-hour rate.
+
+* **Auto scaling** automatically adjusts the number of EC2 instances in your deployment according to conditions you define. This service is available at no additional charge beyond CloudWatch fees.
+
+* **Elastic IP addresses**. You can have one Elastic IP address associated with a running instance at no charge.
+
+Operating systems and Software packages:
+
+* **Operating system** prices are included in the instance prices.
+
+* **Software packages**. AWS has partnerships with Microsoft, IBM, etc. to simplify running certain commercial software packages on your EC2 instances, for example: MS SQL Server on Windows. For commercial software packages tht AWS does not provide, such as nonstandard OS, Oracle applications, Windows Server applications such as MS SharePoint and MS Exchange, you need to obtain a license from the vendors. You can bring your existing license to the cloud through specific vendor programs such as Microsoft License Mobility through Software Assurance Program.
+
+`How AWS Pricing Works <https://d0.awsstatic.com/whitepapers/aws_pricing_overview.pdf>`_
+
+`AWS Free Tier <https://aws.amazon.com/free/>`_
 
 Reserved Instances
 ==================
@@ -284,7 +364,7 @@ Reserved Instances
 
 `Amazon EC2 Reserved Instances and Other Reservation Models <https://docs.aws.amazon.com/whitepapers/latest/cost-optimization-reservation-models/introduction.html>`_
 
-Using Reserved Instances can have a significant impact on savings compared to on-demand, in some cases up to 75%. Typically, Reserved Instances are used for workloads that need to run most or all of the time, such as production environments. The commitment level could be 1 year or 3 years. AWS services offering RIs are: Amazon EC2, ECS, RDS, DynamoDB, Redshift, ElastiCache, Reserved Transcode Slots and Reserved Queues (AWS Elemental MediaConvert). RI types are Standard, Convertible and Scheduled.
+Using Reserved Instances can have a significant impact on savings compared to on-demand, in some cases up to 75%. Typically, Reserved Instances are used for workloads that need to run most or all of the time, such as production environments. The commitment level could be 1 year or 3 years. AWS services offering RIs are: Amazon EC2, ECS, RDS, DynamoDB, Redshift, ElastiCache, Reserved Transcode Slots and Reserved Queues (AWS Elemental MediaConvert). It offers payment flexibility with 3 upfront payment options (all, partial, none). RI types are Standard, Convertible and Scheduled.
 
 While using RIs, in certain cases, customers can take advantage of regional benefits. Regional benefits can simplify reserved instance optimization by allowing a reserved instance to be applied for the whole AWS Region, rather than just a specific Availability Zone, which can simplify capacity planning.
 
@@ -328,7 +408,7 @@ Some guidelines for exchanging convertible RIs are the following:
 
   * Converted RIs have the latest expiration data of the whole group.
 
-  * In the case of multiple terns, converted RIs will be a 3-year RIs.
+  * In the case of multiple terms, converted RIs will be a 3-year RIs.
 
 For complete set of conversion rules, see `Exchanging Convertible Reserved Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-convertible-exchange.html>`_.
 
@@ -371,6 +451,14 @@ Amazon EC2 Spot instances integrate natively with a number of other AWS services
 
 `Amazon EC2 Spot Instances workshops website <https://ec2spotworkshops.com/>`_
 
+Amazon EC2 fleet
+================
+
+Amazon EC2 Fleet is a new feature that simplifies the provisioning of Amazon EC2 capacity across different Amazon EC2 instance types, Availability Zones and across On-Demand, Amazon EC2 Reserved Instances (RI) and Amazon EC2 Spot purchase models. With a single API call, you can provision capacity across EC2 instance types and across purchase models to achieve desired scale, performance and cost.
+
+It uses all 3 purchase options to optimize costs. It is integrated with Amazon EC2 Auto Scaling, Amazon ECS, Amazon EKS, and AWS Batch.
+
+
 Amazon EC2 dedicated options
 ============================
 
@@ -387,34 +475,103 @@ AWS tagging strategies
 
 * **Cost Allocation Tags** only eases the organization of your resource costs on your cost allocation report, to make it easier for you to categorize and track your AWS costs.
 
+`AWS re:Invent 2018: [REPEAT 1] Amazon EC2 Foundations (CMP208-R1) <https://www.youtube.com/watch?time_continue=1&v=vXBeO9vQAI8&feature=emb_logo>`_
 
+.. _secEBS:
 
+Amazon EBS
+**********
 
+Overview
+========
 
+EBS is block storage as a service. With an API call, you create an EBS volume, which is a configurable amount of raw block storage with configurable performance characteristics. With another API call, you can attacj a volume to an EC2 instance when you need access to that data. Access to the volume os over the network. Once attached, you can create a file system on top of a volume, run a database on it, or use it in any other way you would use block storage. 
 
+An EBS volume is not a single physical disk. It is a logical volume. EBS is a distributed system an each EBS volume is made up of multiple, physical devices. By distributing a volume across many devices EBS provides added performance and durability that you can't get from a single disk device.
 
+EBS volumes are created in a specific AZ, and can then be attached to any instances in that same AZ. To make a volume available outside of the AZ, you can create a snapshot and restore that snapshot to a new volume anywhere in that region.
 
+Data on an EBS volume persists independently from the life of an EC2 instance. As a result, you can detach your volume from one instance and attach it to another instance in the same AZ as the volume. If an EC2 instance fails, EBS storage persists independently from the EC2 instance. Because the system has failed, and has not been terminated by calling an PI, the volume is still available. In this case, you can re-attach the EBS volume to a new EC2 instance.
 
+An EBS volume can be attached to only one instance at a time, but many volumes can attach to a single instance. For example, you might separate boot volume from application-specific data volumes.
 
+EBS is designed to give a high level of volume availability and durability. Each volume is designed for five 9s of service availability. That's an average down time of about 5 minutes per year. For durability, the Annualized Failure Rate (AFR) is between 0.1% and 0.2%, nearly 20 times more reliable than a typical HDD at 4% AFR. To recover from a volume failure, you can use EBS to create snapshots of volumes, which are point-in-time copies of your data that is stored in S3 buckets. 
 
+Block storage offerings
+-----------------------
 
+AWS addresses the block storage market in 3 categories to align with different customer workloads: 
 
+* EC2 instance store provides SSD and HDD-based local instance store that targets high IOPS workloads that require low microsecond latency.
 
+* EBS SSD storage offers General Purpose (gp2) and Provisioned IOPS (io1) volume types.
 
+* EBS HDD storage offers Throughput Optimized (st1) and Cold HDD (sc1) volume types.
 
+An instance store provides temporary block-level storage for your instance. This storage is located on disks that are physically attached to the host computer. Instance store is ideal for temporary storage of information that changes frequently, such as buffers, caches, scratch data, an other temporary content, or for data that is replicated across a fleet of instances, such as load-balanced pool of web servers.
 
+An instance store consists of one or more instance store volumes exposed as block devices. The size of an instance store and the number of devices available varies by instance type. Although an instance store is dedicated to a particular instance, the disk subsystem is shared among instances on a host computer.
 
-Launching Amazon EC2 instances with user data
-=============================================
+The EC2 instance and EBS have some similarities:
 
-`Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_
+* Both are presented as block storage to EC2.
 
-Amazon EC2 and storing data
+* Both are available as either SSD or HDD, depending on the EC2 instance type.
+
+Their differences are:
+
+* EC2 instance store is ephemeral. Data stored on the instance store does not persist beyond the life of the EC2 instance, consider it as being temporary storage.
+
+* By default, data on EC2 instance store volumes is not replicated as a part of the EC2 service. However, you can set up replication yourself by setting up a RAID volume on the instance or replicating that data to another EC2 instance.
+
+* Snapshots of an EC2 instance store volume are not supported, so you would have to implement your own mechanism to back up data stored on an instance store volume.
+
+Use Cases
+---------
+
+**Relational Databases** such as Orable, Microsoft SQL Server, MySQL, and PostgreSQL are widely deployed on EBS.
+
+EBS meets the diverse needs of reliable block storage to run **mission-critical applications** such as Oracle, SAP, Microsoft Exchange, and Microsoft SharePoint.
+
+EBS enables your organization to be more agile and responsive to customer needs. Provision, duplicate, scale, or archive your **development, test, and production** environment with a few clicks.
+
+EBS volumes provide the consistent and low-latency performance your application needs when running **NoSQL databases**.
+
+**Business Continuity**. Minimize data loss and recovery time by regularly backing up your data and log files across different geographic regions. Copy AMIs and EBS snapshots to deploy applications in new AWS Regions.
+
+Types of Amazon EBS volumes
 ===========================
 
 
+`Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
+
+`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic Block Storage (Amazon EBS) (STG310-R1) <https://www.youtube.com/watch?v=BuJa6Vl8cn8>`_
+
+`Introduction to Amazon Elastic Block Store (EBS) <https://www.qwiklabs.com/focuses/370?parent=catalog>`_
+
+`Amazon Elastic Block Store (Amazon EBS) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html>`_
+
+
+
+`Amazon EBS-?Optimized Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html>`_
+
+`New -? Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
+
+Cost factors
+^^^^^^^^^^^^
+
+To estimate the cost of using EBS, you need to consider the following:
+
+* **Volumes**. Volumes storage for all EBS volume types is charged by the amount you provision in GB per month, until you release the storage.
+
+* **IOPS**. I/O is included in the price of general purpose volumes. Magnetic volumes are charged by the number of requests you make to your volume. Provisioned IOPS volumes are charged by the amount you provision in IOPS, multiplied by the percentage of days you provision for the month.
+
+* **Snapshot**. EBS provides the ability to back up snapshots of your data to S3 for durable recovery. If you opt for EBS snapshots, the added cost is per gigabyte-month of data stored.
+
+* Outbound **Data transfer** is tiered and inbound data is free. 
+
 Amazon EFS
-----------
+**********
 
 `Amazon Elastic File System - Scalable, Elastic, Cloud-Native File System for Linux <https://www.youtube.com/watch?v=AvgAozsfCrY&feature=emb_logo>`_
 
@@ -431,56 +588,8 @@ Amazon EFS
 `Mounting from an Amazon EC2 Instance <https://docs.aws.amazon.com/fsx/latest/LustreGuide/mounting-ec2-instance.html>`_
 
 
-Cost Factors
-============
-
-To estimate the cost of using EC2, you need to consider the following:
-
-* **Clock seconds/hours of server Time**. Resources incur charges when they are running. For example, from the time EC2 instances are launched until they are terminated, or from the time elastic IPs are allocated until the time they are de-allocated.
-
-* **Instance configuration**. Consider the physical capacity of the EC2 instance you choose. Instance pricing varies with the AWS region, OS, instance type and instance size.
-
-* **Number of instances**. You can provision multiple instances to handle peak loads.
-
-* **Load balancing**. An elastic load balancer can be used to distribute traffic among EC2 instances. The number of hours the ELB runs and the amount of data it processes contribute to the monthly cost.
-
-The product options are the following:
-
-* **Detailed monitoring**. You can use Amazon CloudWatch to monitor your EC2 instances. By default, basic monitoring is enabled and available at no additional cost. However, for a fixed monthly rate, you can opt for detailed monitoring, which includes 7 preselected metrics recorded once a minute. Partial months are charge on an hourly prorated basis, at a per instance-hour rate.
-
-* **Auto scaling** automatically adjusts the number of EC2 instances in your deployment according to conditions you define. This service is available at no additional charge beyond CloudWatch fees.
-
-* **Elastic IP addresses**. You can have one Elastic IP address associated with a running instance at no charge.
-
-Operating systems and Software packages:
-
-* **Operating system** prices are included in the instance prices.
-
-* **Software packages**. AWS has partnerships with Microsoft, IBM, etc. to simplify running certain commercial software packages on your EC2 instances, for example: MS SQL Server on Windows. For commercial software packages tht AWS does not provide, such as nonstandard OS, Oracle applications, Windows Server applications such as MS SharePoint and MS Exchange, you need to obtain a license from the vendors. You can bring your existing license to the cloud through specific vendor programs such as Microsoft License Mobility through Software Assurance Program.
-
-`How AWS Pricing Works <https://d0.awsstatic.com/whitepapers/aws_pricing_overview.pdf>`_
-
-`AWS Free Tier <https://aws.amazon.com/free/>`_
-
-
 Amazon EC2 considerations
 *************************
-
-The appropriate user names for connecting to a newly created Amazon EC2 instance are as follows:
-
-* For an Amazon Linux AMI, the user name is ``ec2-user``.
-
-* For a RHEL AMI, the user name is ``ec2-user`` or ``root``.
-
-* For an Ubuntu AMI, the user name is ``ubuntu`` or ``root``.
-
-* For a Centos AMI, the user name is ``centos``.
-
-* For a Debian AMI, the user name is ``admin`` or ``root``.
-
-* For a Fedora AMI, the user name is ``ec2-user``.
-
-* For a SUSE AMI, the user name is ``ec2-user`` or ``root``.
 
 
 `Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
@@ -495,4 +604,3 @@ Instances within a VPC with a public address have that address released when it 
 
 All EC2 instances in the default VPC have both a public and private IP address.
 
-`AWS re:Invent 2018: [REPEAT 1] Amazon EC2 Foundations (CMP208-R1) <https://www.youtube.com/watch?time_continue=1&v=vXBeO9vQAI8&feature=emb_logo>`_

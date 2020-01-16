@@ -542,6 +542,80 @@ EBS volumes provide the consistent and low-latency performance your application 
 Types of Amazon EBS volumes
 ===========================
 
+Comparison of EBS volume types
+------------------------------
+
+EBS provides the following volume types, which differ in performance characteristics and price, so that you can tailor your storage performance and cost to the needs of your applications. The volume types fall into 2 categories: Solid state drives and Hard disk drives.
+
+Solid state drive, or SSD-backed volumes are optimized for transactional workloads that involve frequent read/write operations with small size and random I/O. For SSD-backed volumes, the dominant performance attribute is I/O operations per second, or IOPS. These volumes provide low latency.
+
+Hard disk drive, or HDD-backed volumes are optimized for large streaming workloads where throughput (measured in MiB/s) is a better performance measure than IOPS. These volumes work best when the workload is sequential. For example, back up operations and writing SQL transaction log files. The more sequential a workload is, the less time spent in read operations. Therefore, the faster disk response leads to higher throughput rates.
+
+There are 2 types of SSD-backed volumes: General Purpose (gp2) and Provisioned IOPS (io1). There are 2 types of HDD-backed volumes: Throughput Optimized (st1) and Cold HDD (sc1). This table describes and compares the 4 volume types.
+
+.. figure:: /compute_d/ebs.png
+   :align: center
+
+	 Comparison of SSD and HDD volumes
+
+The General Purpose SSD volume can handle most workloads, such as boot volumes, virtual machines, interactive applications, and development environments. The Provisiones IOPS SSD volume can handle critical business applications that require nearly continuous IOPS performance. This type of volume is used for large database workloads.
+
+The Throughput Optimized HDD volume can handle streaming workloads that require consistent and fast throughput at a low price. For example, big data, data warehouses, and log processing. The Colod HDD volume can handle throughput-oriented storage for large amounts of data that are infrequently accessed. Use this type of volume for scenarios in which achieving the lowest storage cost is important
+
+Choosing an EBS volume type
+---------------------------
+
+How do you determine which volume type to use? Begin be asking: Which storage best aligns with the performance and cost requirements of my applications? Each has benefits and limitations that work with or against certain workloads. 
+
+**What is more important IOPS or Throughput?**
+
+* If IOPS is more important, **how many IOPS do you need?**
+
+	* If the answer is more than 80000, choose an EC2 instance store. 
+
+	* If you need 80000 or fewer, **what are your latency requirements?**
+
+		* If your latency is in microseconds, the choice is an EC2 instance store. EC2 instance stores provide the lowest latency that you can achieve.
+
+		* If your latency is in the single-digit millisecond category, decide **what's more important? Cost or performance?**
+
+			* If cost is more important, choose General purpose (gp2).
+
+			* If performance is the main driver for your workload, choose SSD volume type, Provisioned IOPS (io1). Compared to gp2, io1 provides more consistent latency (less jitter) and an order of magnitude more of IOPS consistency. 
+
+* If Throughput is the defining characteristic of your workload, **Waht type of I/O do you have? Small, random I/O or large, sequential I/O?**
+
+	* If you have small random I/O, re-evaluate the SSD categories.
+
+	* If you have large sequential I/O, **what is your aggregate throughput?**
+
+		* If you need more than 1750-MB/s throughput, consider D2 or H1 optimized instance types. D2 is dense storage instance type, which enables you to take advantage of the low cost, high disk throughput, and high sequential I/O access rates. D2 has up to 48 TB of local spinning hard disk, and it can do upwards of 3 GB/s of sequential throughput. H1 instances are storage-optimized instances, which are designed for applications that require low-cost, high-disk throughput, and high sequential disk I/O access to large datasets.
+
+		* If your throughput requirement is less than 1750 MB/s, **Which is more important? Cost or performance?**
+
+			* If it's performance, consider the HDD volume type throughput optimied HDD (st1). 
+
+			* If the most important factor is cost, choose the Cold HDD (sc1) volume.
+
+.. figure:: /compute_d/choosing.png
+   :align: center
+
+	 Choosing an EBS volume
+
+When you are not sure what your workload is, choose General Purpose SSD (gp2) as it satisfies almost all workloads. However, this volume type works well for boot volumes, low-latency applications, and the bursty databases where the data transmission is interrupted at intervals.
+
+EBS-Optimized instances
+-----------------------
+
+A non-EBS optimized instances has a shared network pipe. As a result, Amazon EBS traffic is on the same pipe as the network traffic to other EC2 instances, AWS services, such as Amazon S3, and the Internet. A shared network pipe is used because EBS storage is network-attaches storage and not attached directly to the EBS instance. The sharing of network traffic can caouse increased I/O latency to your EBS volumes.
+
+EBS-optimized instances have dedicated network bandwidth for Amazon EBS i/O that is not shared. This optimization provides the best performance for your EBS volumes by minimizing contention between EBS i/O and other traffic from your instance. The size of an EBS-optimized instance, for example 2xlarge or 16xlarge, defines the amount of dedicated network bandwidth that is allocated yo your instance for the attached EBS volumes.
+
+It is important to choose the right size EC2 that can support the bandwidth to your EBS volume. Choosing the right size helps you achieve the required IOPS and throughput.
+
+
+
+`Amazon EBS-?Optimized Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html>`_
 
 `Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
 
@@ -553,7 +627,7 @@ Types of Amazon EBS volumes
 
 
 
-`Amazon EBS-?Optimized Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html>`_
+`
 
 `New -? Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
 

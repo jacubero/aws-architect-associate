@@ -216,6 +216,8 @@ The more loose your system is coupled, the more easily it scales and the more fa
 
     Tightly-coupled systems versus Loosely-coupled systems  
 
+`Building Fault-Tolerant Applications on AWS <https://media.amazonwebservices.com/AWS_Building_Fault_Tolerant_Applications.pdf>`_
+
 Test axioms
 ===========
 

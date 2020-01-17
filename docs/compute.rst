@@ -453,6 +453,8 @@ Amazon EC2 Spot instances integrate natively with a number of other AWS services
 
 `New -? Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
 
+`AWS ANZ Webinar Series - Spot Instances: Benefits and Best Practices Explained <https://www.youtube.com/watch?v=PKvss-RgSjI&feature=emb_title>`_
+
 Amazon EC2 fleet
 ================
 
@@ -728,6 +730,8 @@ If you create the volume from a snapshot and do not specify a volume size, the d
 
 The states of a volume are Creating, Deleting, Available, and In-use. A volume in the *available* state can be attached to an EC2 instance. 
 
+`Creating an Amazon EBS Volume <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-creating-volume.html>`_
+
 Attaching an EBS volume
 -----------------------
 
@@ -737,14 +741,182 @@ To attach an EBS volume to a running or stopped instance, use the ``attach-volum
 
 After connecting to an EC2 instance, the steps to make the volume available for use in Linux are the following:
 
-1. Create and ext4 file system on the new volume
+1. List volumes.
 
 .. code-block:: console
 
-	sudo mkfs -t ext4 /dev/sdf
+	$ lsblk
+	NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+	xvda    202:0    0    8G  0 disk
+	-xvda1  202:1    0    8G  0 part /
+	xvdf    202:80   0   10G  0 disk	
 
+2. Check that there is no file system on the device.
 
+.. code-block:: console
 
+	$ sudo file -s /dev/svdf
+	/dev/svdf: data
+
+3. Create and ext4 (a journaling file system that the Linux kernel commonly uses) file system on the new volume.
+
+.. code-block:: console
+
+	$ sudo mkfs -t ext4 /dev/xvdf
+	mke2fs 1.43.4 (31-Jan-2017)
+	Creating filesystem with 261888 4k blocks and 65536 inodes
+	Filesystem UUID: 15d8146f-bcb3-414c-864f-5100bb4b0bf8
+	Superblock backups stored on blocks:
+	        32768, 98304, 163840, 229376
+
+	Allocating group tables: done
+	Writing inode tables: done
+	Creating journal (4096 blocks): done
+	Writing superblocks and filesystem accounting information: done
+
+4. Create a directory for mounting the new volume.
+
+.. code-block:: console
+
+	$ sudo mkdir /mnt/data-store
+
+5. Mount the new volume.
+
+.. code-block:: console
+
+	$ sudo mount /dev/xvdf /mnt/data-store
+
+6. Check that the volume is mounted.
+
+.. code-block:: console
+
+	$ df -hT
+	Filesystem		Type    Size  Used Avail Use% Mounted on
+	/dev/xvdf		ext4    197G   61M  187G   1% /data-store
+
+`Making an Amazon EBS Volume Available for Use on Linux <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html>`_
+
+`Making an Amazon EBS Volume Available for Use on Windows <https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ebs-using-volumes.html>`_
+
+Detaching an EBS volume
+-----------------------
+
+You can detach an EBS volume from an EC2 instance explicitly or by terminating the instance. If the instance is running, you must first unmount the volume from the instance. If an EBS volume is the root device of an instance, you must stop the EC2 instance before you can detach the volume.
+
+The command to unmount the ``/dev/xvdf`` device on a Linux instance is
+
+.. code-block:: console
+
+	sudo umount -d /dev/xvdf
+
+Deleting an EBS volume
+----------------------
+
+After volume deletion, the data is physically gone, and the volume cannot be attached to any instance. However, before deletion, it is good practicce to create a snapshot of the volume, which you can use to re-create the volume later if needed. To delete a volume, it must be in the available state (that is, not attached to an instance).
+
+Modifying Amazon EBS volumes
+============================
+
+You can modify your volumes as the needs of your applications change. You can perform certain dynamic operations on existing volumes with no downtime or negative effects on performance:
+
+* Increase capacity.
+
+* Change the volume type.
+
+* Increase or decrease provisioned IOPS.
+
+You can easily right-size your deployment and adapt to performance changes. Use Amazon CloudWatch with AWS Lambda to automate volume changes to meet the changing needs of your applications, without establishing planning cycles to implement the changes.
+
+In general, you must follow 3 major steps when modifying an EBS volume:
+
+1. Use AWS Management console or the AWS CLI to issue ``modify`` volume command.
+
+2. Use AWS Management console or the AWS CLI to monitor the progress of the modification.
+
+3. If the size of the volume was modified, extend the volume's file system to take advantage of the increased storage capacity, by using OS commands for your EC2 instances.
+
+`Amazon EBS Update – New Elastic Volumes Change Everything <https://aws.amazon.com/blogs/aws/amazon-ebs-update-new-elastic-volumes-change-everything/>`_
+
+Modify a volume
+---------------
+
+You can modify volumes that are in the *in-use* state (attached to an EC2 instance) or the available state (not attaches to an EC2 instance). Minimum and maximum values for size depend on the volume type. For example, for a General Purpose SSD volume, the minimum size is 1 GiB, and the maximum size is 16384 GiB. Though the size of a volume can be changed, it can only be increased, not decreased.
+
+You can change the IOPS value only for the Provisioned IOPS SSD volume type. This setting is the requested number of I/O operations per second that the volume can support. For provisioned IOPS volumes, you can provision up to 50 IOPS per GiB depending on what level of performance your applications require.
+
+Monitor the progress
+--------------------
+
+During modifications, you can view the status of the volume in the AWS Management Console. An EBS volume that is being modified moves through a sequence of progress states: ``Modifying``, ``Optimizing``, and ``Complete``. You can resize your file system as soon as the volume enters the ``Optimizing`` state. Size changes usually take a few seconds to complete and take effect after a volume is in the ``Optimizing`` state. The ``Optimizing`` state requires the most time to complete.
+
+Extend the file system
+----------------------
+
+To take advantage of the larger EBS volume, you must extend the file system on your local operating system. Use a file system-specific command to resize the file system to the larger size of the volume. These commands work even if the volume to extend is the root volume. For ext2, ext3, and ext4 file systems, the comand is ``resize2fs``.  XFS file systems, the command is ``xfs_growfs``. 
+
+`Extending a Linux File System After Resizing a Volume <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/recognize-expanded-volume-linux.html>`_
+
+Securing Amazon EBS
+===================
+
+Access to EBS volumes is integrated with AWS IAM. IAM enables access control to your EBS volumes and snapshots. For example, you can use an IAM policy to allow specified EC2 instances to attach and detach volumes. You can also encrypt data that is written to EBS volumes.
+
+EBS encryption
+--------------
+
+Amazon EBS encryption offers a simple encryption solution for EBS volumes without the need for you to build maintain, and secure your own key management infrastructure. When you create an encrypted EBS volume and attach it to a supported instance type, the following types of data are encrypted:
+
+* Data at rest inside the volume.
+
+* All data moving between the volume and the instance.
+
+* All snapshots that were created from the volume.
+
+Encryption is supported by all EBS volume types (General Purpose SSD, Provisioned IOPS SSD, Throughput Optimized HDD, Cold HDD and Magnetic[standard]). You can expect the same IOPS performance on encrypted volumes as you would with unencrypted volumes, with only a minimal effect on latency.
+
+You can access encrypted volumes the same way that you access unencrypted volumes. Encryption and decryption are handled transparently, and they require no additional action from the user, the EC2 instances, or the applications.
+
+EBS encryption uses a customer master key (CMK) from the AWS KMS when creating encrypted volumes. The CMK is also used for any snapshots that are created from the volumes. The first time you create an encrypted volume in a region, a default CMK is created automatically. This key is used for EBS encryption unless you select a CMK that you created separately with AWS KMS.
+
+Encrypting a new volume
+-----------------------
+
+If you are not using a snapshot to create a volume, you can choose whether to encrypt the volume. Use the default key or select your own custom key. Creating your own CMK gives you more flexibility, including the ability to create, rotate, and disable keys. By using your own CMK, it is easier to define access controls, and to audit the encryption keys that are used to protect your data.
+
+It is a best practice to create your own master key. By creating your own master key, you gain flexibility over the key. For example, you can have one team of users control encryption and another team of users control decryption. You can have separate master keys per application, or per data classification level. You can:
+
+* Define the key rotation policy.
+
+* Enable AWS CloudTrail auditing.
+
+* Control who can use the key.
+
+* Control who can administer the key.
+
+EBS encryption is integrated into the AWS KMS, and AWS KMS is integrated with the IAM console. You have to access IAM console in order to create a key. Configuration options include:
+
+* Adding tags.
+
+* Defining key administrative permissions.
+
+* Defining key usage permissions.
+
+As part of the process for launching a new EC2 instance, you can use custom keys to encrypt EBS volumes at launch time by using the EC2 console or by executing the ``run-instances`` command.
+
+How EBS encryption works
+------------------------
+
+EBS applies a strategy called envelope encryption that uses a two-tier hierarchy of keys. The customer master key (CMK) is at the top of the hierarchy and encrypts and decrypts data keys that are used outside of AWS KMS to encrypt data. CMKs never leave the AWS KMS. 
+
+Each newly created EBS volume is encrypted with a unique 256-bit data key. The CMK is called to wrap the data key with a second layer, or second tier, of encryption. EBS stores the encrypted data key with the volume metadata. Any snapshots created from this volume will also be encrypted with this data key.
+
+When a volume is attached to an EC2 instance, the CMK unlocks the volume data key and stores it in the memory of the server that hosts your instance. When the data key is stored in memory, it can decrypt and encrypt data to and from the volume. If the volume is detached, the data key is purged from memory. The data key is never saved to disk. The data key is stored in memory because:
+
+1. If one resource is compromised, exposure is limited. Only one data key is exposed (and not all volumes).
+
+2. The encryption key is in the memory of the system doing the encryption, thus limiting any performance degradation. You are not required to bulk-load large amounts of EBS data over the network to encrypt it.
+
+3. Small number of master keys are used to protect potentially a large number of data keys.
 
 Cost factors
 ^^^^^^^^^^^^

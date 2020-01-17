@@ -360,6 +360,8 @@ You may choose to use resource-based policies, user policies, or some combinatio
 
 Additionally, when trying to understand if the application of your policies will work as expected, AWS has a `Policy Simulator <https://policysim.aws.amazon.com/>`_ you can use to determine if your policies will work as expected.
 
+`How do I configure an S3 bucket policy to Deny all actions unless they meet certain conditions? <https://www.youtube.com/watch?v=8ew8MSXBiA4&feature=emb_logo>`_
+
 Access Control Lists
 ^^^^^^^^^^^^^^^^^^^^
 

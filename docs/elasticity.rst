@@ -76,6 +76,8 @@ Some Amazon CloudWatch features include collecting and tracking metrics like CPU
 
 `Collect Metrics and Logs from Amazon EC2 instances with the CloudWatch Agent <https://www.youtube.com/watch?time_continue=3&v=vAnIhIwE5hY&feature=emb_logo>`_
 
+`AWS re:Invent 2018: CloudWatch Logs Insights Customer Use Case <https://www.youtube.com/watch?time_continue=3&v=RnN1o4Zdego&feature=emb_logo>`_
+
 `AWS re:Invent 2018: Augmenting Security & Improving Operational Health w/ AWS CloudTrail (SEC323) <https://www.youtube.com/watch?v=YWzmoDzzg4U&feature=emb_logo>`_
 
 Gaining elasticity and scaling your architecture

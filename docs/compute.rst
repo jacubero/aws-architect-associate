@@ -451,6 +451,8 @@ Amazon EC2 Spot instances integrate natively with a number of other AWS services
 
 `Amazon EC2 Spot Instances workshops website <https://ec2spotworkshops.com/>`_
 
+`New -? Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
+
 Amazon EC2 fleet
 ================
 
@@ -539,6 +541,12 @@ EBS volumes provide the consistent and low-latency performance your application 
 
 **Business Continuity**. Minimize data loss and recovery time by regularly backing up your data and log files across different geographic regions. Copy AMIs and EBS snapshots to deploy applications in new AWS Regions.
 
+`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic Block Storage (Amazon EBS) (STG310-R1) <https://www.youtube.com/watch?v=BuJa6Vl8cn8>`_
+
+`Introduction to Amazon Elastic Block Store (EBS) <https://www.qwiklabs.com/focuses/370?parent=catalog>`_
+
+`Amazon Elastic Block Store (Amazon EBS) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html>`_
+
 Types of Amazon EBS volumes
 ===========================
 
@@ -560,7 +568,11 @@ There are 2 types of SSD-backed volumes: General Purpose (gp2) and Provisioned I
 
 The General Purpose SSD volume can handle most workloads, such as boot volumes, virtual machines, interactive applications, and development environments. The Provisiones IOPS SSD volume can handle critical business applications that require nearly continuous IOPS performance. This type of volume is used for large database workloads.
 
-The Throughput Optimized HDD volume can handle streaming workloads that require consistent and fast throughput at a low price. For example, big data, data warehouses, and log processing. The Colod HDD volume can handle throughput-oriented storage for large amounts of data that are infrequently accessed. Use this type of volume for scenarios in which achieving the lowest storage cost is important
+The Throughput Optimized HDD volume can handle streaming workloads that require consistent and fast throughput at a low price. For example, big data, data warehouses, and log processing. The Colod HDD volume can handle throughput-oriented storage for large amounts of data that are infrequently accessed. Use this type of volume for scenarios in which achieving the lowest storage cost is important.
+
+`Amazon EBS features <https://aws.amazon.com/ebs/features/?nc1=h_ls>`_
+
+`Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
 
 Choosing an EBS volume type
 ---------------------------
@@ -613,23 +625,126 @@ EBS-optimized instances have dedicated network bandwidth for Amazon EBS i/O that
 
 It is important to choose the right size EC2 that can support the bandwidth to your EBS volume. Choosing the right size helps you achieve the required IOPS and throughput.
 
+EBS-optimized instances deliver dedicated bandwidth to EBS, with options between 425 Mbps and 14000 Mbps, depending on the instance type that you use. When attached to and EBS-optimized instance, General Purpose SSD (gp2) volumes are designed to deliver within 10% of their baseline and burst performance 99.9% of the time in a given year. Both Throughput Optimized HDD (st1) and Cold HDD (sc1) are designed for performance consistency of 90% of burst throughtput 99% of the time.
 
+EBS-Optimized burst
+-------------------
+
+C5 instance types provide EBS-optimized burst. The C5 instance types can support maximum performance for 30 minutes at least once every 24 hours. For example, c5.large instances can deliver 275 MB/s for 30 minutes at least once every 24 hours. If you have a workload that requires sustained maximum performance for longer than 30 minutes, choose an instance type based on the baseline performancee listed for each C5 instance.
 
 `Amazon EBS-?Optimized Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html>`_
 
-`Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
+Managing Amazon EBS snapshots
+=============================
 
-`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic Block Storage (Amazon EBS) (STG310-R1) <https://www.youtube.com/watch?v=BuJa6Vl8cn8>`_
+An EBS snapshot is a point-in-time backup copy of an EBS volume that is stored in S3. S3 is a regional service that is not tied to a specific AZ. It is designed for 11 9s of durability, which is several orders of magnitude greater than the volume itself.
 
-`Introduction to Amazon Elastic Block Store (EBS) <https://www.qwiklabs.com/focuses/370?parent=catalog>`_
+Snapshots are incremental backups, which means that only the blocks on the device that have changed after your most recent snapshot are saved. The incremental backups minimize the time required to create the snapshot and save on storage costs by not duplicating data. When you delete a snapshot, only the data that's unique to that snapshot is removed. Each snapshot contains all the information needed to restore your data (from the moment when the snapshot was taken) to a new EBS volume.
 
-`Amazon Elastic Block Store (Amazon EBS) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html>`_
+When you create an EBS volume from a snapshot, the new volume begins as an exact replica of the original volume that was used to create the snapshot. The replicated volume loads data lazily, that is, loads data when it's needed, in the background so that you can begin using it immediately.
+
+How does a snapshot work?
+-------------------------
+
+When you execute the first snapshot, all blocks on the volume that have been modified (let's call them A,B,C) are marked as a snapshot copy to S3. Empty blocks are not part of the snapshot. The volume is useable again as soon as the CreateSnapshot API returns successfully, usually within a few seconds. You do not have to wait for the actual data transfer to complete before using the volume.
+
+Snapshots are incremental backups so the second snapshot contains only new blocks or blocks that were modified since the first snapshot. For snapshot 2, block C has been modified to C1. A second snapshot is taken. Because the snapshot is incremental, C1 is the only block saved to the second snapshot. None of the data from the snapshot 1 is included in the new snapshot. Snapshot 2 contains only references to snapshot 1 for any unchanged data.
+
+Before snapshot 3 is taken, two new blocks, D and E, are added, and the file system has deleted the file that contained block B. From a block perspective, block B was modified. Snapshot 3 contains any new or changed data since snapshot 2, but the new snapshot only references the blocks in snapshots 1 and 2 that are unchanged.
+
+If you delete the first 2 snapshots, the deletion process is designed so that you retain only the most recent snapshot to restore the volume. The state of the original B block is now gone and A is still restorable from the latest snapshot even though it was not part of the original change set.
+
+Active snapshots contain all the necessary information to restore the volume to the instant at which that snapshot was taken. When you create a new volume from a snapshot, data is lazily loaded in the background so that the volume is immediately available. You don't have to wait for all the data to be transferred to the new volume. If you access a piece of data that hasn't been loaded to the volume yet, that piece immediately moves to the front of the queue of data that flows from the snapshot data in S3 to your new volume.
+
+Creating snapshots
+------------------
+
+1. You can use snapshots as an easy way to back up and share data on EBS volumes among multiple AZs within the same region. 
+
+2. Another possible scenario is that you want to use snapshots in a different region or share with a different account. You can use copy-snapshot API operation, or the snapshot copy action from the AWS management console to copu snapshots to different regions. You can share sanpshots by modifying the permissions of the snapshot and granting different AWS accounts permission to use that snapshot. From that snapshot, others can create EBS volumes and get access to a copy of the snapshot data. The copy of snapshots to a different regions can be part of your disaster recovery strategy.
+
+Amazon Data Lifecycle Manager (DLM)
+-----------------------------------
+
+When you must back up a large number of volumes or manage a large number of snapshots, you can use Amazon Data Lifecycle Manager (DLM). DLM automates the backup of EBS volumes and the retention of those backups for as long as needed. This feature uses policies to define backup schedules that specify when you want a snapshot to be taken and how often DLM creates the snapshots when you define the policies.
+
+You also specify how many snapshots you want to retain, and Amazon DLM automatically manages the expiration of snapshots. This is an important feature if you need to retain snapshots for a certain period of time, or need to retain a certain number of snapshots for compliance and auditing reasons. Retention rules also help you to keep snapshot costs under control by removing snapshots that are no longer needed.
+
+When you define a DLM policy, you specify volume tags to identify which EBS volumes should be backed up. This allows a single policy to be applied to multiple volumes. You can also use IAM to fully control access to DLM policies. There's no additional cost to using DLM. You pay only for the cost of the snapshots.
+
+An example of DLM policy that satisfies the customer requirement: *All EC2 instance root volumes must be backed up once per day, and that backups should be retained for 7 days*. It is necessary to define a data lifecycle policy by specifying the EBS volume type to use. In this example, the tag name is *voltype* with a value of *root*. As we want to take one snapshot per day, so you specify to take a snapshot every 24 hours at 0700 UTC. Then, you retain the latest 7 snapshots.
+
+DLM enables you to take snapshots every 12 hours or every 24 hours. If you need to take snapshots more often than this, you can use multiple tags on the same volume. For example, suppose that you want to create a snapshot every 8 hours and retain 7 days of snapshots. You add 3 tags to your volume for backup. The tag key-value pairs can be anything that makes sense for your organization. you then define 3 separate policies, one for each tag, running once per day for each policy. You stagger the start time so that it is offset by 8 hours from the other policies. 
+
+Here are some considerations to take into account when using DLM for EBS snapshots:
+
+* When specifying multiple tags in a policy, the policy applies to any of the tags specified. A snapshot is generated for each volume with a matching tag.
+
+* You can use a volume tag in only one DLM policy. You cannot create a policy with a volume tag that has been already assigned to an existing policy.
+
+* Snapshots are taken within one hour of the specified start time. The snapshot may not generally be taken exactly at the time specified in the policy.
+
+* To improve the manageability of snapshots, DLM automatically applies AWS tags to each snapshot that is generates. Alternatively, you can specify custom tags to be applied to the snapshot.
+
+Tagging EBS snapshots
+---------------------
+
+AWS supports tagging both EBS volumes and snapshots during creation. Tagging snapshots during creation is an atomic operation, that is, the snapshot must be created and the tags must be applied for the successful creation of snapshots. This functionality facilitates the proper tracking of snapshots from the moment that they are created. It also means that any IAM policies that apply to snapshots tags are enforced immediately.
+
+You can add up to 50 tags to your snapshot when it's created. AWS provides resource-level permissions to control access to EBS snapshots through IAM policies. You can use tags to enforce tighter security policies. The ``CreateSnapshot``, ``DeleteSnapshot``, and ``ModifySnapshotAttribute`` are API operations that support IAM resource-level permissions.
+
+The IAM policies give you precise control over access to resources. For example, you can require that a certain set of tags is applied when the snapshot is created, or you can restrict which IAM users can take snapshots on specific volumes. You can also control who can also control who can delete snapshots.
+
+`Amazon EBS Snapshots <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSSnapshots.html>`_ 
+
+`Automating the Amazon EBS Snapshot Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snapshot-lifecycle.html>`_
+
+Managing Amazon EBS volumes
+===========================
+
+EBS volume management actions
+-----------------------------
+
+The actions that you can perform on a volume are the following:
+
+* **Create**: New EBS volumes are created from large amounts of available space. They can have a size from 1 GiB to TiB.
+
+* **Attach**: An EBS volume can be attached to an instance. After attachment, it becomes visible to the operating system as a regular block device. Each EBS volume can be a single EC2 instance at a time.
+
+* **Create snapshot**. Snapshots can be created from a volume at any time while the volume is in the in-use state.
+
+* **Detach**. When the operating system no longer uses the volume, it can be detached from the instance. Data remains stored on the EBS volume, and the volume remains available for attachment to any other instance within the same AZ.
+
+* **Delete**. When the volume and its contents are no longer needed, the EBS can be deleted.
+
+Creating a volume
+-----------------
+
+You can create an EBS volume and attach it to any EC2 instance within the same AZ. You can create an encrypted EBS volume, but you can attach an encrypted volume only to supported EC2 instance types. When a volume is created, its state is *available*. When the volume is attached to an instance, its state changes to *in-use*. 
+
+To create an encrypted volume with the AWS Management console, you must select the *Encrypted* box, and choose the master key you want to use when encrypting the volume. You can choose the default master key for your account, or use AWS KMS to choose any customer master (CMK) that you have previously created. 
+
+If you create the volume from a snapshot and do not specify a volume size, the default size is the snapshot size.
+
+The states of a volume are Creating, Deleting, Available, and In-use. A volume in the *available* state can be attached to an EC2 instance. 
+
+Attaching an EBS volume
+-----------------------
+
+To attach a volume to an EC2 instance, the volume must be in the *available* state. After the volume is attached, you must connect to the EC2 instance and make the volume available. You can view the attachment information on the volume's Description tab in the console. The information provides an instance ID and an instance device, which are required to make the volume available on its EC2 instance. 
+
+To attach an EBS volume to a running or stopped instance, use the ``attach-volume`` command. After you attach an EBS volume to your instance, it is exposed as a block device. You can format the volume with any file system and then mount it. After you make the EBS volume available for use, you can access it in the same ways that you access any other volume. Any data written to this file system is written to the EBS volume and is transparent to applications that use the device.
+
+After connecting to an EC2 instance, the steps to make the volume available for use in Linux are the following:
+
+1. Create and ext4 file system on the new volume
+
+.. code-block:: console
+
+	sudo mkfs -t ext4 /dev/sdf
 
 
 
-`
-
-`New -? Hibernate Your EC2 Instances <https://aws.amazon.com/es/blogs/aws/new-hibernate-your-ec2-instances/>`_
 
 Cost factors
 ^^^^^^^^^^^^

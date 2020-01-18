@@ -101,13 +101,13 @@ After the dot, you have the instance size (in this example ``xlarge``). From nan
 
       - :math:`\cdots`
 
-    * - :math:`y`xlarge
+    * - :math:`y` xlarge
 
       - :math:`y \times 2`
 
       - :math:`y \times 8`
 
-.. figure:: /compute_d/types.png
+.. figure:: /compute_d/nomenclature.png
    :align: center
 
 	 Amazon EC2 instance types nomenclature
@@ -563,7 +563,7 @@ Hard disk drive, or HDD-backed volumes are optimized for large streaming workloa
 
 There are 2 types of SSD-backed volumes: General Purpose (gp2) and Provisioned IOPS (io1). There are 2 types of HDD-backed volumes: Throughput Optimized (st1) and Cold HDD (sc1). This table describes and compares the 4 volume types.
 
-.. figure:: /compute_d/ebs.png
+.. figure:: /compute_d/ebs-types.png
    :align: center
 
 	 Comparison of SSD and HDD volumes
@@ -947,15 +947,66 @@ To create a copy of an encrypted EBS snapshot in another account, complete these
 
 1. Share the custom key associated with the snapshots with the target account. You can do it from the IAM console:
   
-  1.1. Under *External Account*, click *Add and External account*.
+  	1.1. Under *External Account*, click *Add and External account*.
 
-  1.2. Specify which external accounts can use this key to encrypt and decrypt data. Administrators of the specified accounts are responsible for managing the permissions that allow their IAM users and roles to use this key.
+  	1.2. Specify which external accounts can use this key to encrypt and decrypt data. Administrators of the specified accounts are responsible for managing the permissions that allow their IAM users and roles to use this key.
 
 2. Share the encrypted EBS snapshot with the target account.
 
+	2.1. Select the snapshot.
+
+	2.2. From the actions menu, click *Modify Permissions*.
+
 3. From the target account, locate the shared snapshot and create a copy of it.
 
+	3.1. Select the shared snapshot.
+
+	3.2. Expand the Actions menu.
+
+	3.3. Click *Copy*. To select the master key:
+
+		3.3.1. In the Destination Region box, select the target region.
+
+		3.3.2. In the Description box, enter a description that is used to easily identify the snapshot.
+
+		3.3.3. In the Master Key box, select your master key, and click *Copy*.
+
 4. Verify your copy of the snapshot.
+
+EBS performance and monitoring
+==============================
+
+Many factors can affect the peformance of EBS, including:
+
+* The I/O characteristics of your applications.
+
+* The type and configuration of your EC2 instances.
+
+* The type and configuration of your volumes.
+
+EBS performance tips
+--------------------
+
+These tips represent best practices for getting optimal performanace from your EBS volumes in various user scenarios:
+
+* *Understand how performance is calculated*. Know which units of measure are involved in calculating the performance metrics. For example, kilobytes per second for bandwidth, input/output operations per second (IOPS) for throughput, milliseconds per operation for latency, etc.
+
+* *Understand your workload*. Know the relationship between the maximum performance of your EBS volumes, the size and number of I/O operations, and the time for each action to complete.
+
+* *Use EBS-optimized instances*. Network traffic can contend with traffic between your EC2 instance and your EBS volumes. On EBS-optimized instances, the two types of traffic are kept separate.
+
+* *Certain factors can degrade HDD performance*. For example, when you create a snapshot of a Throughput Optimized HDD (st1) or Cold HDD (sc1) volume, performance can drop to the volume's baseline value while the snapshot is in progress. Also, driving more throughput than the instance can support can limit performances. Performance also degrades when you initialize volumes that are restored from a snapshot*. Your performance can also be affected if your application does not send enough I/O requests.
+
+* *Be aware of performance behavior when initializing volumes from snapshots*. You can experience a significant increase in latency when you first access blocks of data on a new EBS volume that was restored from a snapshot. This behavior is a tradeoff since, in this case, EBS volumes were designed for availability over performance. You can avoid this effect on performance by accessing each block beore moving the volume into production.
+
+Initializing EBS volumes
+------------------------
+
+New EBS volumes receive their maximum performance the moment that they are available and do not require *initialization* )formerly known as pre-warming). However, storage blocks or volumes that were restored from snapshots must be initialized before you can access the block. Initialization involves pulling down data from S3 and writing it to the EBS volume.
+
+This preliminary action takes time and can cause a significan increase in the latency of an I/O operation the first time each block is accessed. For most applications, amortizing this cost over the lifetime of the volume is acceptable. Performance is restore after the data is accessed once.
+
+You can avoid this performance degradation in a production environment by reading from all of the blocks on your volume before you use it; this process is called *initialization*. For a new volume created from a snapshot, read all the blocks that have data before using the volume.
 
 Cost factors
 ^^^^^^^^^^^^

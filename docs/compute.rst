@@ -918,6 +918,45 @@ When a volume is attached to an EC2 instance, the CMK unlocks the volume data ke
 
 3. Small number of master keys are used to protect potentially a large number of data keys.
 
+There is no direct way to encrypt an existing unencrypted volume, or to remove encryption from an encrypted volume. Similarly, you cannot remove encryption from an encrypted snapshot.
+
+However, you can migrate data between encrypted and unencrypted volumes. You can also apply a new encryption status while copying a snapshot. While copying an unencrypted snapshot of an unencrypted volume, you an encrypt the copy. Volumes restored from this encrypted copy are also encrypted. 
+
+While copying an encrypted snapshot of an encrypted volume, you can re-encrypt the copy bu using a different CMK. Volumes that are restored from the encrypted copy are accesible only by using the newly applied CMK.
+
+Encrypted snapshots
+-------------------
+
+Snapshots that are created from encrypted volumes are automatically encrypted. Volumes that are created from encrypted snapshots are also automatically encrypted. EBS encryption is available only on certain EC2 instance types. You can attach both encrypted and unencrypted volumes to a supported instance type.
+
+The first snapshot copy to another region is generally a full copy. Each subsequent snapshot copy is incremental (which makes the copy process faster), meaning that only the blocks in the snapshot that have changed since your last snapshot copy to the same destination are transferred.
+
+Support for incremental snapshots is specific to a cross-region pair, where a previous complete snapshot copy of the source volume is already available in the destination region. For example, if you copy an unencrypted snapshot from the US East (Ohio) region to the US West (Oregon) region, the first snapshot copy of the volume is a full copy. Subsequent snapshot copies of the same volume transferred between the same regions are incremental.
+
+Similarly, the first encrypted snapshot copied to another region is always a full copy, an each subsequent snapshot copy is incremental. Support for incremental snapshots is specific to a cross-region pair, whereby a previous complete snapshot copy o the source volume is already available in the destination region.
+
+When you copy a snapshot, if the original snapshot was not encrypted, you can choose to encrypt the copy. However, changing the encryption status usually results in a full (not incremental) copy, which may incur greater data transfer an storage charges.
+
+Suppose that an encrypted snapshot is shared with you. It is recommended that you create a copy of the shared snapshot using a different CMK that you control. This protects your access to the volume if the original CMK is compromised, or if the owner revokes the CMK for any reason. You can specify a CMK that is different from the original one, and the resulting copied snapshot uses the new CMK. However, using a custom EBS CMK during a copy operation always results in a full (not incremental) copy, which may incur increased data transfer and storage charges.
+
+By modifying the permissions of the snapshot, you can share your unencrypted snapshots with others in the AWS community by selecting *Private* and providing a user's account number. When you share an unencrypted snapshot, you give another account permission to both copy the snapshot and create a volume from it.
+
+You can share an encrypted snapshot with specific AWS accounts, but you cannot make it public. Be aware that sharing the snapshot provides other accounts access to all the data. For others to use the snapshot, you must also share the custome CMK key used to encrypt it. Users with access cna copy your snapshot an create their own EBS volumes based on your snapshot while your original snapshot remains unaffected. Cross-account permissions can be applied to a CMK either when it is created or later.
+
+To create a copy of an encrypted EBS snapshot in another account, complete these 4 steps:
+
+1. Share the custom key associated with the snapshots with the target account. You can do it from the IAM console:
+  
+  1.1. Under *External Account*, click *Add and External account*.
+
+  1.2. Specify which external accounts can use this key to encrypt and decrypt data. Administrators of the specified accounts are responsible for managing the permissions that allow their IAM users and roles to use this key.
+
+2. Share the encrypted EBS snapshot with the target account.
+
+3. From the target account, locate the shared snapshot and create a copy of it.
+
+4. Verify your copy of the snapshot.
+
 Cost factors
 ^^^^^^^^^^^^
 

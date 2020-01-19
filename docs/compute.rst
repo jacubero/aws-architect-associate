@@ -1134,6 +1134,11 @@ Some common EFS use cases are:
 
 Customers are using EFS for *Home directories* and *software development tools*.
 
+.. figure:: /compute_d/efsusage.png
+   :align: center
+
+   Amazon EFS usage
+
 `Amazon Elastic File System - Scalable, Elastic, Cloud-Native File System for Linux <https://www.youtube.com/watch?v=AvgAozsfCrY&feature=emb_logo>`_
 
 `AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic File System (Amazon EFS) (STG301-R1) <https://www.youtube.com/watch?v=4FQvJ2q6_oA>`_
@@ -1245,7 +1250,7 @@ After creating a file system, you can view details about it in the AWS Managemen
 
 To mount your EFS files systems, use the EFS mount helper included in the *amazon-efs-utils* package. It is an open-source collection of Amazon EFS tools and there's no additional cost to use them. This package includes a mount helper and tooling that make it easier to perform encryption of data in transit for EFS. A mount helper is a program that you use when you mount a specific type of file system. 
 
-To prepare for mounting a file system with the EFS mount helper, follow these steps:
+To mount a file system with the EFS mount helper, follow these steps:
 
 1. For an Amazon Linux EC2 isntance, install the Amazon EFS utilities
 
@@ -1253,22 +1258,179 @@ To prepare for mounting a file system with the EFS mount helper, follow these st
 
 	sudo yum install -y amazon-efs-utils
 
-2. Create a new directory on your EC2 instance for the mount point, such as *efs*. 
+By default, when using the EFS mount helper with Transport Layer Security (TLS), the mount helper enforces the use of the Online Certificate Status Protocol (OCSP) and certificate hostname checking.
+
+2. Create a new directory on your EC2 instance for the mount point, such as ``efs``. 
 
 .. code-block:: console
 
 	sudo mkdir efs
+
+3. To mount a file system whose ID is ``fs-4fad7b36``, without encryption using the EFS mount helper:
+
+.. code-block:: console
+
+  sudo mount -t efs fs-4fad7b36:/ efs
+
+If you require encryption of data in transit, include the TLS mount option, as shown:
+
+.. code-block:: console
+
+  sudo mount -t efs -o tls fs-4fad7b36:/ efs
+
+4. With your file system created, you can now mount your file system to your EC2 instances. However, before you can begin the mount process, you must install the NFS client onto the operating system of your EC2 instance and create a directory for the mount point.
+
+.. code-block:: console
+
+  sudo mount -t nfs4 -o nfsvers=4.1, rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 file-system-id.ef.aws-region.amazonaws.com:/ efs
+
+Obtain the file system ID and AWS REgion from the EFS console. The ``nfsvers`` parameter sets the protocol version for NFS. In this case, it is NFS protocol 4.1. The ``rsize``and ``wsize`` parameters are the I/O parameters for read and write data block size. For EFS, the recommended initial size is 1 MB, which is represented in bytes. The next parameter is the mount type. ``Hard`` is the reccommended default value; although ``soft`` can be used with some additional considerations for ``timeo``. ``Timeo`` is the timeout setting, with 600 deciseconds (one-tenth of a second) as the recommended default value for EFS. If the timeout value is changed from the recommended 60 secondsm set it to a minimum of 15 seconds. The ``retrans=2`` parameter specifies that 2 minor timeouts will occur before a major timeout occurs.
+
+Additionally, you can automatically mount your instance to your EFS file system upon startup. You cando this by using a script or configuring an ``fstab`` file when launching and starting your EC2 instance.
+
+`Mounting from an Amazon EC2 Instance <https://docs.aws.amazon.com/fsx/latest/LustreGuide/mounting-ec2-instance.html>`_
+
+`Mounting Your Amazon EFS File System Automatically <https://docs.aws.amazon.com/efs/latest/ug/mount-fs-auto-mount-onreboot.html>`_
+
+`Mounting File Systems Without the EFS Mount Helper <https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-old.html>`_
+
+`Using Microsoft Windows File Shares <https://docs.aws.amazon.com/fsx/latest/WindowsGuide/using-file-shares.html>`_
+
+Securing your data in Amazon EFS
+================================
+
+Security controls
+-----------------
+
+You can control network traffic to and from file system by using VPC security groups and network access control lists to secure network access to your mount targets. To manage file and directory access, use standard Linux directory and file-level permissions to secure access to your data like any other NFS share. To control administrative access to EFS, use AWS IAM to control who can create, change, and manage EFS file systems. If you require encryption, you an encrypt your data at rest in EFS by integrating with the AWS KMS. You can also encrypt data in transit by enabling TLS when you mount your file system.
+
+Security groups
+---------------
+
+For EFS, you can configure up to 5 security groups per mount target. To obtain access to an NFS mount target in AWS, TCP port 2049 must be open for inbound traffic to the mount target and outbound traffic to clients must be connected to the EFS file system.
+
+Amazon EFS POSIX permissions
+----------------------------
+
+Amazon EFS supports the standard permission model you use when working with local file systems in Linux or Windows. These permission settings enforce user and group rights at the file and directory level. In a Linux instance, you can use ``chmod`` and specify read (r), write (w), execute (x) permissions.
+
+Integrating with AWS IAM
+------------------------
+
+Use IAM policies to control access to EFS. AWS IAM has 2 default policies for managin access: ``AmazonElasticFileSystemFullAccess`` and ``AmazonElasticFileSystemReadOnlyAccess``. These policies grant full administrative access and read-only access to EFS.
+
+For scenarios in which you want to grant the ability to create new file systems but prohibit the deletion of files systems, create a custom IAM policy for those types of granular permissions. Additionally, you can allow or deny mount target creation and deletion, security group modification, and tag creation.
+
+Encryption at rest
+------------------
+
+If your workload requires encrypting data at rest, EFS integrates with the AWS KMS to provide encryption key management. Choosing the encryption option when you are creating your file system encrypts all data and metadata in your file system. After you have chosen encryption and created the file system, you cannot change these settings.
+
+If you have an existing EFS file system that contains data that you want to encrypt, you must copy that data to a new encrypted EFS file system. You can create encrypt file systems through the AWS Management console, AWS CLI and AWS SDK.
+
+AWS KMS handles the encryption and decryption of files, which makes the process transparent. Data and metadata are encrypted before being written to a disk and decrypted before being accessed by a client. Additionally, because the encryption process is transparent, it does not affect an application's access to data or metadata, so modifications to your application are not required. 
+
+The process of enabling encryption is simple: select the Enable encryption check box and choose your encryption master key. You must select the encryption option when creating the EFS file system.
+
+Encrypting data in transit
+--------------------------
+
+You can encrypt data in transit for EFS file system by enabling TLS when you mount your file system by using the EFS mount helper. When encryption of data in transit is declared as a mount option for your EFS file system, the mount helper initializaes a client stunnel (ssl-tunnel) process. Stunel is an open source multipurpose network relay. The client stunnel process listens on a local port for inbound traffic, and the mount helper redirects NFS client traffic to this local port. The mount helper uses TLS version 1.2 to communicate with your file system.
+
+`Data Encryption in EFS <https://docs.aws.amazon.com/efs/latest/ug/encryption.html>`_ 
+
+Performance and optimization
+============================
+
+Amazon EFS is a distributed file system in that it is distributed across an unconstrained number of servers. This configuration enables EFS to avoid bottlenecks and constraints of traditional file servers. Additionally, this distributed design enables a high level of aggregate IOPS and throughput for your applications. Data is also distributed across AZs, which enables the high level of durability and availability that EFS provides. Mount targets are placed in each AZ, and data is distributed across AZs.
+
+Performance modes
+-----------------
+
+The default general purpose mode, is suitable for most workloads, general purpose mode provides the lowest latency operations, but has a limit of 7000 operations per second. Mas I/O mode is suitable for workloads that require more than 7000 operations per second, but there are some tradeoff to consider. The increase in operations per second often results in higher latency times for file operations. If a change in performance mode is needed after creation, you must create a new file system, select the correct mode, and then copy your data to the new resource.
+
+.. figure:: /compute_d/performance.png
+   :align: center
+
+   Amazon EFS performance modes
+
+Throughput in relation to size
+------------------------------
+
+With EFS, the throughput performance you can achieve is directly related to the size of the file system. Throughput levels on EFS scale as a file system grows. Because file-based workloads are typically spiky, which drive high levels of throughput for short periods of time and low level of throughput the rest of the time, EFS is designed to burst to high throughtput levels when needed.
+
+All file systems, regardless of size can burst to 100 MiB/s of throughput, and those over 1-TiB large can burst to 100 MiB/s per TiB of data stored in the file system. For example, a 3-TiB file system can burst 300 MiB per second of throughput. The portion of time a file system can burst is determined by its size, and the bursting model is designed so that typical file system workloads will be able to burst when needed.
+
+EFS uses a credit system to determine when file systems can burst. Each file system earns credits over time ata a baseline rate that is determined by the size of the file system, and uses credits whenever it reads or writes data. If you find that you need more throughput than EFS is providing based on your data size, you can enable Provisioned Throughput mode to provide additional throughput to support your application requirements.
+
+Throughput modes
+----------------
+
+The throughput mode of the file system helps determine the overall throughput a file system is able to achieve. You can select the throughput mode at any time (subject to daily limits). Changing the throughput mode is a non-disruptive operation and can be run while clients continuously access the file system. You can choose between 2 throughput modes: Bursting or Provisioned. 
+
+**Bursting Throughput** is the default mode and is recommended for a majority of uses cases and workloads. Throughput scales as your file system grows, and you are billed for only the amount of data stored on the file system in GB-Month. Because file (based workloads are typically spiky-driving high levels of throughput for short periods of time and low level of throughput the rest of the time) using Bursting Throughtput mode allow for high throughput levels for a limited period of time. 
+
+You can monitor and alert on your file system's burst credit balance by using the ``BurstCreditBalance`` file system metric in Amazon CloudWatch. File systems earn burst credits at the baseline throughput rate of 50 MiB/s per TiB of data stored and can accumulate burst credits up to the maximum size of 2.1 TiB per TiB of data stored. A newly created file systems begin with an initial credit balance of 2.1 TiB. As a result, larget file systems can accumulate and store more burst credits, which allows them to burst to longer periods.
+
+**Provisioned Throughput** is available for applications that require a higher throughput to storage ratio thatn those allowed by the Bursting Throughput moe. In this mode, you can provision the file system's throughput independent of the amount of data stored in the file system. Provisioned Throughput allows you to optimize your file system's throughput performance to match your application's needs, and your application can drive up to the provisioned throughput continuously. 
+
+When file systems are running in Provisioned Throughput mode, you are billed for the storage you use in GB-Month and for the throughput provisioned in MiB/s-Month. The storage charge for both Bursting and Provisioned Throughput modes includes throughput of the file system in the price storage.
+
+You can increase Provisioned Throughput as often as you need. You can decrease Provisioned Throughput or switch throughput modes as long as it's been more then 24 hours since the last decrease or throughput mode change.
+
+.. figure:: /compute_d/throughput.png
+   :align: center
+
+   Amazon EFS throughput modes
+
+`Whitepaper: Choosing Between the Different Throughput & Performance Modes <https://aws.amazon.com/efs/choosing-your-performance-mode/>`_
+
+`Amazon EFS Performance <https://docs.aws.amazon.com/efs/latest/ug/performance.html>`_
+
+Maximizing Amazon EFS throughput
+--------------------------------
+
+Parallelizing file operations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When looking at your workload, consider the type of Amazon EC2 instance that is connecting to your file system. Review the virtual CPU, memory, and the network performance capabilities before deciding on Amazon EFS. These attributes determine the performance level of applications that use EFS.
+
+To achieve higher throughput levels, EFS takes advantage of parallelizing your operations owing to EFS' distributed architecture. Parallelization means using more instances and more threads per instance. If your application can use multiple threads to perform file operations, you can take advantage of parallelization to increase performance.
+
+An effective use case could be a data migration or large file copy operation that use multiple threads to shorten the time frame of the data move.
+
+I/O size - serial operations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The I/O size impact throughput for EFS is when performing serialized operations. As the amount of data you are reading or writing in an operation increases, the throughput increases as well. This is because of the distributed storage design of Amazon EFS. 
+
+This distributed architecture results in a small latency overhead for each file operation. As the result of this per-operation latency, overall throughput generally increases as the average I/O size increases because the overhead is amortized over a larger amount of data.
+
+Testing your workloads and understanding how your application is reading or writing data help you determine which applications are eligible for high throuhput data transfers with EFS. 
+
+Amazon EFS CloudWatch metrics
+-----------------------------
+
+Performance metrics are displayed for each file system created. CloudWatch captures the following metrics:
+
+* ``BurstCreditBalance`` determines the number of burst credits you have available.
+
+* ``ClientConnections`` displays the number of client connections to a file system. When using a standard clien, there is 1 connection per mounted EC2 instance.
+
+* ``DataReadIOBytes`` is the number of bytes for each file system read operation.
+
+* ``DataWriteIOBytes`` is the number of bytes for each file system write operation.
+
+* ``MetaDataIOBytes`` is the number of bytes for each metadata operation.
+
+* ``PercentIOLimit`` is an important metric to look at when using the General Purpose mode. This metric is available only on the General Purpose mode and helps you determine whether you are reaching the limits of this mode, and if you need to switch to the Max I/O mode.
 
 
 `Amazon EFS now Supports Access Across Accounts and VPCs <https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-efs-now-supports-access-across-accounts-and-vpcs/?nc1=h_ls>`_
 
 `Mounting EFS File Systems from Another Account or VPC <https://docs.aws.amazon.com/efs/latest/ug/manage-fs-access-vpc-peering.html>`_
 
-`Mounting File Systems Without the EFS Mount Helper <https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-old.html>`_
 
-`Using Microsoft Windows File Shares <https://docs.aws.amazon.com/fsx/latest/WindowsGuide/using-file-shares.html>`_
-
-`Mounting from an Amazon EC2 Instance <https://docs.aws.amazon.com/fsx/latest/LustreGuide/mounting-ec2-instance.html>`_
 
 
 Amazon EC2 considerations

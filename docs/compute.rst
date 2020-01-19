@@ -1096,9 +1096,169 @@ You can activate tags as *cost allocation* tags in the Amazon S3 Billing dashboa
 Amazon EFS
 **********
 
+Overview
+========
+
+Amazon EFS has a simple web service interface that allows you to create and configure file systems quickly and easily. EFS manages all the file storage infrastructure for you which allows tou to avoid the complexity of deploying, patching, and maintaining complex file system deployments. EFS provides simple, scalable file storage for use with Amazon EC2.
+
+EFS file systems store data and metadata across multiple AZs to prevent data loss from the failure of any single component. With EFS, storage capacity is elastic, growing and shrinking automatically as you add or remove files, so your applications have the storage they need, when they need it. Since capacity is elastics, there is no provisioning necessary and you will only be billed for the capacity used. 
+
+Choose EFS as a solution for the following scenarios:
+
+* Applications running on EC2 instances that require a file system. 
+
+* On-premises file systems that require multi-host attachments.
+
+* High throughput application requirements.
+
+* Applications that require multiple AZs for HA and durability.
+
+It is important to understand your file workload requirements to determine whether EFS is a proper fit for your storage needs.
+
+Use cases
+---------
+
+Some common EFS use cases are:
+
+* *Web serving*. The need for shared file storage for web-serving applications can be challenge when integrating backend applications. Typically, multiple web servers deliver a website's contant, with each web server needing access to the same set of files.
+
+* *Big data analytics*. Big data requires storage that can handle large amounts of data while scaling, to keep up with growth, and providing the performance necessary to deliver data to analytics tools. Many analytics workloads interact with data by means of a file interface, rely on file semantics, such as file locks, and require the ability to write to portions of a file. EFS provies the scale and performance required for big data applications that require high throughput to compute nodes coupled with read-after-write consistency and low-latency file operations. EFS can provide storage for organizations taht have many users that need to access and share common datasets.
+
+* *Media and entertainment*. Digital media and entertainment workflows access data by using nework file protocols, such as NFS. These workflows require flexible, consistent, and secure access to data from off-the-shelf, custom-built, and partner solutions.
+
+* *Container storage*. Docker containers are ideal for building microservices because they're quick to provision, easily portable, and provide process isolation. A container that needs access to the original data each time it starts may require a shared file system that it can connect to regardless of which instance they're running on.
+
+* *Database backups*. Backing up data by using existing mechanisms, software, and semantics can create a isolated recovery scenario with little locational flexibility for recovery. 
+
+* *Content management*. You an use EFS to create a file system accesible to people across an organization and establish permissions for users and groups ata the file or directory level.
+
+Customers are using EFS for *Home directories* and *software development tools*.
+
 `Amazon Elastic File System - Scalable, Elastic, Cloud-Native File System for Linux <https://www.youtube.com/watch?v=AvgAozsfCrY&feature=emb_logo>`_
 
 `AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Elastic File System (Amazon EFS) (STG301-R1) <https://www.youtube.com/watch?v=4FQvJ2q6_oA>`_
+
+Amazon EFS architecture
+=======================
+
+There are 3 deployment models for NFS storage: On-premises NFS storage, Cloud-based NFS storage in a "do it yourself model", and Amazon EFS, which is a fully-managed NFS storage service.
+
+An on-premises NFS storage system is designed asking the following questions: "How much storage you need today? How do I ensure that it is sized for the performance needs of my application? What is my expected data growth over the next year, three years, and five years? Do I need to design this system for HA?". In general, you might not have all the answers to these questions, which can have you speculating on the best approach.
+
+You might also consider building your own NFS storage solution in the cloud through a combination of compute instances (EC2 instances), storage volumes (EBS volumes attached to EC2 instances), and NFS software. The total costs of an NFS setup become expensive to build and manage.
+
+EFS architecture
+----------------
+
+When you choose Amazon EFS, you need to only create mount targets in each AZ where your EC2 instances reside to connect to the Amazon EFS share. Amazon EFS does all the heavy lifting by providing a common DNS namespace in a high durable, scalable, NFS system that your EC2 instances can connect to. EFS supports NFS versions 4.0 and 4.1, so the applications and tools that use this protocols work with EFS. Multiple EC2 instances can access an EFS file system at the same time, providing a common data source for workloads and applications running on more than one instance. EFS charges by gigabyte of data stored and no provisioning of storage is required.
+
+.. Note:: Provisioned Throughput mode.
+
+	Provisioned Throughput mode adds a second price dimension. You are charged for the amount of storage you use and the throughtput you provision.
+
+.. figure:: /compute_d/efs.png
+   :align: center
+
+	 Amazon EFS architecture
+
+EFS file system
+^^^^^^^^^^^^^^^
+
+The **EFS file system** is the primary resource for EFS where files and directories are stored. EFS provides strong data consistency and file-locking features, so using EFS is just like using any of the popular NFS file systems. EFS is based on aregional construct, so you create an EFS file system in your chosen supported region. For most regions, EFS limits the number of file systems that you can create per account to 125. 
+
+When creating your file system, you can choose from 2 performance modes: General Purpose and Max I/O. **General Purpose** mode is recommended as the best choice for most workloads, and provides the lowest latency for file operations. Consider the **Max I/O** mode for data-heavy applications that scale out significantly over time.
+
+You can choose from 2 throughput modes: Bursting and Provisioned. **Bursting** Throughput mode is recommended for most file systems. Use the **Provisioned** Throughtput mode for applications that require more throughput than allowed by Bursting Throughput.
+
+After you have created your file system, it is instantly accessible from EC2 instances within your VPC and can be accessed by multiple instances simultaneously. Additionally, you can connect to EFS from your on-premises clients by using AWS Direct Connect. After you have mounted your EFS file system, you can control access by using Portable Operating System Interface (POSIX) permissions.
+
+To help you easily identify or organize the multiple file systems you create, you can add tags to your file systems. These are key and value pairs that you create during or after your file system creation. You can create up to 50 tgas per file system. 
+
+Mount target
+^^^^^^^^^^^^
+
+A **mount target** is the resource created to enable access to your EFS file system from an EC2 instance or on-premises clients. A single mount target exists in each AZ an is the only way in which you can access your EFS file system. A mount target is analogous to an NFS endpoint. A mount target allows resources that reside in a VPC to access the EFS file system. Mount targets are automatically created during the EFS file system creation process. The mount target has an IP address and a DNS name that you use to mount your EFS file system to your EC2 instances.
+
+.. figure:: /compute_d/mount.png
+   :align: center
+
+	 Mount targets
+
+The DNS name contains the file system ID and the AWS Region where the file system was created. By default, mount targets are designed to be highly available. You can also configure access to a mount target by using security groups.
+
+Only one mount target is in each AZ, but if your AZ contains multiple subnets, you can choose which subnet ID to assign to your EFS file system, then mount your Ec2 instances. After this is done, you can create one mount target in each AZ. The mount target obtains an IP address from the subnet dynamically, or you can assign a static IP address. The subnet IP address of the mount target does not change.
+
+EFS requirements
+----------------
+
+Before setting up your file system in EFS, you must take insto account certain requirements:
+
+1. You can mount an EFS file system to instances in only one VPC at a time. As you design and configure your applications, remember to keep your instances, which need access to the same file system, in a single VPC.
+
+2. Your EFS file system and your VPC must reside in the same region. Because EFS is available only in certain regions, consider the locations where your are deploying resources in AWS.
+
+Accessing EFS file systems
+--------------------------
+
+You can access EFS file systems in 3 ways: from EC2 instances, from on-premises hosts that mount EFS file systems over AWS Direct Connect, and from hosts running in the VMware Cloud on AWS.
+
+From on-premises hosts, you mount your file systems through mount targets as you would with EC2, but instead of using a DNS name, AWS recommends that you use an IP address in the mount command. If you choose to mount your file system on your on-premises server through AWS Direct Connect with a DNS name, you must integrate your DNS in your VPC with your on-premises DNS domains. Specifically, to forward the DNS requests for EFS mount targets to a DNS server in the VPC over the AWS Direct Connect connection, you must update your on-premises DNS server.
+
+.. figure:: /compute_d/dx.png
+   :align: center
+
+	 Amazon EFS with AWS Direct Connect
+
+Some of the common uses cases for using AWS Direct Connect are the migration of data, backup/disaster recovery, and bursting. Bursting is copying on-premises data to EFS, analyzing the data at high speed, and sending the data back to the on-premises servers.
+
+Amazon EFS File Sync
+--------------------
+
+Amazon EFS File Sync copies existing on-premises or cloud file systems to an EFS file system. Data copy operations are 5 times faster than standard Linux copy tools, and you can set up and manage your copy job easily from the AWS Management Console.
+
+`What Is Amazon Elastic File System? <https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html>`_
+
+Amazon EFS File System Management
+=================================
+
+Setting up and managing a file system
+-------------------------------------
+
+With EFS, you can set up and manage your file system by using 3 distinct interfaces: the AWS Management Console, AWS CLI and AWS SDK. The process of creating an EFS file system from the AWS Management Console has the following steps:
+
+1. Choose the region where you want to create your file system.
+
+2. Choose a VPC that has EC2 instances that will connect to your new file system.
+
+3. Choose the appropriate subnets for your EFS where your EC2 instances reside.
+
+4. Assign a security group for your file system. If you have not created a security group, you can create it later.
+
+5. Choose the performance moe for your cloud storage workloads. Choose the throughput mode for your file system.
+
+6. You can enable encryption for your file system, if it is needed.
+
+Mounting a file system
+----------------------
+
+After creating a file system, you can view details about it in the AWS Management Console, such as its file system ID, performance mode, and throughput mode. The instructions for mounting the file system on an EC2 instance provide steps for installing the EFS mount helper and the NFS client. Steps to mount the file system with either the NFS client or the EFS mount helper are also provided. Each mount command requires the file system ID as an argument.
+
+To mount your EFS files systems, use the EFS mount helper included in the *amazon-efs-utils* package. It is an open-source collection of Amazon EFS tools and there's no additional cost to use them. This package includes a mount helper and tooling that make it easier to perform encryption of data in transit for EFS. A mount helper is a program that you use when you mount a specific type of file system. 
+
+To prepare for mounting a file system with the EFS mount helper, follow these steps:
+
+1. For an Amazon Linux EC2 isntance, install the Amazon EFS utilities
+
+.. code-block:: console
+
+	sudo yum install -y amazon-efs-utils
+
+2. Create a new directory on your EC2 instance for the mount point, such as *efs*. 
+
+.. code-block:: console
+
+	sudo mkdir efs
+
 
 `Amazon EFS now Supports Access Across Accounts and VPCs <https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-efs-now-supports-access-across-accounts-and-vpcs/?nc1=h_ls>`_
 

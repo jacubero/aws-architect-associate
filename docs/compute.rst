@@ -999,6 +999,14 @@ These tips represent best practices for getting optimal performanace from your E
 
 * *Be aware of performance behavior when initializing volumes from snapshots*. You can experience a significant increase in latency when you first access blocks of data on a new EBS volume that was restored from a snapshot. This behavior is a tradeoff since, in this case, EBS volumes were designed for availability over performance. You can avoid this effect on performance by accessing each block beore moving the volume into production.
 
+* *Use a modern Linux kernel* with support for indirect descriptors. By using indirect descriptors, you can queue more buffers. Indirect descriptors support block devices by making sure that large requests do not exhaust the ring buffer and increase the queue depth. Linux kernel 3.11 and later includes support for indirect descriptors, as do nay current-generation EC2 instances.
+
+* *Increase read-ahead for high-throughput, read heavy workloads on Throughput Optimized HDD and Cold HDD volumes*. Some read-heavy workloads access the block device through the operating system page cache. To achieve the maximum throughput, configure the read-ahead setting to 1 MiB.
+
+.. Note:: Linux performance tuning.
+
+	Some workloads are read-heavy and access he block device through the operating system page cache (for example, from a file system). In this case, to achieve the maximum throughput, the default buffer size for Amazon Linux AMI is 128 KB (256 sectors). AWS recommends that you configure the read-ahead setting to 1 MiB. Apply this per-block-device setting only to your HDD volumes. For example: ``sudo blockdev -setra 2048 /dev/xvdf``
+
 Initializing EBS volumes
 ------------------------
 
@@ -1008,18 +1016,82 @@ This preliminary action takes time and can cause a significan increase in the la
 
 You can avoid this performance degradation in a production environment by reading from all of the blocks on your volume before you use it; this process is called *initialization*. For a new volume created from a snapshot, read all the blocks that have data before using the volume.
 
-Cost factors
-^^^^^^^^^^^^
+Deciding when to use RAID
+-------------------------
+
+You can join multiple EBS volumes, in a redundant array of independent disks (RAID) 0 stripping configuration to use the available bandwidth for these instances. With RAID 0 striping of multiple volumes, IOPS is distributed among the volumes of a stripe. As a result, you gain faster I/O performance. RAID is a data storage virtualization technology that combines multiple physical disk drive components into a single logical unit for the purposes of data redundancy, performance improvement, or both. Use RAID 0 when:
+ 
+* Your storage requirement is greater than 16 TB.
+
+* Your throughput requirement is greater than 500 MB/s.
+
+* Your IOPS requirement is greater than 32000 IOPS at 16 K.
+
+Avoid RAID for redundancy because:
+
+* Amazon EBS data is already replicated.
+
+* RAID 1 cuts available EBS bandwidth in half.
+
+* RAID 5 and 6 lose 20% to 30% of usable I/O to parity.
+
+Monitoring performance using Amazon CloudWatch
+----------------------------------------------
+
+Amazon CloudWatch monitors in real time your AWS resources and the applications that you run. CloudWatch metrics are statistical data that you can use to view, analyze, and set alarms on the operational behavior of your volumes. Types of monitoring data that are available for your Amazon EBS volumes:
+
+* Basic data is available automatically in 5-minute periods. Data for the root device volumes of EBS-backed instances is also provided.
+
+* Detailed data is provided by Provisioned IOPS SSD volumes that automatically send one-minute metrics to CloudWatch.
+
+.. figure:: /compute_d/metrics.png
+   :align: center
+
+	 Amazon EBS metrics
+
+`Monitoring the Status of Your Volumes <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-volume-status.html>`_
+
+A number of performance metrics are available for Amazon EBS. The CloudWatch window in the Amazon EC2 console shows some of the graphs that are created from various EBS metrics. For example:
+
+* The *Write Bandwith* graph shows the sum of the *VolumeWriteBytes* metric per second. The *VolumeWriteBytes* metric measures the number of bytes that are written to the volume. 
+
+* The *Write Throughput* graph shows the *VolumeWriteOps* metric. This metric measures the total number of write operations in a specified period of time. 
+
+* The *Average Queue Length* graph shows the *VolumeQueueLength* metric. This metric measures the number of read and write operation requests waiting to be completed in a specified period of time.
+
+* The *Average Write* graph uses the *VolumeWriteBytes* metric to measure the average size of each write operation during the specified period.
+
+.. figure:: /compute_d/cloudwatch.png
+   :align: center
+
+	 EBS metrics graphs in EC2 console
+
+You can retrieve data from CloudWatch by using either the CloudWatch API or the Amazon EC2 console. Use the ``get-metric-data`` API to retrieve as many as 100 different metrics in a single request and ``get-metric-statistics`` for getting statistics for the specified metric. The console uses the raw data that the CloudWatch API  return to display a series of graphs that represent the data. Data is reported to CloudWatch only when the volume is active. If the volume is not attached to an EC2 instance, no data is reported.
+
+Tracking Amazon EBS usage and costs
+===================================
+
+EBS pricing model
+-----------------
 
 To estimate the cost of using EBS, you need to consider the following:
 
 * **Volumes**. Volumes storage for all EBS volume types is charged by the amount you provision in GB per month, until you release the storage.
 
-* **IOPS**. I/O is included in the price of general purpose volumes. Magnetic volumes are charged by the number of requests you make to your volume. Provisioned IOPS volumes are charged by the amount you provision in IOPS, multiplied by the percentage of days you provision for the month.
+* Provisioned **IOPS** SSD volumes. The throughput amount billed in a month is based on the average provisioned throughput for the month. Your throughput is measured in MB/s-month, which are added up at the end of the month to generate your monthly charges.
 
-* **Snapshot**. EBS provides the ability to back up snapshots of your data to S3 for durable recovery. If you opt for EBS snapshots, the added cost is per gigabyte-month of data stored.
+* **Snapshots**. Snapshot storage is based on the amount of space your data consumes in S3. Because EBS does not save empty blocks, it is likely that the snapshot size is considerably less than your volume size. Copying EBS snapshots is charged based on the volume of data transferred across regions. For the first snapshot of a volume, EBS saves a full copy of your data to S3. For each incremental snapshot, only the changed part of your EBS volume is saved. After the snapshot is copied, standard EBS snapshot charges apply for storage in the destination region.
 
-* Outbound **Data transfer** is tiered and inbound data is free. 
+* Outbound **Data transfer** is tiered and inbound data is free.
+
+Tracking costs using tags
+-------------------------
+
+Tagging is an important feature that enables you to better manage your AWS resources. Use tags to assign simple key-value pair to resources, like EC2 instances, EBS volumes, and EBS sanpshots. With tagging, you can logically group resources to help visualize, analyze, and manage resources. By activating user-defined tags for cost allocation, AWS makes the associated cost data for these tags available throughout the billing pipeline.
+
+`Using Cost Allocation Tags <https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html>`_
+
+You can activate tags as *cost allocation* tags in the Amazon S3 Billing dashboard. By activating cost allocation tags, you can generate reports on cost and usage, broken down by tag values, such as dev, test, or backup. The same dataset that is used to generate AWS Cost and Usage reports is visible in the Cost Explorer for additional visualization. In Cost Explorer, you can view patterns in how much you spend on EBS snapshots. Cost Explorer is enabled from the Billing and Cost Management console in the AWS Management Console.
 
 Amazon EFS
 **********

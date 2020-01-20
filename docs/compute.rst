@@ -481,6 +481,23 @@ AWS tagging strategies
 
 `AWS re:Invent 2018: [REPEAT 1] Amazon EC2 Foundations (CMP208-R1) <https://www.youtube.com/watch?time_continue=1&v=vXBeO9vQAI8&feature=emb_logo>`_
 
+Amazon EC2 considerations
+*************************
+
+
+`Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
+
+
+`Resource Locations <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resources.html>`_
+
+
+For all new AWS accounts, 20 instances are allowed per region. However, you can increase this limit by requesting it via AWS support.
+
+Instances within a VPC with a public address have that address released when it is stopped and are reassigned a new IP when restarted.
+
+All EC2 instances in the default VPC have both a public and private IP address.
+
+
 .. _secEBS:
 
 Amazon EBS
@@ -1425,6 +1442,54 @@ Performance metrics are displayed for each file system created. CloudWatch captu
 
 * ``PercentIOLimit`` is an important metric to look at when using the General Purpose mode. This metric is available only on the General Purpose mode and helps you determine whether you are reaching the limits of this mode, and if you need to switch to the Max I/O mode.
 
+* ``PermittedThroughput`` shows the amount of throughput the file system is allowed. For file systems in the Provisioned Throughput mode, this value is the same as the provisioned throughput. For the file systems in the Bursting Throughput mode, this value is a function of the file system size and ``BurstCreditBalance``.
+
+* ``TotalIOBytes`` is the number of bytes for each file system operation, including data read, data write, and metadata operations.
+
+The 2 most important metrics for CloudWatch monitoring are ``PercentIOLimit`` and ``BurstCreditBalance``. ``PercentIOLimit`` because you will use this metric for determining when to use the General Purpose mode or Max I/O mode. ``BurstCreditBalance`` because it can show you how youa are using the available burst credits you have and how often you are using burst capacity. File systems by nature are spiky and will most likely use some bursting, but if a performance issue surfaces, you must also determine how often you might be draining you burst credits.
+
+Metric math enables you to query multiple CloudWatch metrics and use math expressions to create a new time series based on these metrics. You can visualize the resulting time series in the CloudWatch console and add them to dashboards.
+
+`Monitoring EFS with Amazon CloudWatch <https://docs.aws.amazon.com/efs/latest/ug/monitoring-cloudwatch.html>`_
+
+Best practices using Amazon EFS
+-------------------------------
+
+In summary, here are some key recommendations to consider when using Amazon EFS:
+
+* Before moving your applications to EFS, set up test environments in AWS to understand how your applications behaves while using EFS. In your test environment, you can obtain data on performance levels, throughput levels, and latency before deciding on EFS. The General Purpose setting is suitable for the majority of most workloads and provides the lowest latency.
+
+* Start testing with Bursting Throughput. It is the recommended throughput mode for most file systems.
+
+* For optimal performance and to avoid a variety of known NFS client defects, work with a recent Linux kernel, version 4.0 or later.
+
+* To mount your EFS file system on your EC2 instance, use the EFS mount helper. You can use NFS version 4.1 when creating your file system mount points to ensure optimum compatibility. EFS supports NFS versions 4.0 and 4.1 protocols when mounting your file systems on EC2 instances. However, NFS v4.1 provides better performance.
+
+* Improve EFS performance by aggregating I/O operations, parallelizing, and managing burst credits. Check your burst credit earn/spend rate when testing to ensure a sufficient amount of storage.
+
+* Where possible, leverage the use of multiple threads, EC2 instances, and directories. 
+
+* Monitor EFS metrics with CloudWatch to maintain the reliability, availability, and performance of EFS.
+
+Amazon EFS cost and billing
+===========================
+
+EFS pricing model
+-----------------
+
+Generally, Amazon EFS pricing varies by region. With EFS, you have 3 pricing dimensions:
+
+* **Storage**: amount of file system storage you use per month.
+
+* **Throughput**. In the default Bursting Throughput mode, no charges are incurred for bandwidth or requests, and you get a baseline rate of 50 KB/s per GB of throughput included with the price of storage. You can choose the Provisioned Throughput mode and provision the throughput of your file system independent of the amount of data stored and pay separately for storage and throughput. Like the default Bursting Throughput mode, the Provisioned Throughput mode also includes 50 KB/s per GB (or 1 MB/s per 20 GB) of throughput in the price of storage. You are billed only for the throughput provisiones above what you are provided based on data you have stored. When using the Provisioned Throughput mode, you pay for the throughput you provision per month. No minimum fee and no setup charges are incurred.
+
+* **EFS File Sync**. You pay per-GB for data copied to EFS. You can use CloudWatch to track the amount of data synced with another file system, whether it's on the AWS Cloud or on premises. If your source file system is in AWS, you are billed at standard EC2 rates fpr the instance on which the EFS File Sync agent runs.
+
+Amazon EFS versus DIY file storage
+----------------------------------
+
+EFS pricing is based on paying for what you use. If Provisioned Throughput mode is enabled, there are no minimum commitments or upfront fees, and you are charged per GB stored and throughput consumed. You are not required to provision storage in advance, and you do not incur additional charges or billing dimensions when using EFS. With do-it-yourself file storage configurations, you must consider many costs, such as EC2 instance costs, EBS volume costs, and Inter-Availability Zone transfer costs. 
+
 
 `Amazon EFS now Supports Access Across Accounts and VPCs <https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-efs-now-supports-access-across-accounts-and-vpcs/?nc1=h_ls>`_
 
@@ -1432,20 +1497,4 @@ Performance metrics are displayed for each file system created. CloudWatch captu
 
 
 
-
-Amazon EC2 considerations
-*************************
-
-
-`Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
-
-
-`Resource Locations <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resources.html>`_
-
-
-For all new AWS accounts, 20 instances are allowed per region. However, you can increase this limit by requesting it via AWS support.
-
-Instances within a VPC with a public address have that address released when it is stopped and are reassigned a new IP when restarted.
-
-All EC2 instances in the default VPC have both a public and private IP address.
 

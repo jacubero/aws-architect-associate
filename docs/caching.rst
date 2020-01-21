@@ -10,6 +10,12 @@ Caching on AWS
 CloudFront
 ==========
 
+CloudFront provides improved latency, packet loss and overall quality. It avoids conflicts and network interconnect capacity. It offers greater operational control.
+
+
+
+
+
 To estimate the cost of using CloudFront, you need to consider the following:
 
 * **Traffic distribution**. Data transfer and request pricing vary across geographic regions, and pricing is based on the edge location through which your content is served.

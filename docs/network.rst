@@ -131,11 +131,183 @@ With NACLs, you can define ALLOW and DENY rules. The default ACLs allow all traf
 
 `AWS re:Invent 2018: Your Virtual Data Center: VPC Fundamentals and Connectivity Options (NET201) <https://www.youtube.com/watch?time_continue=1&v=jZAvKgqlrjY&feature=emb_logo>`_
 
-
 Amazon VPC: Route tables and gateways
 =====================================
 
+VPC subnets route table
+-----------------------
 
+The route tables allows you to route to some gateway. The route table get applied to router of the subnet itself (+1 of the subnet itself). The default gateway of the EC2 instance (``0.0.0.0/0``) always will be pointing to the router of the subnet. In this router, you will have a routing table with an entry with destination the VPC CIDR blocks and the target local. Local means that you can route to every resource in the VPC. The local entry in the routing table has priority over the rest of the routes. The other entry in the routing table has a destination ``0.0.0.0/0`` and target the internet gateway. The **internet gateway** allow an EC2 instance to route traffic to Internet or any resource in the Internet route traffic to the EC2 instance.
+
+.. figure:: /networks_d/internetg.png
+   :align: center
+
+	 Example of a routing table
+
+VPC: Gateways
+-------------
+
+A **NAT gateway** is a managed address translation gateway. 
+
+IPv6 addresses on EC2 instances are public addresses, so that if we connect them to internet gateway there would be reachable from Internet. The **egress-only internet gateway** is a gateway for IPv6 only, that allows EC2 instances with IPv6 addresses to reach Internet, but they are not reachable from Internet.
+
+**VPC peering connection**
+
+VPC Routing: Public subnet
+--------------------------
+
+What makes a subnet public is its routing table. It has an entry with destination ``0.0.0.0/0`` and target the Internet Gateway. You would need a public IP address attached to the network interface of EC2 instance in this subnet. The packets coming from the EC2 instance to the Internet Gateway have a private IP address and they are translated to the public IP address attached to it thanks to the Internet Gateway.
+
+.. figure:: /networks_d/public.png
+   :align: center
+
+	  Example of public subnet routing table
+
+You do not need to manage the Internet Gateway. It scales out or in depending on the amount the traffic it has to handle. The maximum throughtput it can support is 5Gbps.
+
+VPC Routing: Private subnet
+---------------------------
+
+If an EC2 in a private subnet wants to communicate to the Internet, this subnet needs to be attached to a NAT gateway which lives in a public subnet. There is an entry in the routing table in which the destination is ``0.0.0.0/0`` ad the target is the NAT gateway. 
+
+.. figure:: /networks_d/private.png
+   :align: center
+
+	  Example of private subnet routing table
+
+The NAT gateway allows the EC2 with a private address to reach the Internet but the EC2 instance is not reachable from the Internet. The NAT gateway requires an Elastic IP address that will be used to translate the private address of the EC2 instance. Even if you are using a NAT gateway, you are still passing through an Internet Gateway to reach the Internet. You have one Internet Gateway per VPC but you can have multiple NAT gateways inside you VPC. The reason to have more than one is that they are highly available within an AZ, not across AZs. 
+
+A NAT gateway separate subnets and can scale up to 45 Gbps. There is a limit of 55000 connections towards the same destination. If you need more thant 45 Gbps or more than 55000 connections towards the same destination, then you will need more than one NAT gateway. In that case, you will need another subnet with a different routing table that will point towards the second NAT gateway.
+
+EC2 instance as in-line next-hop
+--------------------------------
+
+If you want to implement you own NAT gateway or IDS or IPS, ... by using an EC2 instance, then you will need to use it as in-line next-hop. There are several methods to implement it.
+
+Method 1
+^^^^^^^^
+
+You will need to define an entry in the routing table with destination ``0.0.0.0/0`` and the target is an ENI (Elastic Network Interface) of an EC2 instance within a public subnet. This EC2 instance has reachability to the Internet via an Internet Gateway.
+
+.. figure:: /networks_d/method1.png
+   :align: center
+
+	  EC2 instance as in-line next-hop: Method 1
+
+The responsible for translating the private address of the EC2 to the public address is the Internet Gateway. 
+
+Method 2
+^^^^^^^^
+
+Another method is to configure a route inside the EC2 and redirects it to another EC2 instance inside the same subnet. The latter EC2 instance sends the traffic to the default gateway (``+1`` of subnet network) and its routing table has the entry for destination ``0.0.0.0/0`` pointing to the Internet Gateway. The responsible for translating the private address of the EC2 to the public address is the Internet Gateway. 
+
+.. figure:: /networks_d/method2.png
+   :align: center
+
+	  EC2 instance as in-line next-hop: Method 2
+
+VPC endpoints for AWS services
+------------------------------
+
+It allows to communicate with some services directly within your VPC. There are two types of VPC: interface and gateway.
+
+.. list-table:: VPC endpoints for AWS services
+    :widths: 30 35 35 
+    :header-rows: 1
+
+    * - Endpoint Type
+
+      - Description
+
+      - Supported Services
+
+    * - Interface (powered by PrivateLink)
+
+      - An elastic network interface with a private IP address that serves as an entry point for the traffic destinaed to a supported AWS service.
+
+      - Amazon Kinesis, Elastic Load Balancing API, Amazon EC2 API, AWS Systems Manager, AWS Service Catalog, Amazon SNS, AWS SNS. 
+
+    * - Gateway
+
+      - A gateway that is a target for a specified route in your route table, used for traffic destined to a supported AWS service.
+
+      - Amazon S3, Amazon DynamoDB. 
+
+The characteristics of an **Interface VPC endpoint** are the following:
+
+* There is one interface per AZ. It is an ENI from an EC2 instance which lives in an AZ.
+
+* It does not support endpoint policies.
+
+* You can apply a security groups.
+
+* You access over AWS Direct Connect, but no through AWS VPN.
+
+* It makes requests to the service using endpoint-specific DNS hostnames. Optionally, you can use Amazon Route 53 DNS private hosted zone to make requests to the service using its default public DNS name.
+
+The characteristics of an **Gateway VPC endpoint** are the following:
+
+* It supports multiple AZs.
+
+* It supports the use of endpoint policies.
+
+* It cannot be accessed neither over AWS Direct Connect nor over VPN.
+
+* It makes requests to the service using its default public DNS name.
+
+An example of creating an Amazon S3 VPC endpoint is the following:
+
+.. code-block:: console
+
+  $ aws ec2 create-vpc-endpoint --vpc-id vpc-40f18d25 --service-name com.amazonaws.us-west-2.s3 --route-table-ids rtb-2ae6a24f
+
+You need an entry in the routing table with destination the prefix list for the S3 endpoint and the target the VPC endpoint. 
+
+.. figure:: /networks_d/s3ep.png
+   :align: center
+
+	  Creating an Amazon S3 VPC endpoint
+
+That prefix list is built by AWS. It is a logical route destination target that dynamically translates to service IPs. Amazon S3 IP ranges change over time and Amazon S3 prefix lists abstract change.
+
+.. code-block:: console
+
+  $ aws ec2 describe-prefix-lists
+
+  {
+    "PrefixLists": [
+      {
+        "PrefixListName": "com.amazonaws.us-east-1.s3",
+        "Cidrs": [
+          "54.231.0.0/17"
+        ],
+        "PrefixListId": "pl-63a5400a"
+      }
+    ]
+  }
+
+The VPC endpoint policy allows you to control VPC access to Amazon S3. An example could be the following:
+
+.. code-block:: JSON
+
+  {
+    "Statement": [
+      {
+        "Sid": "Access-to-specific-bucket-only",
+        "Principal": "*",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject"
+        ],
+        "Effect": "Allow",
+        "Resource": ["arn:aws:s3:::my_secure_bucket",
+                     "arn:aws:s3:::my_secure_bucket/*"]
+      }
+    ]
+  }	
+
+Virtual Private Gateway
+-----------------------
 
 
 Security in the cloud

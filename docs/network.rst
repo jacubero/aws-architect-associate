@@ -272,39 +272,105 @@ That prefix list is built by AWS. It is a logical route destination target that 
 
 .. code-block:: console
 
-  $ aws ec2 describe-prefix-lists
+	$ aws ec2 describe-prefix-lists
 
-  {
-    "PrefixLists": [
-      {
-        "PrefixListName": "com.amazonaws.us-east-1.s3",
-        "Cidrs": [
-          "54.231.0.0/17"
-        ],
-        "PrefixListId": "pl-63a5400a"
-      }
-    ]
-  }
+	{
+	"PrefixLists": [
+	  {
+	    "PrefixListName": "com.amazonaws.us-east-1.s3",
+	    "Cidrs": [
+	      "54.231.0.0/17"
+	    ],
+	    "PrefixListId": "pl-63a5400a"
+	  }
+	]
+	}
 
 The VPC endpoint policy allows you to control VPC access to Amazon S3. An example could be the following:
 
 .. code-block:: JSON
 
-  {
-    "Statement": [
-      {
-        "Sid": "Access-to-specific-bucket-only",
-        "Principal": "*",
-        "Action": [
-          "s3:GetObject",
-          "s3:PutObject"
-        ],
-        "Effect": "Allow",
-        "Resource": ["arn:aws:s3:::my_secure_bucket",
-                     "arn:aws:s3:::my_secure_bucket/*"]
-      }
-    ]
-  }	
+	{
+	"Statement": [
+	  {
+	    "Sid": "vpce-restrict-to-my_secure_bucket",
+	    "Principal": "*",
+	    "Action": [
+	      "s3:GetObject",
+	      "s3:PutObject"
+	    ],
+	    "Effect": "Allow",
+	    "Resource": ["arn:aws:s3:::my_secure_bucket",
+	                 "arn:aws:s3:::my_secure_bucket/*"]
+	  }
+	]
+	}	
+
+Having a VPC endpoint policy in place does not mean that you have access to a bucket. There are bucket policy that can allow or deny access to it. For instance, you can restrict that the bucket must be accesible only from the S3 VPC endpoint:
+
+.. code-block:: JSON
+
+	{
+	  "Version":"2012-10-17",
+	  "Statement":[
+	    {
+	      "Sid":"bucket-restrict-to-specific-vpce",
+	      "Principal": "*", 
+	      "Action":"s3:*",
+	      "Effect":"Deny",
+	      "Resource":["arn:aws:s3:::my_secure_bucket",
+                     "arn:aws:s3:::my_secure_bucket/*"],
+	      "Condition":{"StringNotEquals":{"aws:sourceVpce":["vpce-bc42a4e5"]}}
+	    }
+	  ]
+	}
+
+As a summary, you can control VPC access to Amazon S3 via several security layers:
+
+1. Route table association.
+
+2. VPC endpoint policy.
+
+3. Bucket policy.
+
+4. EC2 security groups with prefix list.
+
+.. figure:: /networks_d/layers.png
+   :align: center
+
+	  Controlling VPC access to Amazon S3
+
+.. Note:: Prefix list.
+	You can use prefix list with security groups but not with NACLs.
+
+Amazon EC2 networking
+=====================
+
+Elastic network interface
+-------------------------
+
+You always have an ENI attached to an instance, it is the default ENI and cannot be modified. You can attach more than one ENI to an EC2 instance and they can be moved to another EC2 instance. In general, the ENIs of an EC2 instance are attached to different subnets. Each ENI have a private IP address and a public IP address, optionally you can have up to 4 private IP addresses and 4 public IP addresses.
+
+.. figure:: /networks_d/eni.png
+   :align: center
+
+	  Elastic network interface
+
+The ENIs will be attached to different VPC subnets in the same AZ. The ENIs are used to talk among EC2 instances but also between an EC2 instance and an EBS volume. Some EC2 instance types support EBS optimized dedicated throughput, which allows you to have dedicated throughtput to access an ENS volume.  
+
+.. figure:: /networks_d/dedicated.png
+   :align: center
+
+	  EC2 instance types supporting EBS-optimized dedicated throughput
+
+If we need to optimize network performance between 2 EC2 instances. The supported throughput is based on the instace type.
+
+.. figure:: /networks_d/performance.png
+   :align: center
+
+	  Instance sizing: burstable network performance
+
+
 
 Virtual Private Gateway
 -----------------------

@@ -577,7 +577,6 @@ Client side encryption happens before your data is uploaded into your S3 bucket.
 * Customer managed master encryption keys (**CSE-C**). You use your own client-side master key. When using your client-side master keys, your unencrypted data is never sent to AWS. It is important that you safely manage your encryption keys. If you lose them, you don't be able to decrypt your data.
 
 .. Note:: Default Encryption.
-
 	**Default Encryption** is an option that allows you to enable automatically encrypt of all new objects written to your Amazon S3 bucket using either SSE-SE or SSE-KMS. This property does not affect existing objects in your bucket.
 
 AWS Config

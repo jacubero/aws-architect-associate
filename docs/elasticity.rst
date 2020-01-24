@@ -80,16 +80,39 @@ Some Amazon CloudWatch features include collecting and tracking metrics like CPU
 
 `AWS re:Invent 2018: Augmenting Security & Improving Operational Health w/ AWS CloudTrail (SEC323) <https://www.youtube.com/watch?v=YWzmoDzzg4U&feature=emb_logo>`_
 
-Gaining elasticity and scaling your architecture
-************************************************
-
 Auto Scaling
-============
+************
 
-`AWS re:Invent 2018: Capacity Management Made Easy with Amazon EC2 Auto Scaling (CMP377) <https://www.youtube.com/watch?v=PideBMIcwBQ&feature=emb_logo>`_
+We can identify 3 types of autoscaling services:
 
-`Introduction to Amazon EC2 Auto Scaling <https://www.qwiklabs.com/focuses/7932?parent=catalog>`_
+* **Amazon EC2 Auto Scaling** helps you ensure that you have the correct number of Amazon EC2 instances available to handle the load for your application. 
 
+* **Application Auto Scaling** allows you to configure automatic scaling for the following resources:
+
+	* Amazon ECS services
+
+	* Spot Fleet requests
+
+	* Amazon EMR clusters
+
+	* AppStream 2.0 fleets
+
+	* DynamoDB tables and global secondary indexes
+
+	* Aurora replicas
+
+	* Amazon SageMaker endpoint variants
+
+	* Custom resources provided by your own applications or services. For more information, see the GitHub repository.
+
+	* Amazon Comprehend document classification endpoints
+
+	* Lambda function provisioned concurrency
+
+* **AWS Auto Scaling** which allows you to scale a number of services at the same time and in a very simple fashion. For example, if you have an application that is using EC2 instances and DynamoDB tables, you can setup the automatic provisioning and scaling of all these resources from one single interface.
+
+Amazon EC2 Auto Scaling
+=======================
 
 Auto Scaling helps you ensure that you have the correct number of Amazon EC2 instances available to handle the load for your application. Using Auto Scaling removes the guesswork of how many EC2 instances you need at a point in time to meet your workload requirements.
 
@@ -105,9 +128,13 @@ If Auto Scaling adds more instances, this is termed as *scaling out*. When Auto 
 
 There are 3 components required for auto-scaling:
 
-1. Create a **launch configuration**. This defines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups and roles to apply to the instance.
+1. Create a **launch configuration** or **launch template** determines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups, SSH keys, AWS IAM instance profile and user data to apply to the instance.
 
-2. Create a **Auto Scaling group**. This defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the minimum, the maximum, ans the desired size of the Auto Scaling Group. If you set a minimum of 2, if the number of servers goes below 2, another instance will be launched. If you set a maximum of 8, you will never have more than 8 instances in your group. The desire capacity is the number that you wich to start with. You can select the health check type.
+2. Create a **Auto Scaling group**. It is a logical group of instances for your service and defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the *minimum*, the *maximum*, ans the *desired* size of the Auto Scaling Group. If you set a minimum of 1, if the number of servers goes below 1, another instance will be launched. If you set a maximum of 4, you will never have more than 4 instances in your group. The desire capacity is the number of instances that should be running at any given time (for example 2). The Auto Scaling is going to launch instances or terminate instances in order to meet the desired capacity. You can select the health check type.
+
+.. figure:: /elasticity_d/as-basic-diagram.png
+
+	Sample Auto Scaling group
 
 3. Define a least one **Auto Scaling policy**, which specifies how much to scale in or scale out. This specifies when to launch or terminate EC2 instances. You can schedule Auto Scaling every Thrusday at 9:00 a.m. as an example, or create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in. You can attach one or more Auto Scaling policies to an Auto Scaling group.
 
@@ -119,22 +146,89 @@ One common configuration to have dynamic Auto Scaling is to create CloudWatch al
 
 CloudWatch can monitor metrics such as CPU, network traffic and queue size. CloudWatch has a feature called CloudWatch Logs that alllows you pick up logs from EC2 instances, AWS Lambdas or CloudTrail. You can store the logs in the CloudWatch logs. You can also convert logs into metrics by extracting metrics using patterns. CloudWatch provides default metric across many AWS services and resources. You can also define custom metrics for your applications.
 
-Status checking of your EC2 instances
--------------------------------------
+`AWS re:Invent 2018: Capacity Management Made Easy with Amazon EC2 Auto Scaling (CMP377) <https://www.youtube.com/watch?v=PideBMIcwBQ&feature=emb_logo>`_
+
+`Introduction to Amazon EC2 Auto Scaling <https://www.qwiklabs.com/focuses/7932?parent=catalog>`_
+
+Use case: Automate provisioning of instances
+--------------------------------------------
+
+One of the use cases of Auto Scaling is automating the provision of EC2 instances. When the instances come up, they need to have some software and applications installed. You have to approaches to achieve it:
+
+* You can use AMIs with all required configuration and software for this purpose, this is called the **golden image**. This golden image can be specified in the launch template.
+
+* You can define a **base AMI** and install code and configuration as needed through user data in the launch template, AWS CodeDeploy, AWS Systems Manager, or even with configuration tools such as Puppet, Chef, and Ansible.
+
+.. code-block:: console
+	:caption: Sample user data
+
+	#!/bin/bash
+
+	# Install updates
+	sudo yum update -y;
+
+	# Install AWS CodeDeploy agent
+	cd /home/ec2-user;
+	wget https://aws-codedeploy-us-east-1.s3.region-identifier.amazonaws.com/latest/install \ -o install &&
+	chmod +x ./install &&
+	sudo ./install auto && sudo service codedeploy-agent start;
+
+Perform additional actions with lifecycle hooks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Another use case is when the EC2 instance comes up, you want to execute additional actions when the instance is in pending state or terminating state such as:
+
+* Assign EC2 IP address or ENI on launch.
+
+* Register new instances with DNS, external monitoring systems, firewalls.
+
+* Load existing state from Amazon S3 or other system.
+
+* Pull down log files before instance is terminated.
+
+* Investigate issues with an instance before terminating it.
+
+* Persist instance state to external system.
+
+The EC2 instances in an Auto Scaling group have a path, or lifecycle, that differs from that of other EC2 instances. The lifecycle starts when the Auto Scaling group launches an instance and puts it into service. The lifecycle ends when you terminate the instance, or the Auto Scaling group takes the instance out of service and terminates it. The following illustration shows the transitions between instance states in the Amazon EC2 Auto Scaling lifecycle.
+
+.. figure:: /elasticity_d/auto_scaling_lifecycle.png
+
+	Auto Scaling Lifecycle
+
+.. Note::
+	You are billed for instances as soon as they are launched, including the time that they are not yet in service.
+
+You can receive notification when state transitions happen. You can rely on notifications to react to changes that happened. It is available via Amazon SNS and Amazon CloudWatch Events.
+
+Register instances behind load balancer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You have full integration with ELB allowing you to automatically register instances behind Application Load Balancer, Network Load Balancer, and Classic Load Balancer.
+
+Reduce paging frequency
+-----------------------
+
+Replace unhealthy instances
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When the load balancer determines that an instance is unhealthy, it stops routing requests to that instance. The load balancer resumes routing requests to the instance when it has been restored to a healthy state. There are 3 ways of checking the status of your EC2 instances:
+
+1. **Via the Auto Scaling group**. The default health checks for an Auto Scaling group are EC2 status checks only. If an instance state is different from ``running`` or system health check equals ``impaired``, the Auto Scaling group considers the instance unhealthy and replaces it. If you attached one or more load balancers or target groups to your Auto Scaling group, the group does not, by default, consider an instance unhealthy and replace it if it fails the load balancer health checks.
+
+2. **Via the ELB health checks**. However, you can optionally configure the Auto Scaling group to use Elastic Load Balancing health checks. This ensures that the group can determine an instance's health based on additional tests provided by the load balancer. The load balancer periodically sends pings, attempts connections, or sends requests to test the EC2 instances. These tests are called health checks. Load balancer health checks fail if ELB health equals ``OutOfService``.
+
+If you configure the Auto Scaling group to use Elastic Load Balancing health checks, it considers the instance unhealthy if it fails either the EC2 status checks or the load balancer health checks. If you attach multiple load balancers to an Auto Scaling group, all of them must report that the instance is healthy in order for it to consider the instance healthy. If one load balancer reports an instance as unhealthy, the Auto Scaling group replaces the instance, even if other load balancers report it as healthy.
+
+3. **Via custom health checks**. You can manually mark instances as ``unhealthy``. You can integrate with external monitoring systems.
 
 `Why did Auto Scaling Group terminate my healthy instance(s)? <https://www.youtube.com/watch?v=_ew-J3DQKZg&feature=emb_logo>`_
 
-When the load balancer determines that an instance is unhealthy, it stops routing requests to that instance. The load balancer resumes routing requests to the instance when it has been restored to a healthy state. There are two ways of checking the status of your EC2 instances:
+Balance capaciy across AZs
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Via the Auto Scaling group
+Your capacity should be distributed across AZs. For example 
 
-2. Via the ELB health checks
-
-The default health checks for an Auto Scaling group are EC2 status checks only. If an instance fails these status checks, the Auto Scaling group considers the instance unhealthy and replaces. If you attached one or more load balancers or target groups to your Auto Scaling group, the group does not, by default, consider an instance unhealthy and replace it if it fails the load balancer health checks.
-
-However, you can optionally configure the Auto Scaling group to use Elastic Load Balancing health checks. This ensures that the group can determine an instance's health based on additional tests provided by the load balancer. The load balancer periodically sends pings, attempts connections, or sends requests to test the EC2 instances. These tests are called health checks.
-
-If you configure the Auto Scaling group to use Elastic Load Balancing health checks, it considers the instance unhealthy if it fails either the EC2 status checks or the load balancer health checks. If you attach multiple load balancers to an Auto Scaling group, all of them must report that the instance is healthy in order for it to consider the instance healthy. If one load balancer reports an instance as unhealthy, the Auto Scaling group replaces the instance, even if other load balancers report it as healthy.
 
 Scaling your databases
 **********************

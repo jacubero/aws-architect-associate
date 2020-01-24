@@ -137,12 +137,12 @@ Amazon VPC: Route tables and gateways
 VPC subnets route table
 -----------------------
 
-The route tables allows you to route to some gateway. The route table get applied to router of the subnet itself (+1 of the subnet itself). The default gateway of the EC2 instance (``0.0.0.0/0``) always will be pointing to the router of the subnet. In this router, you will have a routing table with an entry with destination the VPC CIDR blocks and the target local. Local means that you can route to every resource in the VPC. The local entry in the routing table has priority over the rest of the routes. The other entry in the routing table has a destination ``0.0.0.0/0`` and target the internet gateway. The **internet gateway** allow an EC2 instance to route traffic to Internet or any resource in the Internet route traffic to the EC2 instance.
+The route tables allows you to route to some gateway. The route table get applied to router of the subnet itself (+1 of the subnet itself). The default gateway of the EC2 instance (``0.0.0.0/0``) always will be pointing to the router of the subnet. In this router, you will have a route table with an entry with destination the VPC CIDR blocks and the target local. Local means that you can route to every resource in the VPC. The local entry in the route table has priority over the rest of the routes. The other entry in the route table has a destination ``0.0.0.0/0`` and target the internet gateway. The **internet gateway** allow an EC2 instance to route traffic to Internet or any resource in the Internet route traffic to the EC2 instance.
 
 .. figure:: /networks_d/internetg.png
    :align: center
 
-	 Example of a routing table
+	 Example of a route table
 
 VPC: Gateways
 -------------
@@ -156,28 +156,28 @@ IPv6 addresses on EC2 instances are public addresses, so that if we connect them
 VPC Routing: Public subnet
 --------------------------
 
-What makes a subnet public is its routing table. It has an entry with destination ``0.0.0.0/0`` and target the Internet Gateway. You would need a public IP address attached to the network interface of EC2 instance in this subnet. The packets coming from the EC2 instance to the Internet Gateway have a private IP address and they are translated to the public IP address attached to it thanks to the Internet Gateway.
+What makes a subnet public is its route table. It has an entry with destination ``0.0.0.0/0`` and target the Internet Gateway. You would need a public IP address attached to the network interface of EC2 instance in this subnet. The packets coming from the EC2 instance to the Internet Gateway have a private IP address and they are translated to the public IP address attached to it thanks to the Internet Gateway.
 
 .. figure:: /networks_d/public.png
    :align: center
 
-	  Example of public subnet routing table
+	  Example of public subnet route table
 
 You do not need to manage the Internet Gateway. It scales out or in depending on the amount the traffic it has to handle. The maximum throughtput it can support is 5Gbps.
 
 VPC Routing: Private subnet
 ---------------------------
 
-If an EC2 in a private subnet wants to communicate to the Internet, this subnet needs to be attached to a NAT gateway which lives in a public subnet. There is an entry in the routing table in which the destination is ``0.0.0.0/0`` ad the target is the NAT gateway. 
+If an EC2 in a private subnet wants to communicate to the Internet, this subnet needs to be attached to a NAT gateway which lives in a public subnet. There is an entry in the route table in which the destination is ``0.0.0.0/0`` ad the target is the NAT gateway. 
 
 .. figure:: /networks_d/private.png
    :align: center
 
-	  Example of private subnet routing table
+	  Example of private subnet route table
 
 The NAT gateway allows the EC2 with a private address to reach the Internet but the EC2 instance is not reachable from the Internet. The NAT gateway requires an Elastic IP address that will be used to translate the private address of the EC2 instance. Even if you are using a NAT gateway, you are still passing through an Internet Gateway to reach the Internet. You have one Internet Gateway per VPC but you can have multiple NAT gateways inside you VPC. The reason to have more than one is that they are highly available within an AZ, not across AZs. 
 
-A NAT gateway separate subnets and can scale up to 45 Gbps. There is a limit of 55000 connections towards the same destination. If you need more thant 45 Gbps or more than 55000 connections towards the same destination, then you will need more than one NAT gateway. In that case, you will need another subnet with a different routing table that will point towards the second NAT gateway.
+A NAT gateway separate subnets and can scale up to 45 Gbps. There is a limit of 55000 connections towards the same destination. If you need more thant 45 Gbps or more than 55000 connections towards the same destination, then you will need more than one NAT gateway. In that case, you will need another subnet with a different route table that will point towards the second NAT gateway.
 
 EC2 instance as in-line next-hop
 --------------------------------
@@ -187,7 +187,7 @@ If you want to implement you own NAT gateway or IDS or IPS, ... by using an EC2 
 Method 1
 ^^^^^^^^
 
-You will need to define an entry in the routing table with destination ``0.0.0.0/0`` and the target is an ENI (Elastic Network Interface) of an EC2 instance within a public subnet. This EC2 instance has reachability to the Internet via an Internet Gateway.
+You will need to define an entry in the route table with destination ``0.0.0.0/0`` and the target is an ENI (Elastic Network Interface) of an EC2 instance within a public subnet. This EC2 instance has reachability to the Internet via an Internet Gateway.
 
 .. figure:: /networks_d/method1.png
    :align: center
@@ -199,7 +199,7 @@ The responsible for translating the private address of the EC2 to the public add
 Method 2
 ^^^^^^^^
 
-Another method is to configure a route inside the EC2 and redirects it to another EC2 instance inside the same subnet. The latter EC2 instance sends the traffic to the default gateway (``+1`` of subnet network) and its routing table has the entry for destination ``0.0.0.0/0`` pointing to the Internet Gateway. The responsible for translating the private address of the EC2 to the public address is the Internet Gateway. 
+Another method is to configure a route inside the EC2 and redirects it to another EC2 instance inside the same subnet. The latter EC2 instance sends the traffic to the default gateway (``+1`` of subnet network) and its route table has the entry for destination ``0.0.0.0/0`` pointing to the Internet Gateway. The responsible for translating the private address of the EC2 to the public address is the Internet Gateway. 
 
 .. figure:: /networks_d/method2.png
    :align: center
@@ -261,7 +261,7 @@ An example of creating an Amazon S3 VPC endpoint is the following:
 
   $ aws ec2 create-vpc-endpoint --vpc-id vpc-40f18d25 --service-name com.amazonaws.us-west-2.s3 --route-table-ids rtb-2ae6a24f
 
-You need an entry in the routing table with destination the prefix list for the S3 endpoint and the target the VPC endpoint. 
+You need an entry in the route table with destination the prefix list for the S3 endpoint and the target the VPC endpoint. 
 
 .. figure:: /networks_d/s3ep.png
    :align: center
@@ -363,21 +363,161 @@ The ENIs will be attached to different VPC subnets in the same AZ. The ENIs are 
 
 	  EC2 instance types supporting EBS-optimized dedicated throughput
 
-If we need to optimize network performance between 2 EC2 instances. The supported throughput is based on the instace type.
+If we need to optimize network performance between 2 EC2 instances, the supported throughput is based on the instace type.
 
 .. figure:: /networks_d/performance.png
    :align: center
 
 	  Instance sizing: burstable network performance
 
+The 25 Gigabit and 10 Gigabit performance is measured one way. you have to double that for birdirectional (full duplex). Sometimes the Amazon EC2 network performance is classified as high, moderate or low. It is a function of the instance size, but not all instances are created equal, so it is recommended to test it with iperf or another network performance measurement tool. Burstable network performance are defined in C5, I3 and R4 EC2 instance types. It is supported 5 GB maximum per instance on egress traffic destined outside the VPC. You can go above the 5 GB by using placement groups or VPC endpoints.  
 
+Enhanced networking
+-------------------
 
-Virtual Private Gateway
------------------------
+There are 3 main strategies to get towards the 25 Gbps: Device pass-through, Elastic Network Adapter (ENA) and Intel Data Plane Development Kit (DPDK).
 
+Device pass-through
+^^^^^^^^^^^^^^^^^^^
 
-Security in the cloud
-*********************
+In virtualization, single root input/output virtualization or SR-IOV is a specification that allows the isolation of the PCI Express resources for manageability. It allows PCIe devices to appear as multiple separate physical PCIe devices using Virtual Functions (VF). It provides higher bandwidth, higher packet per second (PPS) performance, and consistently lower inter-instance latencies. Enhanced networking requires a specialized driver, which means:
+
+* Your instance OS must know about it.
+
+* Amazon EC2 must be notified that your instance can use it.
+
+Elastic Network Adapter (ENA)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is the next generation of enhanced networking that supports HW checksums, multi-queue, receive side steering. It can achieve 25 Gbps of throuhput in a placement group. It is an open-source Amazon network driver. There are items for advanced tuning:
+
+* Multiple Tx/Rx queue pairs (the maximum number is advertised by the device through the administration queue).
+
+* CPU cache line optimizes data placement.
+
+* Chacksum offload and TCP transmit segmentation offload (TSO).
+
+* Support for receive-side scaling (RSS) for multi-core scaling.
+
+* Depending on ENA device, support for low-latency queue (LLQ), which saves more microseconds.
+
+Intel Data Plane Development Kit
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+It is a set of libraries and drivers for fast packet processing. It is supported for both the Intel 82599 Virtual Interface and the ENA driver. It is a software accelerator that runs in user space, bypassing the Linux kernel and providing access to NICs, CPUs, and memory for a packet processing application. The DPDK can:
+
+* Receive and send packets within the minimum number of CPU cycles (usually fewer than 80 cycles).
+
+* Develop fast capture algorithms (tcpdump-like)
+
+* Run third-party fast path stacks.
+
+There are some use cases: firewalls, real-time communication processing, HPC, and network appliances. 
+
+Placement groups
+----------------
+
+When you want a group of EC2 instances to talk very fast and with high throughtput, you may need to include them inside placement groups. 
+
+When you launch EC2 instances in the same AZ, it doesn't mean that they are going to be in the same data center. An AZ can have more than one data center. To force the EC2 instances to be very close (perhaps in the same rack) and allows you to have full Amazon EC2 bandwidth.
+
+Use placement groups when you need high, consisteng instance-to-instance bandwidth. The maximum network throughput is limited by the slower of the two instances. A placement group can span peered VPCs in the same region (may not get full bi-section bandwidth). It can launch multiple instance types into a placement group. All traffic is limited to 5 Gb/s when exiting VPC.
+
+It is recommended not to have different instance types in a placement group because it is more difficult to launched them very close among them.
+
+Jumbo frames
+------------
+
+An standard frame in AWS has a MTU of 1522. It means that your payload has 1522 bytes and the overhead is quite big. In Jumbo frames, what allows you to do is allocate more capacity for the payload (9001 bytes) and a smaller overhead.
+
+.. figure:: /networks_d/jumbo.png
+   :align: center
+
+	  Jumbo frames
+
+Every single device in between the EC2 instances must support 9001 MTU, which is not going to work when you go out the Internet. It is supported inside VPCs, but if you go through a Virtual Private Gateway or a VPN gateway, then it is not supported.
+
+.. Note:: 
+	Enable the ICMP message Type 3, Code 4 (Destination Unreachable: fragmentation needed and don't fragment set). This setting instructs the original host to adjust the MTU until the packet can be transmitted.
+
+Design and implement hybrid IT network architects ad scale
+**********************************************************
+
+In AWS. there are 3 connectivity options: 
+
+* **Public Internet**, via public IPs or elastic IPs, taking into account that traffic out is charged by AWS.
+
+* **VPN**, using IPSec authentication and encryption. It has 2 primary options: AWS managed VPN nad software VPN (Amazon EC2).
+
+* **AWS Direct Connect**, which establishes a private connection with AWS, separate from the Internet. It allows you to have a consistent network experience and the ability to connect through many locations globally. You can have sub-1Gps, 1Gps, 10Gps options.
+
+Depending on the requirements (security, cost, management) that you customer has, the possible options could be different.
+
+Virtual Private Networks
+========================
+
+There are mainly 2 types of VPN: site-to-site VPN and client-to-site VPN. In site-to-site VPN, you are connecting the corporate data center over the Internet towards my VPC. In the client-to-site VPN, you have users that use VPN clients to EC2 instances.
+
+Site-to-site VPN
+----------------
+
+There are two options of site-to-site VPN:
+
+* Terminating the VPN connection in a **VPN Gatewway (VGW)**, which is an AWS managed service that only supports IPSec protocol to setup VPNs.
+
+* Terminating the VPN connection in 2 endpoints (for HA) on top EC2 instances.
+
+A VGW is a fully managed gateway endpoint for your VPC with built-in multiple AZ HA. You only can have 1 VGW per VPC. It is responsible for hybrid IT connectivity, using VPN and AWS Direct Connect. It is self-sustainable entity that can be created without the requirement of a preexisiting VPC (that is, it can run in detached mode). You have the ability to:
+
+* Attach to nay VPC in the same account and AWS region.
+
+* Detach one VGW and attach another one to a VPC.
+
+* Choose ASN at creation (BYO-ASN).
+
+.. figure:: /networks_d/vgw.png
+   :align: center
+
+	 Extample of VPN connection
+
+In the previous example, the IP addressing of the corporate data center is ``192.168.1.0/24``. In the route table, we can notice that the ``192.168.1.0/24`` has not been propagated so it has to be manually configured and not learned via BGP routing protocol.
+
+You get 2 public IP addresses with a VGW that are across 2 different service providers. The customer gateway located in the corporate data center has only 1 IP address and you have to establish more than 1 VPN connections, unless it is redundant in different service providers. You need to establish 2 IPSec tunnels towards AWS per VGW connection because you 2 endpoints with different IP addresses. You can specify the preshared key of each one of the 2 IPSec tunnels and you can also specify the inside tunnel IP in between the two sides of the VPN.
+
+.. figure:: /networks_d/vgwredundant.png
+   :align: center
+
+	 VPN redundancy
+
+As you have 2 tunnels, there is a risk of asymmetric routing. To avoid it and prevents to send traffic from one path and not getting it returned to the other path, you can use BGP with one of these 2 options:
+
+* Prepend an AS path.
+
+* Set the multi-exit discriminator (MED) attribute.
+
+.. figure:: /networks_d/asymmetric.png
+   :align: center
+
+	 Avoid asymmetric routing
+
+You can connect from different data centers into the same VGW. One of the features of VGW is that you can use as a CloudHub. AWS VPN CloudHub is an AWS functionality, you only need to establish 2 VPN connections and by doing that you will able to use this CloudHub to send traffic between the 2 corporate data centers and there is no need to have direct connection between the two.
+
+.. figure:: /networks_d/hub.png
+   :align: center
+
+	 AWS VPN CloudHub
+
+VGW doesn't initiate IPSec negotiation. AWS uses an on-demand DPD mechanism so that:
+
+* If AWS receives no traffic from a VPN peer for 10 seconds, AWS sends a DPD "R-U-THERE" message.
+
+* If the VPN peer does not respond to 3 successive DPDs, the VPN peer is considered dead and AWS closes the tunnel.
+
+Static VPN (policy-based VPN) is limited to one unique security association (SA) pair per tunnel (one inbound and one outbound). Instead, you should:
+
+* Limit the number of encryption domains (networks) that are allowed access to the VPC and consolidate.
+
+* Configure the policy to allow "any" network (``0.0.0.0/0``) from behind your VPN termination endpoint to the VPC CIDR.
 
 
 Connecting networks

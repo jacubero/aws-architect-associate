@@ -68,7 +68,7 @@ VPC DHCP
 
 It is not supported to use an specific DHCP that you provide, you have to use the DHCP given by AWS. You need to configure the DHCP options set as show below and attach it to your VPC.
 
-.. figure:: /networks_d/options.png
+.. figure:: /networks_d/dhcp_options.png
    :align: center
 
 	 DHCP options set
@@ -98,24 +98,24 @@ Security groups are stateful firewalls. When an EC2 instance talk to another EC2
 
 Suppose you have a VPC as illustred below. Initially, we could think that if we want ELB Frontend to communicate with the web frontend servers, we need to know ELB IP address, which can change dynamically. Analogously, we have the same situation between the Web Frontend and the Back end servers. 
 
-.. figure:: /networks_d/sg.png
+.. figure:: /networks_d/sgs.png
    :align: center
 
 	 Example of AWS VPC with 3 security groups
 
 The correct way to deal with these scenarios is by tiering security groups. The ``sg_ELB_Frontend`` allow traffic from any IP address via HTTPS. The ``sg_Web_Frontend`` allow traffic from only from ELB_Frontend via port 8443 by using the ``sg_ELB_Frontend`` ID as the source in the security group.
 
-.. figure:: /networks_d/tieringsg.png
+.. figure:: /networks_d/tierings.png
    :align: center
 
 	 Tiering security groups
 
-.. figure:: /networks_d/elb.png
+.. figure:: /networks_d/elbsg.png
    :align: center
 
 	 ELB Frontend security group
 
-.. figure:: /networks_d/web.png
+.. figure:: /networks_d/websg.png
    :align: center
 
 	 Web Frontend security group
@@ -139,7 +139,7 @@ VPC subnets route table
 
 The route tables allows you to route to some gateway. The route table get applied to router of the subnet itself (+1 of the subnet itself). The default gateway of the EC2 instance (``0.0.0.0/0``) always will be pointing to the router of the subnet. In this router, you will have a route table with an entry with destination the VPC CIDR blocks and the target local. Local means that you can route to every resource in the VPC. The local entry in the route table has priority over the rest of the routes. The other entry in the route table has a destination ``0.0.0.0/0`` and target the internet gateway. The **internet gateway** allow an EC2 instance to route traffic to Internet or any resource in the Internet route traffic to the EC2 instance.
 
-.. figure:: /networks_d/internetg.png
+.. figure:: /networks_d/igw.png
    :align: center
 
 	 Example of a route table
@@ -158,7 +158,7 @@ VPC Routing: Public subnet
 
 What makes a subnet public is its route table. It has an entry with destination ``0.0.0.0/0`` and target the Internet Gateway. You would need a public IP address attached to the network interface of EC2 instance in this subnet. The packets coming from the EC2 instance to the Internet Gateway have a private IP address and they are translated to the public IP address attached to it thanks to the Internet Gateway.
 
-.. figure:: /networks_d/public.png
+.. figure:: /networks_d/publics.png
    :align: center
 
 	  Example of public subnet route table
@@ -170,7 +170,7 @@ VPC Routing: Private subnet
 
 If an EC2 in a private subnet wants to communicate to the Internet, this subnet needs to be attached to a NAT gateway which lives in a public subnet. There is an entry in the route table in which the destination is ``0.0.0.0/0`` ad the target is the NAT gateway. 
 
-.. figure:: /networks_d/private.png
+.. figure:: /networks_d/privates.png
    :align: center
 
 	  Example of private subnet route table
@@ -189,7 +189,7 @@ Method 1
 
 You will need to define an entry in the route table with destination ``0.0.0.0/0`` and the target is an ENI (Elastic Network Interface) of an EC2 instance within a public subnet. This EC2 instance has reachability to the Internet via an Internet Gateway.
 
-.. figure:: /networks_d/method1.png
+.. figure:: /networks_d/m1.png
    :align: center
 
 	  EC2 instance as in-line next-hop: Method 1
@@ -201,7 +201,7 @@ Method 2
 
 Another method is to configure a route inside the EC2 and redirects it to another EC2 instance inside the same subnet. The latter EC2 instance sends the traffic to the default gateway (``+1`` of subnet network) and its route table has the entry for destination ``0.0.0.0/0`` pointing to the Internet Gateway. The responsible for translating the private address of the EC2 to the public address is the Internet Gateway. 
 
-.. figure:: /networks_d/method2.png
+.. figure:: /networks_d/m2.png
    :align: center
 
 	  EC2 instance as in-line next-hop: Method 2
@@ -263,7 +263,7 @@ An example of creating an Amazon S3 VPC endpoint is the following:
 
 You need an entry in the route table with destination the prefix list for the S3 endpoint and the target the VPC endpoint. 
 
-.. figure:: /networks_d/s3ep.png
+.. figure:: /networks_d/s3VPCep.png
    :align: center
 
 	  Creating an Amazon S3 VPC endpoint
@@ -335,7 +335,7 @@ As a summary, you can control VPC access to Amazon S3 via several security layer
 
 4. EC2 security groups with prefix list.
 
-.. figure:: /networks_d/layers.png
+.. figure:: /networks_d/layersv.png
    :align: center
 
 	  Controlling VPC access to Amazon S3
@@ -351,21 +351,21 @@ Elastic network interface
 
 You always have an ENI attached to an instance, it is the default ENI and cannot be modified. You can attach more than one ENI to an EC2 instance and they can be moved to another EC2 instance. In general, the ENIs of an EC2 instance are attached to different subnets. Each ENI have a private IP address and a public IP address, optionally you can have up to 4 private IP addresses and 4 public IP addresses.
 
-.. figure:: /networks_d/eni.png
+.. figure:: /networks_d/eniv.png
    :align: center
 
 	  Elastic network interface
 
 The ENIs will be attached to different VPC subnets in the same AZ. The ENIs are used to talk among EC2 instances but also between an EC2 instance and an EBS volume. Some EC2 instance types support EBS optimized dedicated throughput, which allows you to have dedicated throughtput to access an ENS volume.  
 
-.. figure:: /networks_d/dedicated.png
+.. figure:: /networks_d/dedicatedi.png
    :align: center
 
 	  EC2 instance types supporting EBS-optimized dedicated throughput
 
 If we need to optimize network performance between 2 EC2 instances, the supported throughput is based on the instace type.
 
-.. figure:: /networks_d/performance.png
+.. figure:: /networks_d/perform.png
    :align: center
 
 	  Instance sizing: burstable network performance
@@ -430,7 +430,7 @@ Jumbo frames
 
 An standard frame in AWS has a MTU of 1522. It means that your payload has 1522 bytes and the overhead is quite big. In Jumbo frames, what allows you to do is allocate more capacity for the payload (9001 bytes) and a smaller overhead.
 
-.. figure:: /networks_d/jumbo.png
+.. figure:: /networks_d/jumbof.png
    :align: center
 
 	  Jumbo frames
@@ -475,7 +475,7 @@ A VGW is a fully managed gateway endpoint for your VPC with built-in multiple AZ
 
 * Choose ASN at creation (BYO-ASN).
 
-.. figure:: /networks_d/vgw.png
+.. figure:: /networks_d/vpngw.png
    :align: center
 
 	 Extample of VPN connection
@@ -484,7 +484,7 @@ In the previous example, the IP addressing of the corporate data center is ``192
 
 You get 2 public IP addresses with a VGW that are across 2 different service providers. The customer gateway located in the corporate data center has only 1 IP address and you have to establish more than 1 VPN connections, unless it is redundant in different service providers. You need to establish 2 IPSec tunnels towards AWS per VGW connection because you 2 endpoints with different IP addresses. You can specify the preshared key of each one of the 2 IPSec tunnels and you can also specify the inside tunnel IP in between the two sides of the VPN.
 
-.. figure:: /networks_d/vgwredundant.png
+.. figure:: /networks_d/vgwred.png
    :align: center
 
 	 VPN redundancy
@@ -495,14 +495,14 @@ As you have 2 tunnels, there is a risk of asymmetric routing. To avoid it and pr
 
 * Set the multi-exit discriminator (MED) attribute.
 
-.. figure:: /networks_d/asymmetric.png
+.. figure:: /networks_d/asym.png
    :align: center
 
 	 Avoid asymmetric routing
 
 You can connect from different data centers into the same VGW. One of the features of VGW is that you can use as a CloudHub. AWS VPN CloudHub is an AWS functionality, you only need to establish 2 VPN connections and by doing that you will able to use this CloudHub to send traffic between the 2 corporate data centers and there is no need to have direct connection between the two.
 
-.. figure:: /networks_d/hub.png
+.. figure:: /networks_d/cloudhub.png
    :align: center
 
 	 AWS VPN CloudHub

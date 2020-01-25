@@ -146,7 +146,7 @@ Manual Scaling
 
 At any time, you can change the size of an existing Auto Scaling group manually.
 
-.. figure:: /elasticity_d/manual.png
+.. figure:: /elasticity_d/manuals.png
    	:align: center
 
 	Manual Scaling
@@ -154,7 +154,9 @@ At any time, you can change the size of an existing Auto Scaling group manually.
 Scheduled scaling
 -----------------
 
-Scaling based on a schedule allows you to set your own scaling schedule for predictable load changes. For example, every week the traffic to your web application starts to increase on Wednesday, remains high on Thursday, and starts to decrease on Friday. You can plan your scaling actions based on the predictable traffic patterns of your web application. Scaling actions are performed automatically as a function of time and date. You can schedule recurring scaling events or individual events.
+Scaling based on a schedule allows you to set your own scaling schedule for predictable load changes. For example, every week the traffic to your web application starts to increase on Wednesday, remains high on Thursday, and starts to decrease on Friday. You can plan your scaling actions based on the predictable traffic patterns of your web application. Scaling actions are performed automatically as a function of time and date. 
+
+To configure your Auto Scaling group to scale based on a schedule, you create a scheduled action. The scheduled action tells Amazon EC2 Auto Scaling to perform a scaling action at specified times. To create a scheduled scaling action, you specify the start time when the scaling action should take effect, and the new minimum, maximum, and desired sizes for the scaling action. At the specified time, Amazon EC2 Auto Scaling updates the group with the values for minimum, maximum, and desired size specified by the scaling action. You can create scheduled actions for scaling one time only or for scaling on a recurring schedule.
 
 .. Note::
 
@@ -180,7 +182,7 @@ Increase or decrease the current capacity of the group based on a target value f
 
 For example, you have a web application that currently runs on two instances and you want the CPU utilization of the Auto Scaling group to stay at around 50 percent when the load on the application changes. This gives you extra capacity to handle traffic spikes without maintaining an excessive amount of idle resources. You can configure your Auto Scaling group to scale automatically to meet this need.
 
-.. figure:: /elasticity_d/dynamic.png
+.. figure:: /elasticity_d/dynamics.png
    	:align: center
 
 	Dynamic Scaling with target tracking
@@ -206,7 +208,7 @@ Step scaling
 
 Increase or decrease the current capacity of the group based on a set of scaling adjustments, known as step adjustments, that vary based on the size of the alarm breach.
 
-.. figure:: /elasticity_d/step.png
+.. figure:: /elasticity_d/steps.png
    	:align: center
 
 	Dynamic Scaling with step scaling

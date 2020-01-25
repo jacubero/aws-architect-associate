@@ -23,7 +23,7 @@ An exammple of an API name of an EC2 instance type is ``M5d.xlarge``.  The first
 
 * **Compute Optimized**: ``C``: Compute.
 
-* **Memory Optimized**: ``R``: Random-access memory, ``X``: Extra-large memory (approx 4 TB DRAM), ``U``: High memory (purpose built to run large in-memory databases), ``z``: High frequency.
+* **Memory Optimized**: ``R``: Random-access memory, ``X``: Extra-large memory (approx 4 TB DRAM), ``U``: High memory (purpose built to run large in-memory databases), ``Z``: High frequency.
 
 * **Accelerated Computing**: ``P``: GPU optimized for machine learning, ``G``: GPU optimized for graphics, ``F``: FPGA, ``Inf``: Inferentia chips.
 

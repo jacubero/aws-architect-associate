@@ -126,33 +126,47 @@ It matches several reliability design principles: Scale horizontally, Stop guess
 
 There are 3 components required for auto-scaling:
 
-1. Create a :underline:`launch configuration` or :underline:`launch template` determines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups, SSH keys, AWS IAM instance profile and user data to apply to the instance.
+1. Create a **launch configuration** or **launch template** determines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups, SSH keys, AWS IAM instance profile and user data to apply to the instance.
 
-2. Create a :underline:`Auto Scaling group`. It is a logical group of instances for your service and defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the *minimum*, the *maximum*, ans the *desired* size of the Auto Scaling Group. If you set a minimum of 1, if the number of servers goes below 1, another instance will be launched. If you set a maximum of 4, you will never have more than 4 instances in your group. The desire capacity is the number of instances that should be running at any given time (for example 2). The Auto Scaling is going to launch instances or terminate instances in order to meet the desired capacity. You can select the health check type.
+2. Create a **Auto Scaling group**. It is a logical group of instances for your service and defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the *minimum*, the *maximum*, ans the *desired* size of the Auto Scaling Group. If you set a minimum of 1, if the number of servers goes below 1, another instance will be launched. If you set a maximum of 4, you will never have more than 4 instances in your group. The desire capacity is the number of instances that should be running at any given time (for example 2). The Auto Scaling is going to launch instances or terminate instances in order to meet the desired capacity. You can select the health check type.
 
 .. figure:: /elasticity_d/as-basic-diagram.png
    	:align: center
 
 	Sample Auto Scaling group
 
-3. Define a least one :underline:`Auto Scaling policy`, which specifies how and when to scale in or scale out, that is, to launch or terminate EC2 instances. There 4 possible options:
+3. Define a least one **Auto Scaling policy**, which specifies how and when to scale in or scale out, that is, to launch or terminate EC2 instances. 
 
-3.1. **Manual Scaling**. At any time, you can change the size of an existing Auto Scaling group manually.
+Auto Scaling policies
+---------------------
+
+There 4 possible types of auto scaling policies: manual scaling, scheduled scaling, dynamic scaling, predictive scaling.
+
+Manual Scaling
+^^^^^^^^^^^^^^
+
+At any time, you can change the size of an existing Auto Scaling group manually.
 
 .. figure:: /elasticity_d/manual.png
    	:align: center
 
 	Manual Scaling
 
-3.2. **Scheduled scaling**. Scaling based on a schedule allows you to set your own scaling schedule for predictable load changes. For example, every week the traffic to your web application starts to increase on Wednesday, remains high on Thursday, and starts to decrease on Friday. You can plan your scaling actions based on the predictable traffic patterns of your web application. Scaling actions are performed automatically as a function of time and date. You can schedule recurring scaling events or individual events.
+Scheduled scaling
+^^^^^^^^^^^^^^^^^
+
+Scaling based on a schedule allows you to set your own scaling schedule for predictable load changes. For example, every week the traffic to your web application starts to increase on Wednesday, remains high on Thursday, and starts to decrease on Friday. You can plan your scaling actions based on the predictable traffic patterns of your web application. Scaling actions are performed automatically as a function of time and date. You can schedule recurring scaling events or individual events.
 
 .. Note::
 
 	For scaling based on predictable load changes, you can also use the predictive scaling feature of AWS Auto Scaling. 
 
-3.3. **Dynamic scaling**. When you configure dynamic scaling, you must define how to scale in response to changing demand. You create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in. You can attach one or more Auto Scaling policies to an Auto Scaling group. It supports the following types of scaling policies:
+Dynamic scaling
+^^^^^^^^^^^^^^^
 
-3.3.1. *Target tracking scaling*. Increase or decrease the current capacity of the group based on a target value for a specific metric. This is similar to the way that your thermostat maintains the temperature of your home – you select a temperature and the thermostat does the rest.
+When you configure dynamic scaling, you must define how to scale in response to changing demand. You create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in. You can attach one or more Auto Scaling policies to an Auto Scaling group. It supports the following types of scaling policies:
+
+1. *Target tracking scaling*. Increase or decrease the current capacity of the group based on a target value for a specific metric. This is similar to the way that your thermostat maintains the temperature of your home – you select a temperature and the thermostat does the rest.
 
 For example, you have a web application that currently runs on two instances and you want the CPU utilization of the Auto Scaling group to stay at around 50 percent when the load on the application changes. This gives you extra capacity to handle traffic spikes without maintaining an excessive amount of idle resources. You can configure your Auto Scaling group to scale automatically to meet this need.
 
@@ -170,14 +184,14 @@ One common configuration to have dynamic Auto Scaling is to create CloudWatch al
 
 CloudWatch can monitor metrics such as CPU, network traffic and queue size. CloudWatch has a feature called CloudWatch Logs that allows you pick up logs from EC2 instances, AWS Lambdas or CloudTrail. You can store the logs in the CloudWatch logs. You can also convert logs into metrics by extracting metrics using patterns. CloudWatch provides default metric across many AWS services and resources. You can also define custom metrics for your applications.
 
-3.3.2. *Step scaling*. Increase or decrease the current capacity of the group based on a set of scaling adjustments, known as step adjustments, that vary based on the size of the alarm breach.
+2. *Step scaling*. Increase or decrease the current capacity of the group based on a set of scaling adjustments, known as step adjustments, that vary based on the size of the alarm breach.
 
 .. figure:: /elasticity_d/step.png
    	:align: center
 
 	Dynamic Scaling with step scaling
 
-3.3.3. *Simple scaling*. Increase or decrease the current capacity of the group based on a single scaling adjustment.
+3. *Simple scaling*. Increase or decrease the current capacity of the group based on a single scaling adjustment.
 
 If you are scaling based on a utilization metric that increases or decreases proportionally to the number of instances in an Auto Scaling group, we recommend that you use target tracking scaling policies. Otherwise, we recommend that you use step scaling policies.
 
@@ -187,7 +201,10 @@ When there are multiple policies in force at the same time, there's a chance tha
 
 The approach of giving precedence to the policy that provides the largest capacity applies even when the policies use different criteria for scaling in. For example, if one policy terminates three instances, another policy decreases the number of instances by 25 percent, and the group has eight instances at the time of scale in, Amazon EC2 Auto Scaling gives precedence to the policy that provides the largest number of instances for the group. This results in the Auto Scaling group terminating two instances (25 percent of 8 = 2). The intention is to prevent Amazon EC2 Auto Scaling from removing too many instances.
 
-3.4. **Predictive scaling**. Using data collected from your actual EC2 usage and further informed by billions of data points drawn from Amazon.com observations, we use well-trained Machine Learning models to predict your expected traffic (and EC2 usage) including daily and weekly patterns. The model needs at least one day's of historical data to start making predictions; it is re-evaluated every 24 hours to create a forecast for the next 48 hours.
+Predictive scaling
+^^^^^^^^^^^^^^^^^^
+
+Using data collected from your actual EC2 usage and further informed by billions of data points drawn from Amazon.com observations, we use well-trained Machine Learning models to predict your expected traffic (and EC2 usage) including daily and weekly patterns. The model needs at least one day's of historical data to start making predictions; it is re-evaluated every 24 hours to create a forecast for the next 48 hours.
 
 It performs a regression analysis between load metric and scaling metric and schedules scaling actions for the next 2 days, hourly, and repeats this process every day.
 

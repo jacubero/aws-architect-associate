@@ -122,33 +122,75 @@ When you run your applications on EC2 instances, it is critical to monitoring th
 
 2. How can I automate EC2 resource provisioning to occur on-demand?
 
-It matches several reliability design principles: Scale horizontally, Stop guessing capacity and Manage change in automation.
-
-If Auto Scaling adds more instances, this is termed as *scaling out*. When Auto Scaling terminates instances, this is *scaling in*.
+It matches several reliability design principles: Scale horizontally, Stop guessing capacity and Manage change in automation. If Auto Scaling adds more instances, this is termed as *scaling out*. When Auto Scaling terminates instances, this is *scaling in*.
 
 There are 3 components required for auto-scaling:
 
-1. Create a **launch configuration** or **launch template** determines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups, SSH keys, AWS IAM instance profile and user data to apply to the instance.
+1. Create a :underline:`launch configuration` or :underline:`launch template` determines what will be launched by Auto Scaling, i.e. the EC2 instance characteristics you need to specify: AMI, instance type, security groups, SSH keys, AWS IAM instance profile and user data to apply to the instance.
 
-2. Create a **Auto Scaling group**. It is a logical group of instances for your service and defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the *minimum*, the *maximum*, ans the *desired* size of the Auto Scaling Group. If you set a minimum of 1, if the number of servers goes below 1, another instance will be launched. If you set a maximum of 4, you will never have more than 4 instances in your group. The desire capacity is the number of instances that should be running at any given time (for example 2). The Auto Scaling is going to launch instances or terminate instances in order to meet the desired capacity. You can select the health check type.
+2. Create a :underline:`Auto Scaling group`. It is a logical group of instances for your service and defines where the deployment takes place and some boundaries for the deployment. You define which VPC to deploy the instances, in which load balancer to interact with, and specify the boundaries for a group: the *minimum*, the *maximum*, ans the *desired* size of the Auto Scaling Group. If you set a minimum of 1, if the number of servers goes below 1, another instance will be launched. If you set a maximum of 4, you will never have more than 4 instances in your group. The desire capacity is the number of instances that should be running at any given time (for example 2). The Auto Scaling is going to launch instances or terminate instances in order to meet the desired capacity. You can select the health check type.
 
 .. figure:: /elasticity_d/as-basic-diagram.png
+   	:align: center
 
 	Sample Auto Scaling group
 
-3. Define a least one **Auto Scaling policy**, which specifies how much to scale in or scale out. This specifies when to launch or terminate EC2 instances. You can schedule Auto Scaling every Thrusday at 9:00 a.m. as an example, or create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in. You can attach one or more Auto Scaling policies to an Auto Scaling group.
+3. Define a least one :underline:`Auto Scaling policy`, which specifies how and when to scale in or scale out, that is, to launch or terminate EC2 instances. There 4 possible options:
+
+3.1. **Manual Scaling**. At any time, you can change the size of an existing Auto Scaling group manually.
+
+.. figure:: /elasticity_d/manual.png
+   	:align: center
+
+	Manual Scaling
+
+3.2. **Scheduled scaling**. Scaling based on a schedule allows you to set your own scaling schedule for predictable load changes. For example, every week the traffic to your web application starts to increase on Wednesday, remains high on Thursday, and starts to decrease on Friday. You can plan your scaling actions based on the predictable traffic patterns of your web application. Scaling actions are performed automatically as a function of time and date. You can schedule recurring scaling events or individual events.
+
+.. Note::
+
+	For scaling based on predictable load changes, you can also use the predictive scaling feature of AWS Auto Scaling. 
+
+3.3. **Dynamic scaling**. When you configure dynamic scaling, you must define how to scale in response to changing demand. You create conditions that define thresholds to trigger adding or removing instances. Condition-based policies make your Auto Scaling dynamic and able to meet fluctuating requirements. It is best practice to create at least one Auto Scaling policy to specify when to scale out and at least one policy to specify to scale in. You can attach one or more Auto Scaling policies to an Auto Scaling group. It supports the following types of scaling policies:
+
+3.3.1. *Target tracking scaling*. Increase or decrease the current capacity of the group based on a target value for a specific metric. This is similar to the way that your thermostat maintains the temperature of your home – you select a temperature and the thermostat does the rest.
+
+For example, you have a web application that currently runs on two instances and you want the CPU utilization of the Auto Scaling group to stay at around 50 percent when the load on the application changes. This gives you extra capacity to handle traffic spikes without maintaining an excessive amount of idle resources. You can configure your Auto Scaling group to scale automatically to meet this need.
+
+.. figure:: /elasticity_d/dynamic.png
+   	:align: center
+
+	Dynamic Scaling with target tracking
 
 One common configuration to have dynamic Auto Scaling is to create CloudWatch alarms based on performance information from your EC2 instances or a load balancer. When a performance threshold is breached, a CloudWatch alarm triggers an Auto Scaling event which either scales out or scales in EC2 instances in the environment. 
 
 .. figure:: /elasticity_d/CloudWatchalarm.png
+	:align: center
 
 	Sample CloudWatch alarm
 
-CloudWatch can monitor metrics such as CPU, network traffic and queue size. CloudWatch has a feature called CloudWatch Logs that alllows you pick up logs from EC2 instances, AWS Lambdas or CloudTrail. You can store the logs in the CloudWatch logs. You can also convert logs into metrics by extracting metrics using patterns. CloudWatch provides default metric across many AWS services and resources. You can also define custom metrics for your applications.
+CloudWatch can monitor metrics such as CPU, network traffic and queue size. CloudWatch has a feature called CloudWatch Logs that allows you pick up logs from EC2 instances, AWS Lambdas or CloudTrail. You can store the logs in the CloudWatch logs. You can also convert logs into metrics by extracting metrics using patterns. CloudWatch provides default metric across many AWS services and resources. You can also define custom metrics for your applications.
 
-`AWS re:Invent 2018: Capacity Management Made Easy with Amazon EC2 Auto Scaling (CMP377) <https://www.youtube.com/watch?v=PideBMIcwBQ&feature=emb_logo>`_
+3.3.2. *Step scaling*. Increase or decrease the current capacity of the group based on a set of scaling adjustments, known as step adjustments, that vary based on the size of the alarm breach.
 
-`Introduction to Amazon EC2 Auto Scaling <https://www.qwiklabs.com/focuses/7932?parent=catalog>`_
+.. figure:: /elasticity_d/step.png
+   	:align: center
+
+	Dynamic Scaling with step scaling
+
+3.3.3. *Simple scaling*. Increase or decrease the current capacity of the group based on a single scaling adjustment.
+
+If you are scaling based on a utilization metric that increases or decreases proportionally to the number of instances in an Auto Scaling group, we recommend that you use target tracking scaling policies. Otherwise, we recommend that you use step scaling policies.
+
+For an advanced scaling configuration, your Auto Scaling group can have more than one scaling policy. For example, you can define one or more target tracking scaling policies, one or more step scaling policies, or both. This provides greater flexibility to cover multiple scenarios.
+
+When there are multiple policies in force at the same time, there's a chance that each policy could instruct the Auto Scaling group to scale out (or in) at the same time. When these situations occur, Amazon EC2 Auto Scaling chooses the policy that provides the largest capacity for both scale out and scale in. 
+
+The approach of giving precedence to the policy that provides the largest capacity applies even when the policies use different criteria for scaling in. For example, if one policy terminates three instances, another policy decreases the number of instances by 25 percent, and the group has eight instances at the time of scale in, Amazon EC2 Auto Scaling gives precedence to the policy that provides the largest number of instances for the group. This results in the Auto Scaling group terminating two instances (25 percent of 8 = 2). The intention is to prevent Amazon EC2 Auto Scaling from removing too many instances.
+
+3.4. **Predictive scaling**. Using data collected from your actual EC2 usage and further informed by billions of data points drawn from Amazon.com observations, we use well-trained Machine Learning models to predict your expected traffic (and EC2 usage) including daily and weekly patterns. The model needs at least one day's of historical data to start making predictions; it is re-evaluated every 24 hours to create a forecast for the next 48 hours.
+
+It performs a regression analysis between load metric and scaling metric and schedules scaling actions for the next 2 days, hourly, and repeats this process every day.
+
 
 Use case: Automate provisioning of instances
 --------------------------------------------
@@ -193,6 +235,7 @@ Another use case is when the EC2 instance comes up, you want to execute addition
 The EC2 instances in an Auto Scaling group have a path, or lifecycle, that differs from that of other EC2 instances. The lifecycle starts when the Auto Scaling group launches an instance and puts it into service. The lifecycle ends when you terminate the instance, or the Auto Scaling group takes the instance out of service and terminates it. The following illustration shows the transitions between instance states in the Amazon EC2 Auto Scaling lifecycle.
 
 .. figure:: /elasticity_d/auto_scaling_lifecycle.png
+	:align: center
 
 	Auto Scaling Lifecycle
 
@@ -206,8 +249,8 @@ Register instances behind load balancer
 
 You have full integration with ELB allowing you to automatically register instances behind Application Load Balancer, Network Load Balancer, and Classic Load Balancer.
 
-Reduce paging frequency
------------------------
+Use case: Reduce paging frequency
+---------------------------------
 
 Replace unhealthy instances
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -224,10 +267,25 @@ If you configure the Auto Scaling group to use Elastic Load Balancing health che
 
 `Why did Auto Scaling Group terminate my healthy instance(s)? <https://www.youtube.com/watch?v=_ew-J3DQKZg&feature=emb_logo>`_
 
-Balance capaciy across AZs
+Balance capacity across AZs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Your capacity should be distributed across AZs. For example 
+The nodes for your load balancer distribute requests from clients to registered targets. When cross-zone load balancing is enabled, each load balancer node distributes traffic across the registered targets in all enabled Availability Zones. When cross-zone load balancing is disabled, each load balancer node distributes traffic only across the registered targets in its Availability Zone. 
+
+With Application Load Balancers, cross-zone load balancing is always enabled. With Network Load Balancers, cross-zone load balancing is disabled by default. When you create a Classic Load Balancer, the default for cross-zone load balancing depends on how you create the load balancer. With the API or CLI, cross-zone load balancing is disabled by default. With the AWS Management Console, the option to enable cross-zone load balancing is selected by default.
+
+For example, suppose we have 6 EC2 instances across 2 AZs behind an Elastic Load Balancer. In this case, we will have 3 EC2 instances in each AZ. If one of the AZs goes down, then Auto Scaling is going to terminate the 3 EC2 instances that were in this AZ and launch 3 EC2 instances in the AZ that is alive. Whenever the failed AZ is restored, then Auto Scaling rebalance the number of EC2 instances and setting 3 EC2 instances in each AZ.
+
+Use case: Use spot instances to reduce costs
+--------------------------------------------
+
+You can reduce costs, optimize performance and eliminate operational overhead by automatically scaling instances across instance families and purchasing models (spot, on-demand, and reserved instances) in a single Auto Scaling group. 
+
+You can specify what percentage of your group capacity should be fulfilled by on-demand instances, and spot instances to optimize cost. Use a prioritized list for on-demand instance types to scale capacity during an urgent, unpredictable event to optimize performance.
+
+`AWS re:Invent 2018: Capacity Management Made Easy with Amazon EC2 Auto Scaling (CMP377) <https://www.youtube.com/watch?v=PideBMIcwBQ&feature=emb_logo>`_
+
+`Introduction to Amazon EC2 Auto Scaling <https://www.qwiklabs.com/focuses/7932?parent=catalog>`_
 
 
 Scaling your databases

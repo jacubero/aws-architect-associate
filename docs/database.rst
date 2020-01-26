@@ -19,6 +19,9 @@ Amazon Ralational Database Service (RDS) is a manageed relational database with 
 Get started with RDS
 ====================
 
+DB instances
+------------
+
 The basic building block of Amazon RDS is the DB instance. A DB instance is an isolated DB environment that can contain multiple user-created DBs and can be accessed by using the same tools and applications that you use with an standalone DB instance. The resources found in a DB instance are determined by its DB instance class, and the type of storage is dictated by the type of disks. DB instances and storage differ in performance characteristics and price, allowing you to tailor your performance and cost to the needs of your DB. When you choose to create a DB instance, you first have to specify which **DB engine** to run. Amazon RDS currently supports 2 commercial engines (MS SQL Server and Oracle), 3 open source (MySQL, PostgreSQL, and MariaDB) and 1 cloud native (Amazon Aurora). 
 
 .. figure:: /database_d/rdsinstance.png
@@ -30,21 +33,33 @@ DB instances with commercial and open source DB engines use Amazon Elastic Block
 
 If you are developing a new application, then it is recommended to go with the newest DB engine version. If you are migrating an existing application, then it is necessary to check compatibility requirements.
 
-Amazon RDS provides a selection of **instance types** optimized to fit different relational database use cases. Each instance type includes serveral instance sizes, allowing you to scale your database to the requirements of your target workload. Not every instance type is supported for every database engine, version, edition or region. The current Amazon RDS Instance Types are:
+You can run Amazon RDS on VMware through the Amazon RDS connector. It packages technologies at the core of Amazon RDS in AWS and deploys them on premises. You need connectivity to AWS via a dedicated VPN tunnel enables database management entirely within your private data center.
+
+Instance types
+--------------
+
+Amazon RDS provides a selection of instance types optimized to fit different relational database use cases. Each instance type includes serveral instance sizes, allowing you to scale your database to the requirements of your target workload. Not every instance type is supported for every database engine, version, edition or region. The current Amazon RDS Instance Types are:
 
 * General purpose: T3, T2, M5, M4.
 
 * Memory optimized: R5, R4, X1e, X1, Z1d.
 
-Amazon RDS provides three **storage types**: General Purpose SSD (also known as gp2), Provisioned IOPS SSD (also known as io1), and magnetic. The following list briefly describes the three storage types:
+You can scale compute and memory vertically up or down. The new host is attaches to existing storage with minimal downtime. The endpoint will be the same, but you will have to reconnect to the new instance. 
 
-* *General Purpose SSD*. General Purpose SSD volumes offer cost-effective storage that is ideal for a broad range of workloads. These volumes deliver single-digit millisecond latencies and the ability to burst to 3,000 IOPS for extended periods of time. Baseline performance for these volumes is determined by the volume's size.
+Storage types
+-------------
 
-* *Provisioned IOPS*. Provisioned IOPS storage is designed to meet the needs of I/O-intensive workloads, particularly database workloads, that require low I/O latency and consistent I/O throughput.
+Amazon RDS provides three storage types: General Purpose SSD (also known as gp2), Provisioned IOPS SSD (also known as io1), and magnetic. The following list briefly describes the three storage types:
 
-* *Magnetic*. Amazon RDS also supports magnetic storage for backward compatibility. We recommend that you use General Purpose SSD or Provisioned IOPS for any new storage needs. The maximum amount of storage allowed for DB instances on magnetic storage is less than that of the other storage types. 
+* **General Purpose SSD**. General Purpose SSD volumes offer cost-effective storage that is ideal for a broad range of workloads. These volumes deliver single-digit millisecond latencies and the ability to burst to 3,000 IOPS for extended periods of time. Baseline performance for these volumes is determined by the volume's size.
 
-You can run Amazon RDS on VMware through the Amazon RDS connector. It packages technologies at the core of Amazon RDS in AWS and deploys them on premises. You need connectivity to AWS via a dedicated VPN tunnel enables database management entirely within your private data center.
+* **Provisioned IOPS**. Provisioned IOPS storage is designed to meet the needs of I/O-intensive workloads, particularly database workloads, that require low I/O latency and consistent I/O throughput.
+
+* **Magnetic**. Amazon RDS also supports magnetic storage for backward compatibility. We recommend that you use General Purpose SSD or Provisioned IOPS for any new storage needs. The maximum amount of storage allowed for DB instances on magnetic storage is less than that of the other storage types. 
+
+General Purpose SSD is a great choice, but you have to be aware of burst credits on volumes less than 1 TB. Hitting credit-depletion results in IOPS drop, latencry and queue depth metrics will sppike until credits are replenished. You have to monitor ``BurstBalance`` to see the percent of burst-bucket I/O credits available. You have to monitor read/write IOPS to see if average IOPS is greater than the baseline. You can think General Purpose SSD burst rate and PIOPS stated rate as maximum I/O rates.
+
+You can scale up Amazon EBS storage with no downtime. Initial scaling operation may take longer, because storage is reconfigured on older instances. You can re-provision IOPS on the fly without any disruption in the storage. You are limited to scale up to once every 6 hours.
 
 Managing High Availability, read replicas, and backups
 ======================================================
@@ -52,7 +67,7 @@ Managing High Availability, read replicas, and backups
 High Availability with Multi-AZ
 -------------------------------
 
-One of the most powerful features of Amazon RDS is the ability to configure your DB instance for HA with a multi-AZ deployment. Once configured, Amazon RDS automatically generates a standby copy of the primary instance in another AZ within the same Amazon VPC. Each DB instance manages a set of Amazon EBS volumes with a full copy of the data. After seeding the DB copy, transactions are synchronously replicated to the standby copy. 
+Multi-AZ provides enterprise-grade fault-tolerance solution for production databases. Once configured, Amazon RDS automatically generates a standby copy of the primary instance in another AZ within the same Amazon VPC. Each DB instance manages a set of Amazon EBS volumes with a full copy of the data. After seeding the DB copy, transactions are synchronously replicated to the standby copy. Instances are monitored by an external observer to maintain consensus over quorum.
 
 .. figure:: /database_d/RDSmultiAZ.png
    :align: center
@@ -68,7 +83,7 @@ Running a DB instance with Multi-AZ can enhance availability during planned syst
 Read scalability with Amazon RDS Read Replicas
 ----------------------------------------------
 
-Amazon RDS can gain read scalability with the creation of read replicas for MySQL, MariaDB, and PostgreSQL. Updates made to the source DB instance are aynchronously copied to the read replica instance. You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. Using read replicas, you can also scale out beyond the capacity constraints of a single DB instance for read-heavy DB workloads. Read replicas can also be promoted to become the master DB instance, but due to the asynchronous replication, this requires manual action.
+Amazon RDS can gain read scalability with the creation of read replicas for MySQL, MariaDB, and PostgreSQL. Updates made to the source DB instance are asynchronously copied to the read replica instance. You can reduce the load on your source DB instance by routing read queries from your applications to the read replica. Using read replicas, you can also scale out beyond the capacity constraints of a single DB instance for read-heavy DB workloads. It brings data close to your applications in different regions. 
 
 .. figure:: /database_d/readreplicas.png
    :align: center
@@ -76,6 +91,32 @@ Amazon RDS can gain read scalability with the creation of read replicas for MySQ
    Amazon RDS read replicas
 
 You can create up to 5 replicas per source database. You can monitor replication lag in Amazon CloudWatch or Amazon RDS console. Read replicas can be created in a different region than the master DB. This feature can help satisfy DR requirements or cutting down on latency by directing reads to a read replica closer to the user. Single-region read replicas is supported for Oracle EE and is coming soon for SQL Server.
+
+Read replicas can also be promoted to become the master DB instance, but due to the asynchronous replication, this requires manual action. You can do it for faster recovery in the event of a disaster. You can upgrade a read replica to a new engine version.
+
+.. list-table:: Multi-AZ vs Read Replicas
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Multi-AZ
+     - Read Replicas
+   * - Synchronous replication:
+       highly durable
+     - Asynchronous replication:
+       highly scalable
+   * - Only primary instance is active
+       at any point in time
+     - All replicas are active and 
+       can be used for read scaling
+   * - Backups can be taken from secondary
+     - No backups configured by default
+   * - Always in 2 AZs within a region
+     - It can be within an AZ, cross-AZ,
+       or cross-region
+   * - Database engine version upgrades
+       happen on primary
+     - Database engine version upgrades
+       independently from source instance
 
 Plan for DR
 -----------
@@ -121,6 +162,32 @@ Events
 ------
 
 Amazon RDS event notifications let you know when important things happen. You can leverage built-in notifications via Amazon SNS. Events are published to Amazon CloudWatch Events, where you can create rules to respond to the events. It supports cross-account event delivery. There are 6 different source types: DB instance, DB parameter group, DB security group, DB snapshot, DB cluster, DB cluster snapshot. There are 17 different event categories, such as availability, backup, deletion, configuration change, etc.
+
+Security controls
+=================
+
+Data Protection
+---------------
+
+Identity and Access Management
+------------------------------
+
+IAM Database Authentication for MySQL and PostgreSQL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can authenticate to your DB instance using AWS Identity and Access Management (IAM) database authentication. IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don't need to use a password when you connect to a DB instance. Instead, you use an authentication token.
+
+An *authentication token* is a unique string of characters that Amazon RDS generates on request. Authentication tokens are generated using AWS Signature Version 4. Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication is managed externally using IAM. You can also still use standard database authentication.
+
+IAM database authentication provides the following benefits:
+
+1. Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
+
+2. You can use IAM to centrally manage access to your database resources, instead of managing access individually on each DB instance.
+
+3. For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security
+
+`IAM Database Authentication for MySQL and PostgreSQL <https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html>`_
 
 Use cases
 =========
@@ -175,22 +242,7 @@ Amazon DynamoDB
 ***************
 
 
-Security controls for Amazon RDS and DynamoDB
-*********************************************
 
-You can authenticate to your DB instance using AWS Identity and Access Management (IAM) database authentication. IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don't need to use a password when you connect to a DB instance. Instead, you use an authentication token.
-
-An *authentication token* is a unique string of characters that Amazon RDS generates on request. Authentication tokens are generated using AWS Signature Version 4. Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication is managed externally using IAM. You can also still use standard database authentication.
-
-IAM database authentication provides the following benefits:
-
-1. Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
-
-2. You can use IAM to centrally manage access to your database resources, instead of managing access individually on each DB instance.
-
-3. For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security
-
-`IAM Database Authentication for MySQL and PostgreSQL <https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html>`_
 
 
 

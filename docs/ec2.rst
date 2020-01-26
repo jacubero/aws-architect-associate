@@ -118,6 +118,8 @@ After the dot, you have the instance size (in this example ``xlarge``). From nan
 
 `EC2 Instance Types & Pricing <http://ec2pricing.net/>`_
 
+.. _secAMI:
+
 Amazon Machine Images (AMIs)
 ----------------------------
 
@@ -310,11 +312,106 @@ AWS License Manager offers a simplified license management for on premises and c
 Monitoring
 ==========
 
+Troubleshooting
+===============
+
+Connecting to Your Instance
+---------------------------
+
+Error connecting to your instance: Connection timed out
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you try to connect to your instance and get an error message ``Network error: Connection timed out`` or ``Error connecting to [instance], reason: -> Connection timed out: connect``, try the following:
+
+* Check your security group rules. You need a security group rule that allows inbound traffic from your public IPv4 address on the proper port.
+
+* Check the route table for the subnet. You need a route that sends all traffic destined outside the VPC to the internet gateway for the VPC.
+
+* Check the network access control list (ACL) for the subnet. The network ACLs must allow inbound and outbound traffic from your local IP address on the proper port. The default network ACL allows all inbound and outbound traffic.
+
+* If your computer is on a corporate network, ask your network administrator whether the internal firewall allows inbound and outbound traffic from your computer on port 22 (for Linux instances) or port 3389 (for Windows instances).
+
+* Check that your instance has a public IPv4 address. If not, you can associate an Elastic IP address with your instance. 
+
+* Check the CPU load on your instance; the server may be overloaded. AWS automatically provides data such as Amazon CloudWatch metrics and instance status, which you can use to see how much CPU load is on your instance and, if necessary, adjust how your loads are handled. 
+
+To connect to your instance using an IPv6 address, check the following:
+
+* Your subnet must be associated with a route table that has a route for IPv6 traffic (::/0) to an internet gateway.
+
+* Your security group rules must allow inbound traffic from your local IPv6 address on the proper port (22 for Linux and 3389 for Windows).
+
+* Your network ACL rules must allow inbound and outbound IPv6 traffic.
+
+* If you launched your instance from an older AMI, it may not be configured for DHCPv6 (IPv6 addresses are not automatically recognized on the network interface). 
+
+* Your local computer must have an IPv6 address, and must be configured to use IPv6.
+
+Error: unable to load key … Expecting: ANY PRIVATE KEY
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you try to connect to your instance and get the error message, ``unable to load key ... Expecting: ANY PRIVATE KEY``, the file in which the private key is stored is incorrectly configured. If the private key file ends in ``.pem``, it might still be incorrectly configured. A possible cause for an incorrectly configured private key file is a missing certificate.
+
+Error: User key not recognized by server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you use PuTTY to connect to your instance:
+
+* Verify that your private key (.pem) file has been converted to the format recognized by PuTTY (.ppk).
+
+* Verify that you are connecting with the appropriate user name for your AMI. See section :ref:`secAMI`.
+
+* Verify that you have an inbound security group rule to allow inbound traffic to the appropriate port. 
+
+Error: Host key not found, Permission denied (publickey), or Authentication failed, permission denied
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you connect to your instance using SSH and get any of the following errors, ``Host key not found in [directory], Permission denied (publickey)``, or ``Authentication failed, permission denied``, verify that you are connecting with the appropriate user name for your AMI and that you have specified the proper private key (.pem) file for your instance. See section :ref:`secAMI`.
+
+Error: Unprotected Private Key File
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Your private key file must be protected from read and write operations from any other users. If your private key can be read or written to by anyone but you, then SSH ignores your key and you see the following warning message below.
+
+.. code-block:: console
+
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+  Permissions 0777 for '.ssh/my_private_key.pem' are too open.
+  It is required that your private key files are NOT accessible by others.
+  This private key will be ignored.
+  bad permissions: ignore key: .ssh/my_private_key.pem
+  Permission denied (publickey).
+
+If you see a similar message when you try to log in to your instance, examine the first line of the error message to verify that you are using the correct public key for your instance. The above example uses the private key ``.ssh/my_private_key.pem`` with file permissions of ``0777``, which allow anyone to read or write to this file. This permission level is very insecure, and so SSH ignores this key. To fix the error, execute the following command, substituting the path for your private key file.
+
+.. code-block:: console
+
+  [ec2-user ~]$ chmod 0400 .ssh/my_private_key.pem
+
+Error: Private key must begin with "-----BEGIN RSA PRIVATE KEY-----" and end with "-----END RSA PRIVATE KEY-----"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you use a third-party tool, such as ssh-keygen, to create an RSA key pair, it generates the private key in the OpenSSH key format. When you connect to your instance, if you use the private key in the OpenSSH format to decrypt the password, you'll get the error Private key must begin with ``"-----BEGIN RSA PRIVATE KEY-----" and end with "-----END RSA PRIVATE KEY-----"``.
+
+To resolve the error, the private key must be in the PEM format. Use the following command to create the private key in the PEM format:
+
+.. code-block:: console
+
+  ssh-keygen -m PEM
+
+Error: Server refused our key or No supported authentication methods available
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you use PuTTY to connect to your instance and get either of the following errors, ``Error: Server refused our key`` or ``Error: No supported authentication methods available``, verify that you are connecting with the appropriate user name for your AMI. See section :ref:`secAMI`.
+
+You should also verify that your private key (.pem) file has been correctly converted to the format recognized by PuTTY (.ppk).
 
 .. _secEC2pricing:
 
-Amazon EC2 pricing options
-**************************
+Pricing options
+***************
 
 AWS offers 3 core purchasing options: On-Demand, Reserved Instances, Spot Instances. Each purchasing model launches the same underlying EC2 instances.
 
@@ -481,8 +578,8 @@ AWS tagging strategies
 
 `AWS re:Invent 2018: [REPEAT 1] Amazon EC2 Foundations (CMP208-R1) <https://www.youtube.com/watch?time_continue=1&v=vXBeO9vQAI8&feature=emb_logo>`_
 
-Amazon EC2 considerations
-*************************
+Considerations
+**************
 
 
 `Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_

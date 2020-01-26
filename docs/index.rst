@@ -21,9 +21,9 @@ Contents:
 
    Preface <preface>
    Introduction <intro>
-   The simplest architectures <simplest>
-   Adding a compute layer <compute>
-   Adding a database layer <database>
+   Storage services <storage>
+   Amazon EC2 <ec2>
+   Database services <database>
    Networking in AWS <network>
    AWS Identity and Access Management <iam>
    Elasticity, High Availability, and Monitoring <elasticity>

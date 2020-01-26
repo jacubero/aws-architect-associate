@@ -1,5 +1,5 @@
-Adding a database layer
-#######################
+Database services
+#################
 
 Amazon RDS
 **********
@@ -333,7 +333,14 @@ To estimate the cost of using RDS, you need to consider the following factors:
 
 * **Outbound data transfer** is tiered and inbound data transfer is free.
 
-In order to reduce costs you can stop and start a DB instance from the console, AWS CLIs and SDKs. There are no charges for DB instance hours while it is stopped. The backup retention window is maintained while stopped. However, instances are started automatically after 7 days and you cannot stop DB instances that have read replicas or are read replicas. If you want to stop a DB instance for more than 7 days, a possible strategy is to take an snasphot.
+In order to reduce costs you can stop and start a DB instance from the console, AWS CLIs and SDKs. You can stop and start a DB instance whether it is configured for a single Availability Zone or for Multi-AZ, for database engines that support Multi-AZ deployments. You can't stop an Amazon RDS for SQL Server DB instance in a Multi-AZ configuration. 
+
+When you stop a DB instance, the DB instance performs a normal shutdown and stops running. The status of the DB instance changes to ``stopping`` and then ``stopped``. Any storage volumes remain attached to the DB instance, and their data is kept. Any data stored in the RAM of the DB instance is deleted.
+
+Stopping a DB instance removes pending actions, except for pending actions for the DB instance's option group or DB parameter group. While DB instance is stopped, you only pay for storage. The backup retention window is maintained while stopped. 
+
+.. Important::
+  You can stop a DB instance for up to 7 days. If you don't manually start your DB instance after 7 days, your DB instance is automatically started so that it doesn't fall behind any required maintenance updates. You cannot stop DB instances that have read replicas or are read replicas. If you want to stop a DB instance for more than 7 days, a possible strategy is to take an snasphot.
 
 You can also save money by using Reverved Instances (RIs) that provide a discount over on-demand prices. You have to match region, instance family and engine of on-demand usage to apply benefit. There is size flexibility available for open source and Oracle BYOL engines. By default, RIs are shared among all accounts in consolidated billing. You can use the RI utilization and coverage reports to determine how your RIs are being used. Amazon RDS RI recommendations report uses historical data to recommend which RIs to buy.
 

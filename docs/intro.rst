@@ -683,6 +683,12 @@ AWS Regions
 
 `AWS re:Invent 2016: Tuesday Night Live with James Hamilton <https://www.youtube.com/watch?v*AyOAjFNPAbA>`_
 
+Choosing regions for your architectures:
+
+`AWS & Sustainability <https://aws.amazon.com/about-aws/sustainability/>`_
+
+`Save yourself a lot of pain (and money) by choosing your AWS Region wisely <https://www.concurrencylabs.com/blog/choose-your-aws-region-wisely/>`_
+
 AWS Edge Locations
 ==================
 

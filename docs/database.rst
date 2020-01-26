@@ -16,6 +16,17 @@ Amazon Ralational Database Service (RDS) is a manageed relational database with 
 
 `Amazon Relational Database Service (Amazon RDS) <https://www.youtube.com/watch?time_continue=3&v=igRfulrrYCo&feature=emb_logo>`_
 
+Use cases
+=========
+
+Amazon RDS is ideal for:
+
+* **Web and mobile applications** that need a DB with high throughput, massive storage scalability, and HA. Since RDS does not have any licensing contraints, it perfectly fits the variable usage pattern of these applications.
+
+* For **E-commerce applications**, RDS provides a flexible, secured, and low-cost DB solution for online sales and retailing. 
+
+* **Mobile and online games** require a DB platform with high throughput and HA. RDS manages the DB infrastructure so game developers don't have to worry about provisioning, scaling or monitoring DB servers.
+
 Get started with RDS
 ====================
 
@@ -117,6 +128,10 @@ Read replicas can also be promoted to become the master DB instance, but due to 
        happen on primary
      - Database engine version upgrades
        independently from source instance
+   * - Automatic failover when a problem
+       is detected
+     - It can be manually promoted to a
+       standalone database
 
 Plan for DR
 -----------
@@ -145,35 +160,37 @@ Amazon RDS can manage backups using one of these two options:
 
 Snapshots can be copied across regions or shared with other accounts.
 
-Monitor 
--------
+.. list-table:: Automated backups vs Manual snapshots
+   :widths: 50 50
+   :header-rows: 1
 
-Amazon RDS comes with comprehensive monitoring built-in:
+   * - Automated backups
+     - Manual snapshots
+   * - Specify backup retention window per instance (7-day default)
+     - Manually created through AWS console, AWS CLI, or Amazon RDS
+   * - Kept unitl outside of window (35-day maximum) or instance is deleted
+     - Kept until you delete them
+   * - Supports PITR
+     - Restores to saved snapshot
+   * - Good for DR
+     - Use for checkpoint before making large changes, non-production/test environments, final copy before deleting a database
 
-* **Amazon CloudWatch metrics and alarms**. It allows you to monitor core metrics: CPU, memory, storage, I/O, throughput, latency, replica lag. The monitoring interval is usually down to 1 minute. You can configure alarms on these metrics.
+When you restore a backup, you are creating a entirely new DB instance. In this process, it is defined the instance configuration just like a new instance. It will get the default parameters, security, and option groups. 
 
-* **Amazon CloudWatch logs**. It allows publishing DB logs (errors, audit, slow queries) to a centralized log store (except SQL Server). You can access logs directly from RDS console and API for all engines.
-
-* **Enhanced monitoring**. It is an agent-based monitoring system that allows you to have access to additional CPU, memory, file system, database engine, and disk I/O metrics. It is configurable to monitor up to 1 second intervals. They are automatically published to Amazon CloudWatch logs on your behalf.
-
-* **Performance Insights** uses lightweight data collection methods that don’t impact the performance of your applications, and makes it easy to see which SQL statements are causing the load, and why. It requires no configuration or maintenance, and is currently available for Amazon Aurora (PostgreSQL- and MySQL-compatible editions), Amazon RDS for PostgreSQL, MySQL, MariaDB, SQL Server and Oracle. It provides an easy and powerful dashboard showing load on your database. It helps you identify source of bottlenecks: top SQL queries, wait statistics. It has an adjustable time frame (hour, day week, month). With 7 days of free performance history retention, it's easy to track down and solve a wide variety of issues. If you need longer-term retention, you can choose to pay for up to two years of performance history retention.
-
-Events
-------
-
-Amazon RDS event notifications let you know when important things happen. You can leverage built-in notifications via Amazon SNS. Events are published to Amazon CloudWatch Events, where you can create rules to respond to the events. It supports cross-account event delivery. There are 6 different source types: DB instance, DB parameter group, DB security group, DB snapshot, DB cluster, DB cluster snapshot. There are 17 different event categories, such as availability, backup, deletion, configuration change, etc.
+Restoration can get a long period of time because new volumes are hydrated from Amazon S3. While the volume is usable immediately, full performance requires the volume to be initialized until fully instantiated. One way to mitigate the length of the restoration process is to migrate to a DB instance class with high I/O capacity and later downsizes it. You should maximize I/O during restore process.
 
 Security controls
 =================
 
-Data Protection
----------------
+Amazon RDS is designed to be secure by default. Network isolation is provided with Amazon VPC. AWS IAM based resource-level permission controls are supported. It provides encryption at rest using AWS KMS (for all engines) or Oracle/Microsoft Transparent Data Encryption (TDE). SSL protection for data in transit is used.
 
 Identity and Access Management
 ------------------------------
 
+You can use IAM to control who can perform actions on RDS resources. It is recommended not to use AWS root credentials to manage Amazon RDS resources, you should create an IAM user for everyone, including the administrator. You can use AWS MFA to provide extra level of protection.
+
 IAM Database Authentication for MySQL and PostgreSQL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You can authenticate to your DB instance using AWS Identity and Access Management (IAM) database authentication. IAM database authentication works with MySQL and PostgreSQL. With this authentication method, you don't need to use a password when you connect to a DB instance. Instead, you use an authentication token.
 
@@ -225,35 +242,92 @@ IAM database authentication provides the following benefits:
 
 `How To Connect an AWS RDS Instance with IAM User Authentication <https://medium.com/@mertsaygi/how-to-connect-an-aws-rds-instance-with-iam-user-authentication-db27ac3050d1>`_
 
-Use cases
-=========
+Encryption
+==========
 
-Amazon RDS is ideal for:
+You can use AWS KMS-based encryption in the AWS console. There is no performance penalty for encrypting data and it is performed at the volume level. It provides you with a centralized access and audit of key activity. It uses two-tier encryption with the customer master key provided by you and each individual instance has its data key, which is used to encrypt the data.
 
-* **Web and mobile applications** that need a DB with high throughput, massive storage scalability, and HA. Since RDS does not have any licensing contraints, it perfectly fits the variable usage pattern of these applications.
+.. figure:: /database_d/rds_encrypt.png
+   :align: center
 
-* For **E-commerce applications**, RDS provides a flexible, secured, and low-cost DB solution for online sales and retailing. 
+   Database encryption
 
-* **Mobile and online games** require a DB platform with high throughput and HA. RDS manages the DB infrastructure so game developers don't have to worry about provisioning, scaling or monitoring DB servers.
+Best practices for encryption are follow with RDS:
 
-Costs
-=====
+* Encryption cannot be removed from DB instances.
+
+* If source is encrypted, Read Replicas must be encrypted.
+
+* Add encryption to an uncrypted DB instance by encrypting a snapshot copy.
+
+Monitoring
+==========
+
+Monitor
+-------
+
+Amazon RDS comes with comprehensive monitoring built-in:
+
+* **Amazon CloudWatch metrics and alarms**. It allows you to monitor core metrics: 
+
+   * CPU/Storage/Memory
+
+   * Swap usage
+
+   * I/O (read and write)
+
+   * Latency (read and write)
+
+   * Throughput (read and write)
+
+   * Replica lag
+
+The monitoring interval is usually down to 1 minute. You can configure alarms on these metrics.
+
+* **Amazon CloudWatch logs**. It allows publishing DB logs (errors, audit, slow queries) to a centralized log store (except SQL Server). You can access logs directly from RDS console and API for all engines.
+
+* **Enhanced monitoring**. It is an agent-based monitoring system that allows you to have access to over 50 CPU, memory, file system, database engine, and disk I/O metrics. It is configurable to monitor up to 1 second intervals. They are automatically published to Amazon CloudWatch logs on your behalf.
+
+* **Performance Insights** uses lightweight data collection methods that don’t impact the performance of your applications, and makes it easy to see which SQL statements are causing the load, and why. It requires no configuration or maintenance, and is currently available for Amazon Aurora (PostgreSQL- and MySQL-compatible editions), Amazon RDS for PostgreSQL, MySQL, MariaDB, SQL Server and Oracle. It provides an easy and powerful dashboard showing load on your database. It helps you identify source of bottlenecks: top SQL queries, wait statistics. It has an adjustable time frame (hour, day week, month). With 7 days of free performance history retention, it's easy to track down and solve a wide variety of issues. If you need longer-term retention, you can choose to pay for up to two years of performance history retention.
+
+Events
+------
+
+Amazon RDS event notifications let you know when important things happen. You can leverage built-in notifications via Amazon SNS. Events are published to Amazon CloudWatch Events, where you can create rules to respond to the events. It supports cross-account event delivery. There are 6 different source types: DB instance, DB parameter group, DB security group, DB snapshot, DB cluster, DB cluster snapshot. There are 17 different event categories, such as availability, backup, deletion, configuration change, etc.
+
+Maintenance and billing
+=======================
+
+Maintenance
+-----------
+
+Any maintenance that causes downtime (typically only a few times per year) will be scheduled in your maintenace window. Operating system or Amazon RDS software patches are usually performed without restarting databases. Database engine upgrades require downtime:
+
+* Minor version upgrades: automatic or manually applied.
+
+* Major version upgrades: manually applied because there can be application compatibility issues.
+
+* Version deprecation: 3-6-month notification before scheduled upgrades.
+
+You an view upcoming maintenance events in your AWS Personal Health Dashboard.
+
+.. figure:: /database_d/rds_health.png
+   :align: center
+
+   AWS Personal Health Dashboard
+
+Billing
+-------
 
 To estimate the cost of using RDS, you need to consider the following factors:
 
-* **Clock hours of server time**, from the time you launch a DB instance until you terminate it.
+* **Database instance** (instance hours), from the time you launch a DB instance until you terminate it. It depends on Database characteristics: a combination of region, instance type, DB engine, and license (optional).
 
-* **Database characteristics**. Engine, size, and memory class impacts costs.
+* **Database storage** (GB-mo). It can be either provisioned (Amazon EBS) or consumed (Amazon Aurora). If you are using provisioned IOPS for ``io1`` storage type in IOPS-Mo. You are charged for the number of database input and output requests for Amazon Aurora and Amazon EBS magnetic-storage types. If your purchase options is on-demand DB, then instances are charged by the hour. Reserved DB instances require upfront payment for DB instances reserved.
 
-* **Database purchase type**. On-demand DB instances are charged by the hour. Reserved DB instances require upfront payment for DB instances reserved.
+* **Backup storage** (GB-mo). Size of backups and snapshots stored in Amazon S3. There is no additional charge for backup storage of up to 100% of your provisioned DB storage for an active DB instance. After the DB instance is terminated, backup storage is billed per GB/month.
 
 * **Number of database instances**, to handle peak loads.
-
-* **Provisioned storage**. There is no additional charge for backup storage of up to 100% of your provisioned DB storage for an active DB instance. After the DB instance is terminated, backup storage is billed per GB/month.
-
-* **Additional storage**. The amount of backup storage in addition to the provisioned storage amount is billed per GB/month.
-
-* **Requests**. The number of input and output requests to the DB.
 
 * **Deployment type**. You can deploy the DB to a single AZ or multiple AZs.
 

@@ -179,6 +179,42 @@ You can authenticate to your DB instance using AWS Identity and Access Managemen
 
 An *authentication token* is a unique string of characters that Amazon RDS generates on request. Authentication tokens are generated using AWS Signature Version 4. Each token has a lifetime of 15 minutes. You don't need to store user credentials in the database, because authentication is managed externally using IAM. You can also still use standard database authentication.
 
+.. figure:: /database_d/db_options.png
+   :align: center
+
+   Database options
+
+For enabling RDS IAM authentication, you should check the “Enable IAM DB authentication” option on RDS modify or create phase.
+
+.. figure:: /database_d/db_auth.png
+   :align: center
+
+   Database authentication
+
+After this step, you should create a user for your database account and use “FLUSH PRIVILEGES;“ command in MySQL. The DB user account has to use same name with your IAM account.
+
+.. code-block:: console
+   :caption: Create user phase for MySQL
+
+   mysql > CREATE USER myuser IDENTIFIED WITH AWSAuthenticationPlugin AS 'RDS';
+   Query OK, 0 rows affected (0.18 sec)
+
+.. code-block:: console
+   :caption: Create user phase for PostgreSQL
+
+   # psql --host postgres-sample-instance.cbr4qtvbvyrz.us-east-2.rds.amazonaws.com --username-postgres 
+   Password for user postgres:
+   psql (9.5.19, server 11.5)
+   SSL connection (protocol: TLSv1.2, cipher: ECDHE-RSA-AES256-GCM-SHA384, bits: 256, compression: off)
+   Type "help" for help.
+
+   postgres-> CREATE USER myuser WITH LOGIN;
+   CREATE ROLE
+   postgres-> GRANT rds_iam TO myuser;
+   GRANT ROLE
+
+After this command, you have to add an IAM role to your IAM user for creating a relation between your IAM account and RDS DB user.
+
 IAM database authentication provides the following benefits:
 
 1. Network traffic to and from the database is encrypted using Secure Sockets Layer (SSL).
@@ -187,7 +223,7 @@ IAM database authentication provides the following benefits:
 
 3. For applications running on Amazon EC2, you can use profile credentials specific to your EC2 instance to access your database instead of a password, for greater security
 
-`IAM Database Authentication for MySQL and PostgreSQL <https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.html>`_
+`How To Connect an AWS RDS Instance with IAM User Authentication <https://medium.com/@mertsaygi/how-to-connect-an-aws-rds-instance-with-iam-user-authentication-db27ac3050d1>`_
 
 Use cases
 =========

@@ -10,10 +10,28 @@ Automating your infrastructure
 AWS CloudFormation
 ==================
 
+The process to execute Infrastructure as code with CloudFormation is the following:
+
+1. Code your CloudFormation template in YAML or JSON directly or use sample templates.
+
+2. Upload local files or from an S3 bucket.
+
+3. Create a stack using console, API, or CLI.
+
+4. Stacks and resources are provisioned.
+
+The following scenarios demonstrate how AWS CloudFormation can help: Simplify infrastructure management, quickly replicate your infrastructure, easily control and track changes to your infrastructure.
+
+
+
+The benefits you get from CloudFormation are:
+
+1. As group of resources get deployed or update your resources, if one of your resources fails, Cloud Formation keeps your state and is able to rollback to the last known good state.
+
+2. CloudFormation knows about stabilization of resources. When a resource has been created, it is guaranteed that you can do a describe or a list to the resources.
 
 
 `AWS CloudFormation Deep Dive and Recent Enhancements <https://www.youtube.com/watch?v=d6SJPMdBShI&feature=emb_logo>`_
-
 
 Automating deployments
 **********************

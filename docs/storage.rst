@@ -574,7 +574,24 @@ Client side encryption happens before your data is uploaded into your S3 bucket.
 
 * AWS KMS managed customer master key (**CSE-KMS**). You don'y have to worry about providing any encryption keys to S3 encryption client. Instead, you provide only an AWS KMS customer master key ID, and the client does the rest.
 
-* Customer managed master encryption keys (**CSE-C**). You use your own client-side master key. When using your client-side master keys, your unencrypted data is never sent to AWS. It is important that you safely manage your encryption keys. If you lose them, you don't be able to decrypt your data.
+* Customer managed master encryption keys (**CSE-C**). You use your own client-side master key. When using your client-side master keys, your client-side master keys and your unencrypted data is never sent to AWS. It is important that you safely manage your encryption keys. If you lose them, you don't be able to decrypt your data.
+
+.. figure:: /storage_d/cse-c.png
+   :align: center
+
+   Access decision process
+
+This is how client-side encryption using client-side master key works:
+
+* When *uploading an object*. You provide a client-side master key to the Amazon S3 encryption client. The client uses the master key only to encrypt the data encryption key that it generates randomly. The process works like this:
+
+1. The Amazon S3 encryption client generates a one-time-use symmetric key (also known as a data encryption key or data key) locally. It uses the data key to encrypt the data of a single Amazon S3 object. The client generates a separate data key for each object.
+
+2. The client encrypts the data encryption key using the master key that you provide. The client uploads the encrypted data key and its material description as part of the object metadata. The client uses the material description to determine which client-side master key to use for decryption.
+
+3. The client uploads the encrypted data to Amazon S3 and saves the encrypted data key as object metadata (x-amz-meta-x-amz-key) in Amazon S3.
+
+* When *downloading an object*. The client downloads the encrypted object from Amazon S3. Using the material description from the object's metadata, the client determines which master key to use to decrypt the data key. The client uses that master key to decrypt the data key and then uses the data key to decrypt the object.
 
 .. Note:: Default Encryption.
 	**Default Encryption** is an option that allows you to enable automatically encrypt of all new objects written to your Amazon S3 bucket using either SSE-SE or SSE-KMS. This property does not affect existing objects in your bucket.

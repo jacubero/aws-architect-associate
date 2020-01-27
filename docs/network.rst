@@ -120,7 +120,9 @@ The correct way to deal with these scenarios is by tiering security groups. The 
 
 	 Web Frontend security group
 
-The *Port* field can be a number or a range (for example: 1000-2000). You cannot define Ports separated by commas (for example: 1000,1001,1002). Instead, you have to define different rules for each of this ports and define a range of addresses if they are contiguous. You can have a maximum of 50 rules per security group and up to 5 security groups attached to each interface of the EC2 instance.
+The *Port* field can be a number or a range (for example: 1000-2000). You cannot define Ports separated by commas (for example: 1000,1001,1002). Instead, you have to define different rules for each of this ports and define a range of addresses if they are contiguous. 
+
+A security group acts as a virtual firewall for your instance to control inbound and outbound traffic. When you launch an instance in a VPC, You can have a maximum of 120 (60 inbound and 60 outbound) rules per security group and up to 5 security groups attached to each network interface of the EC2 instance. Security groups act at the instance level, not the subnet level. Therefore, each instance in a subnet in your VPC could be assigned to a different set of security groups. If you don't specify a particular group at launch time, the instance is automatically assigned to the default security group for the VPC. 
 
 Network ACLs
 ------------
@@ -239,11 +241,15 @@ The characteristics of an **Interface VPC endpoint** are the following:
 
 * It does not support endpoint policies.
 
-* You can apply a security groups.
+* You can apply a security group.
 
 * You access over AWS Direct Connect, but no through AWS VPN.
 
 * It makes requests to the service using endpoint-specific DNS hostnames. Optionally, you can use Amazon Route 53 DNS private hosted zone to make requests to the service using its default public DNS name.
+
+.. Note:: Privatelink
+
+	Privatelink is a purpose-built technology desgined to access AWS services, while keeping all the network traffic within the AWS network. There is no need for proxies, NAT gateways or Internet Gateways.
 
 The characteristics of an **Gateway VPC endpoint** are the following:
 

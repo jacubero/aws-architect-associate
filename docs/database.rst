@@ -358,9 +358,29 @@ It is a regional service that offers greater than 99.99% availability. The servi
 Amazon DynamoDB
 ***************
 
+.. list-table:: RDBMS vs Amazon DynamoDB
+   :widths: 20 50 50
+   :header-rows: 1
+   :stub-columns: 1
 
-
-
+   * - Characteristic
+     - Relational Database Management System (RDBMS)
+     - Amazon DynamoDB
+   * - Optional workloads
+     - Ad hoc queries, data warehousing; OLAP
+     - Web-scale applications, including social networks, gaming, media sharing, and IoT
+   * - Data model
+     - The relational model requires a well-defined schema, where data is normalized into tables, rows, and columns. In addition, all of the relationships are defined among tables, columns, indixes, and other database elements.
+	- DynamoDB has schema flexibility. Every table must have a primary key to uniquely identify each data item, but there are no similar constraints on other non-key attributes. It can manage structured or semi-structured data, including JSON documents.
+   * - Data access
+     - SQL is the standard for storing and retriving data. RDBMS offer a rich set of tools for simplifying the development of database-driven applications using SQL
+	- You can use AWS Management console or the AWS CLI to work with DynamoDB and perform ad hoc tasks. Applications can leverage the AWS SDKs to work with DynamoDB using object-based, document-centric, or low-level interfaces.
+   * - Performance
+     - RDBMS are optimized for storage so performance generally depends on the disk subsystem. Developers and database administrator must optimize queries, indexes, and table structures in order to achieve peak performance.
+	- DynamoDB is optimized for compute, so performance is mainly a function of the underlying hardware and network latency. As a managed service, DynamoDB insulates you and your applications from these implementation details, so that you can focus on designing and building robust, high-performance applications.
+   * - Scaling
+     - It is easy to scale up with faster HW. It is also possible for DB tables to span across multiple hosts in a distributed system, but this requires additional investment. Relational DBs have maximum sizes for the number and size of files, which imposes upper limits in scalability.
+	- DynamoDB is designed to scale out using distributed clusters of HW. This design also increased throughput without increasing latency. Customers specify the throughput requirements, and DynamoDB allocates sufficient resources to meet those requirements. There are no upper limits on the number of items per table, nor the total size of that table.
 
 
 Migrating data into your AWS databases

@@ -97,8 +97,51 @@ Amazon CloudWatch
 
 Amazon CloudWatch is a monitoring service that allows you to monitor your AWS resources and the applications you run on AWS in real time.
 
+Metrics
+-------
+
+Metrics are data about the performance of your systems. By default, several services provide free metrics for resources (such as Amazon EC2 instances, Amazon EBS volumes, and Amazon RDS DB instances). You can also enable detailed monitoring for some resources, such as your Amazon EC2 instances, or publish your own application metrics. Amazon CloudWatch can load all the metrics in your account (both AWS resource metrics and application metrics that you provide) for search, graphing, and alarms. Metric data is kept for 15 months, enabling you to view both up-to-the-minute data and historical data.
+
 Some Amazon CloudWatch features include collecting and tracking metrics like CPU utilization, data transfer, as well as disk I/O and utilization. We can also monitor services for cloud resources and applications via collecting and monitoring log files. Additionally, you have the ability to set alarms on any of your metrics so that you can send notifications or take other automated actions.
 
+CloudWatch has available Amazon EC2 Metrics for you to use for monitoring:
+
+* *CPU Utilization* identifies the processing power required to run an application upon a selected instance. 
+
+* *Disk Read operations* metric mesures the completed read operations from all instance store volumes available to the instance in a specified period of time. 
+
+* *Disrk Write operations* metric mesures the completed write operations to all instance store volumes available to the instance in a specified period of time.
+
+* *Disk Read bytes* metric is used to determine the volume of the data the application reads from the hard disk of the instance. This can be used to determine the speed of the application.
+
+* *Disk write bytes* metric is used to determine the volume of the data the application writes onto the hard disk of the instance. This can be used to determine the speed of the application.
+
+* *Network In* measures the number of bytes received on all network interfaces by the instance. This metric identifies the volume of incoming network traffic to a single instance.
+
+* *Network Out* measures the number of bytes sent out on all network interfaces by the instance. This metric identifies the volume of outgoing network traffic from a single instance.
+
+* *Network Packets In* measures the number of packets received on all network interfaces by the instance. This metric identifies the volume of incoming traffic in terms of the number of packets on a single instance. This metric is available for basic monitoring only.
+
+* *Network Packets Out* measures the number of packets sent out on all network interfaces by the instance. This metric identifies the volume of outgoing traffic in terms of the number of packets on a single instance. This metric is available for basic monitoring only.
+
+* *Metadata No Token* measures the number of times the instance metadata service was accessed using a method that does not use a token.
+
+.. figure:: /elasticity_d/cloudwatchmetrics.png
+   	:align: center
+
+	Sample Auto Scaling group
+
+However, there are certain metrics that are not readily available in CloudWatch such as memory utilization, disk space utilization, and many others which can be collected by setting up a custom metric. You need to prepare a custom metric using CloudWatch Monitoring Scripts which is written in Perl. You can also install CloudWatch Agent to collect more system-level metrics from Amazon EC2 instances. Here's the list of custom metrics that you can set up:
+
+* Memory utilization
+
+* Disk swap utilization
+
+* Disk space utilization
+
+* Page file utilization
+
+* Log collection
 
 `Collect Metrics and Logs from Amazon EC2 instances with the CloudWatch Agent <https://www.youtube.com/watch?time_continue=3&v=vAnIhIwE5hY&feature=emb_logo>`_
 

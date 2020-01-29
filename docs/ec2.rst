@@ -131,9 +131,7 @@ AMI is the software required to launch an EC2 instance. There are 3 different ty
 
 * **Your machine images** are AMIs you have created from Amazon EC2 instances. You can maintain them as private in your account, shared with other accounts and even made them public to the community.  
 
-`Amazon Machine Images (AMI) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html>`_
-
-`How do I create an Amazon Machine Image (AMI) from my EBS-backed EC2 instance? <https://www.youtube.com/watch?time_continue=5&v=vSKWBBrEbNQ&feature=emb_logo>`_
+You can copy an Amazon Machine Image (AMI) within or across an AWS region using the AWS Management Console, the AWS command line tools or SDKs, or the Amazon EC2 API, all of which support the ``CopyImage`` action. You can copy both Amazon EBS-backed AMIs and instance store-backed AMIs. You can copy encrypted AMIs and AMIs with encrypted snapshots.
 
 The appropriate user names for connecting to a newly created Amazon EC2 instance are as follows:
 
@@ -150,6 +148,10 @@ The appropriate user names for connecting to a newly created Amazon EC2 instance
 * For a Fedora AMI, the user name is ``ec2-user``.
 
 * For a SUSE AMI, the user name is ``ec2-user`` or ``root``.
+
+`Amazon Machine Images (AMI) <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html>`_
+
+`How do I create an Amazon Machine Image (AMI) from my EBS-backed EC2 instance? <https://www.youtube.com/watch?time_continue=5&v=vSKWBBrEbNQ&feature=emb_logo>`_
 
 Processors and architectures
 ----------------------------

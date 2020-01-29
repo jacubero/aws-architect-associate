@@ -63,6 +63,39 @@ There are 2 types of IPv6 addresses:
 
 * **Link Local Address (LLA)**. In IPv6 world, there are no MAC addresses and as a consequence it is no necessary to do NAT. In IPv4, NAT is needed in order to cover the shortage of available public IPv4 addresses, but in IPv6 there is no a foreseeable shortage of IPv6 addresses. LLA is also assigned to EC2 instance. It has a link-local prefix: ``fe80::/64`` and is a modified EUI-64 format obtained through a 48-bit MAC address. The LLA is used to communicate with the VPC router and to talk with other instances only within a subnet. You cannot cross a subnet with LLAs.
 
+Bring Your Own IP Addresses (BYOIP)
+-----------------------------------
+
+You can bring part or all of your public IPv4 address range from your on-premises network to your AWS account. You continue to own the address range, but AWS advertises it on the internet. After you bring the address range to AWS, it appears in your account as an address pool. You can create an Elastic IP address from your address pool and use it with your AWS resources, such as EC2 instances, NAT gateways, and Network Load Balancers.
+
+.. Important::
+
+	BYOIP is not available in all Regions.
+
+The following requirements have to be met:
+
+* The address range must be registered with your Regional internet registry (RIR), such as the American Registry for Internet Numbers (ARIN), Réseaux IP Européens Network Coordination Centre (RIPE), or Asia-Pacific Network Information Centre (APNIC). It must be registered to a business or institutional entity and can not be registered to an individual person.
+
+* The most specific address range that you can specify is /24.
+
+* You can bring each address range to one Region at a time.
+
+* You can bring five address ranges per Region to your AWS account.
+
+* The addresses in the IP address range must have a clean history. We might investigate the reputation of the IP address range and reserve the right to reject an IP address range if it contains an IP address that has poor reputation or is associated with malicious behavior.
+
+* The following are supported:
+
+* ARIN - "Direct Allocation" and "Direct Assignment" network types
+
+* RIPE - "ALLOCATED PA", "LEGACY", and "ASSIGNED PI" allocation statuses
+
+* APNIC – "ALLOCATED PORTABLE" and "ASSIGNED PORTABLE" allocation statuses
+
+To ensure that only you can bring your address range to your AWS account, you must authorize Amazon to advertise the address range. You must also provide proof that you own the address range through a signed authorization message.
+
+A Route Origin Authorization (ROA) is a cryptographic statement about your route announcements that you can create through your RIR. It contains the address range, the Autonomous System numbers (ASN) that are allowed to advertise the address range, and an expiration date. An ROA authorizes Amazon to advertise an address range under a specific AS number. However, it does not authorize your AWS account to bring the address range to AWS. To authorize your AWS account to bring an address range to AWS, you must publish a self-signed X509 certificate in the Registry Data Access Protocol (RDAP) remarks for the address range. The certificate contains a public key, which AWS uses to verify the authorization-context signature that you provide. You should keep your private key secure and use it to sign the authorization-context message.
+
 VPC DHCP
 --------
 

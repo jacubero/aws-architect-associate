@@ -382,6 +382,23 @@ Amazon DynamoDB
      - It is easy to scale up with faster HW. It is also possible for DB tables to span across multiple hosts in a distributed system, but this requires additional investment. Relational DBs have maximum sizes for the number and size of files, which imposes upper limits in scalability.
 	- DynamoDB is designed to scale out using distributed clusters of HW. This design also increased throughput without increasing latency. Customers specify the throughput requirements, and DynamoDB allocates sufficient resources to meet those requirements. There are no upper limits on the number of items per table, nor the total size of that table.
 
+Amazon DynamoDB Accelerator (DAX)
+=================================
+
+DAX is a DynamoDB-compatible caching service that enables you to benefit from fast in-memory performance for demanding applications. DAX addresses three core scenarios:
+
+1. As an in-memory cache, DAX reduces the response times of eventually consistent read workloads by an order of magnitude, from single-digit milliseconds to microseconds.
+
+2. DAX reduces operational and application complexity by providing a managed service that is API-compatible with DynamoDB. Therefore, it requires only minimal functional changes to use with an existing application.
+
+3. For read-heavy or bursty workloads, DAX provides increased throughput and potential operational cost savings by reducing the need to overprovision read capacity units. This is especially beneficial for applications that require repeated reads for individual keys.
+
+DAX supports server-side encryption. With encryption at rest, the data persisted by DAX on disk will be encrypted. DAX writes data to disk as part of propagating changes from the primary node to read replicas. The following diagram shows a high-level overview of DAX.
+
+.. figure:: /database_d/dax_high_level.png
+   :align: center
+
+   High-level overview of DAX
 
 Migrating data into your AWS databases
 **************************************

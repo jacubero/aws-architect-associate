@@ -25,7 +25,7 @@ Contents:
    Amazon EC2 <ec2>
    Database services <database>
    Networking in AWS <network>
-   AWS Identity and Access Management <iam>
+   Security, Identity, and Compliance <security>
    Elasticity, High Availability, and Monitoring <elasticity>
    Automation <automation>
    Caching <caching>

@@ -18,10 +18,9 @@ Identities in AWS exist in these forms:
 
 * **Roles**: Temporary identities used by EC2 instances, Lambdas, and external users.
 
-* **Federation**: Users with Active Directoty identities or other corporate credentials have role assigned in IAM.
+* **Federation**: Users with Active Directory identities or other corporate credentials have role assigned in IAM.
 
 * **Web Identity Federation**: Users with web identities from Amazon.com or other Open ID provier have role assigned using Security Token System (STS).
-
 
 
 `Secure Access to AWS Services Using AWS Identity and Access Management (IAM) Roles <https://www.youtube.com/watch?v=wY7FOFaPNuE&feature=emb_logo>`_ 
@@ -30,6 +29,18 @@ Identities in AWS exist in these forms:
 
 
 `AWS re:Invent 2018: [REPEAT 1] Become an IAM Policy Master in 60 Minutes or Less (SEC316-R1) <https://www.youtube.com/watch?time_continue=2&v=YQsK4MtsELU&feature=emb_logo>`_
+
+`Deep Dive on AWS Single Sign-On - AWS Online Tech Talks <https://www.youtube.com/watch?v=8jyhsnh0ALQ>`_
+
+SAML 2.0-based Federation
+-------------------------
+
+AWS supports identity federation with SAML 2.0 (Security Assertion Markup Language 2.0), an open standard that many identity providers (IdPs) use, such as Active Directory. This feature enables federated single sign-on (SSO), so users can log into the AWS Management Console or call the AWS API operations without you having to create an IAM user for everyone in your organization. By using SAML, you can simplify the process of configuring federation with AWS, because you can use the IdP's service instead of writing custom identity proxy code.
+
+AWS Directory Service
+*********************
+
+AWS Directory Service provides multiple ways to use Amazon Cloud Directory and Microsoft Active Directory (AD) with other AWS services. Directories store information about users, groups, and devices, and administrators use them to manage access to information and resources. AWS Directory Service provides multiple directory choices for customers who want to use existing Microsoft AD or Lightweight Directory Access Protocol (LDAP)–aware applications in the cloud. It also offers those same choices to developers who need a directory to manage users, groups, devices, and access.
 
 AWS Web Application Firewall (WAF)
 **********************************

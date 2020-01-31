@@ -288,6 +288,17 @@ The monitoring interval is usually down to 1 minute. You can configure alarms on
 
 * **Enhanced monitoring**. It is an agent-based monitoring system that allows you to have access to over 50 CPU, memory, file system, database engine, and disk I/O metrics. It is configurable to monitor up to 1 second intervals. They are automatically published to Amazon CloudWatch logs on your behalf.
 
+Amazon RDS provides metrics in real time for the operating system (OS) that your DB instance runs on. You can view the metrics for your DB instance using the console, or consume the Enhanced Monitoring JSON output from CloudWatch Logs in a monitoring system of your choice. By default, Enhanced Monitoring metrics are stored in the CloudWatch Logs for 30 days. To modify the amount of time the metrics are stored in the CloudWatch Logs, change the retention for the ``RDSOSMetrics`` log group in the CloudWatch console.  
+
+Take note that there are certain differences between CloudWatch and Enhanced Monitoring Metrics.  CloudWatch gathers metrics about CPU utilization from the hypervisor for a DB instance, and Enhanced Monitoring gathers its metrics from an agent on the instance. As a result, you might find differences between the measurements, because the hypervisor layer performs a small amount of work.
+
+The differences can be greater if your DB instances use smaller instance classes, because then there are likely more virtual machines (VMs) that are managed by the hypervisor layer on a single physical instance. Enhanced Monitoring metrics are useful when you want to see how different processes or threads on a DB instance use the CPU and memory.
+
+.. figure:: /database_d/metrics2.png
+   :align: center
+
+   Use of CPU and memory of processes or threads on a DB instance 
+
 * **Performance Insights** uses lightweight data collection methods that don’t impact the performance of your applications, and makes it easy to see which SQL statements are causing the load, and why. It requires no configuration or maintenance, and is currently available for Amazon Aurora (PostgreSQL- and MySQL-compatible editions), Amazon RDS for PostgreSQL, MySQL, MariaDB, SQL Server and Oracle. It provides an easy and powerful dashboard showing load on your database. It helps you identify source of bottlenecks: top SQL queries, wait statistics. It has an adjustable time frame (hour, day week, month). With 7 days of free performance history retention, it's easy to track down and solve a wide variety of issues. If you need longer-term retention, you can choose to pay for up to two years of performance history retention.
 
 Events

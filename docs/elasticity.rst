@@ -256,7 +256,6 @@ Increase or decrease the current capacity of the group based on a set of scaling
 
 	Dynamic Scaling with step scaling
 
-
 Predictive scaling
 ------------------
 
@@ -406,9 +405,9 @@ Replace unhealthy instances
 
 When the load balancer determines that an instance is unhealthy, it stops routing requests to that instance. The load balancer resumes routing requests to the instance when it has been restored to a healthy state. There are 3 ways of checking the status of your EC2 instances:
 
-1. **Via the Auto Scaling group**. The default health checks for an Auto Scaling group are EC2 status checks only. If an instance state is different from ``running`` or system health check equals ``impaired``, the Auto Scaling group considers the instance unhealthy and replaces it. If you attached one or more load balancers or target groups to your Auto Scaling group, the group does not, by default, consider an instance unhealthy and replace it if it fails the load balancer health checks.
+1. Via the Auto Scaling group. The default health checks for an Auto Scaling group are **EC2 status checks only**. If an instance state is different from ``running`` or system health check equals ``impaired``, the Auto Scaling group considers the instance unhealthy and replaces it. If you attached one or more load balancers or target groups to your Auto Scaling group, the group does not, by default, consider an instance unhealthy and replace it if it fails the load balancer health checks.
 
-2. **Via the ELB health checks**. However, you can optionally configure the Auto Scaling group to use Elastic Load Balancing health checks. This ensures that the group can determine an instance's health based on additional tests provided by the load balancer. The load balancer periodically sends pings, attempts connections, or sends requests to test the EC2 instances. These tests are called health checks. Load balancer health checks fail if ELB health equals ``OutOfService``.
+2. Via the **ELB health checks**. However, you can optionally configure the Auto Scaling group to use Elastic Load Balancing health checks. This ensures that the group can determine an instance's health based on additional tests provided by the load balancer. The load balancer periodically sends pings, attempts connections, or sends requests to test the EC2 instances. These tests are called health checks. Load balancer health checks fail if ELB health equals ``OutOfService``.
 
 If you configure the Auto Scaling group to use Elastic Load Balancing health checks, it considers the instance unhealthy if it fails either the EC2 status checks or the load balancer health checks. If you attach multiple load balancers to an Auto Scaling group, all of them must report that the instance is healthy in order for it to consider the instance healthy. If one load balancer reports an instance as unhealthy, the Auto Scaling group replaces the instance, even if other load balancers report it as healthy.
 

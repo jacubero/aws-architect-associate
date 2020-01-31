@@ -182,6 +182,10 @@ The data in an instance store persists only during the lifetime of its associate
 
 The data is not replicated by default and no snapshot is supported. There are SSD or HDD disks configurations.
 
+The virtual devices for instance store volumes are named as ``ephemeral[0-23]``. Instance types that support one instance store volume have ``ephemeral0``. Instance types that support two instance store volumes have ``ephemeral0`` and ``ephemeral1``, and so on until ``ephemeral23``.
+
+If you create an AMI from an instance, the data on its instance store volumes aren't preserved and aren't present on the instance store volumes of the instances that you launch from the AMI. You can specify instance store volumes for an instance only when you launch it. You can't detach an instance store volume from one instance and attach it to a different instance.
+
 `Amazon EC2 Instance Store <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/InstanceStorage.html>`_
 
 Amazon EBS

@@ -411,5 +411,136 @@ DAX supports server-side encryption. With encryption at rest, the data persisted
 
    High-level overview of DAX
 
+Amazon Redshift
+***************
+
+Architecture and concepts
+=========================
+
+Redshift is a fully-managed service which is the result of rewriting PostgreSQL to:
+
+* Become a columnar database.
+
+* Provide MPP (massive parallel processing) that allows to scale out up to a several petabytes database.
+
+* Provide analytics functions to work as an OLAP service.
+
+It is also integrated with the rest of the AWS ecosystem: S3, KMS, Route 53, etc.
+
+The maintenance window occurs weekly, and DB instances can receive upgrades to the operating system (OS) or to the DB engine. AWS requires at least a 30-minute window in your instance's weekly schedule to confirm that all instances have the latest patches and upgrades. During the maintenance window, tasks are performed on clusters and instances. For the security and stability of your data, maintenance can cause instances to be unavailable.
+
+The maintenance window defines when the deployment or operation begins, but maintenance itself can take longer to complete. As a result, the time used for some operations can exceed the duration of the maintenance window.
+
+Architecture
+------------
+
+The elements of the Amazon Redshift data warehouse architecture is shown in the following figure.
+
+.. figure:: /database_d/NodeRelationships.png
+   :align: center
+
+   Amazon Redshift architecture
+
+Client applications
+^^^^^^^^^^^^^^^^^^^
+
+Amazon Redshift integrates with various data loading and ETL (extract, transform, and load) tools and business intelligence (BI) reporting, data mining, and analytics tools. Amazon Redshift is based on industry-standard PostgreSQL, so most existing SQL client applications will work with only minimal changes. Amazon Redshift communicates with client applications by using industry-standard JDBC and ODBC drivers for PostgreSQL. 
+
+Leader node
+^^^^^^^^^^^
+
+The leader node manages communications with client programs and all communication with compute nodes. It parses and develops execution plans to carry out database operations, in particular, the series of steps necessary to obtain results for complex queries. Based on the execution plan, the leader node compiles code, distributes the compiled code to the compute nodes, and assigns a portion of the data to each compute node.
+
+The leader node distributes SQL statements to the compute nodes only when a query references tables that are stored on the compute nodes. All other queries run exclusively on the leader node. Amazon Redshift is designed to implement certain SQL functions only on the leader node. A query that uses any of these functions will return an error if it references tables that reside on the compute nodes. 
+
+Clusters
+^^^^^^^^
+
+The core infrastructure component of an Amazon Redshift data warehouse is a cluster. A cluster is composed of one or more compute nodes. If a cluster is provisioned with two or more compute nodes, an additional leader node coordinates the compute nodes and handles external communication. Your client application interacts directly only with the leader node. The compute nodes are transparent to external applications.
+
+Compute nodes
+^^^^^^^^^^^^^
+
+The leader node compiles code for individual elements of the execution plan and assigns the code to individual compute nodes. The compute nodes execute the compiled code and send intermediate results back to the leader node for final aggregation.
+
+Each compute node has its own dedicated CPU, memory, and attached disk storage, which are determined by the node type. As your workload grows, you can increase the compute capacity and storage capacity of a cluster by increasing the number of nodes, upgrading the node type, or both.
+
+Amazon Redshift provides two node types; dense storage nodes and dense compute nodes. Each node provides two storage choices. You can start with a single 160 GB node and scale up to multiple 16 TB nodes to support a petabyte of data or more.
+
+Hopefully all the data is spread across the compute nodes. The SQL queries are executed in parallel and that's why it is called a massively parallel, shared nothing columnar architecture.
+
+Node slices
+^^^^^^^^^^^
+
+A compute node is partitioned into slices. Each slice is allocated a portion of the node's memory and disk space, where it processes a portion of the workload assigned to the node. The leader node manages distributing data to the slices and apportions the workload for any queries or other database operations to the slices. The slices then work in parallel to complete the operation. The number of slices per node is determined by the node size of the cluster. 
+
+When you create a table, you can optionally specify one column as the distribution key. When the table is loaded with data, the rows are distributed to the node slices according to the distribution key that is defined for a table. Choosing a good distribution key enables Amazon Redshift to use parallel processing to load data and execute queries efficiently. 
+
+Internal network
+^^^^^^^^^^^^^^^^
+
+Amazon Redshift takes advantage of high-bandwidth connections, close proximity, and custom communication protocols to provide private, very high-speed network communication between the leader node and compute nodes. The compute nodes run on a separate, isolated network that client applications never access directly.
+
+Databases
+^^^^^^^^^
+
+A cluster contains one or more databases. User data is stored on the compute nodes. Your SQL client communicates with the leader node, which in turn coordinates query execution with the compute nodes.
+
+Amazon Redshift is a relational database management system (RDBMS), so it is compatible with other RDBMS applications. Although it provides the same functionality as a typical RDBMS, including online transaction processing (OLTP) functions such as inserting and deleting data, Amazon Redshift is optimized for high-performance analysis and reporting of very large datasets.
+
+.. figure:: /database_d/redshiftspectrum.png
+   :align: center
+
+   Amazon Redshift Spectrum architecture
+
+The Load, unload, backup and restore of data is performed on Amazon S3. Amazon Redshift Spectrum is and extension of Amazon Redshift in which the nodes load data from Amazon S3 and execute queries directly against Amazon S3.
+
+Terminology
+-----------
+
+Columnar
+^^^^^^^^
+
+Amazon Redshift uses a columnar architecture for storing data on disk column by column rather than row by row like a traditional database. The reason for doing this is that the types of queries that you execute in an analytics database usually query a subset of the columns, so we are able to reduce the amount of IO needed to be done for analytics queries.
+
+.. figure:: /database_d/columnar.png
+   :align: center
+
+   Columnar architecture: Example
+
+In a columnar architecture, the data is stored physically on disk by column rather than by row. It only reads the column data that is required.
+
+Compression
+^^^^^^^^^^^
+
+The goals of compression (sometimes called encoding) is to allow more data to be stored within an Amazon Redshift cluster and improve query performance by decreasing I/O. As a consequence, it allows several times more data to be stored within the cluster and also improves performance. The reason of this performance improvement is because it reduces the amount of I/O needed to do off disk.
+
+By default, ``copy`` automatically analyzes and compresses data on first load into an empty table. The ``analyze compression`` is a built-in command that will find the optimal compression for each column on an existing table. 
+
+.. figure:: /database_d/compression.png
+   :align: center
+
+   Compression: Example
+
+The best practices are: 
+
+* To apply compression to all tables.
+
+* Use ``analyze compression`` command to find the optimal compression. If it returns a encoding tyoe of RAW, it means that there is no compression, it happens for sparse columns and small tables.
+
+Data storage, ingestion, and ELT
+================================
+
+Workload management and query monitoring
+========================================
+
+Cluster sizing and resizing
+===========================
+
+Additional resources
+====================
+
+`AWS re:Invent 2018: [REPEAT 1] Deep Dive and Best Practices for Amazon Redshift (ANT401-R1) <https://www.youtube.com/watch?v=TJDtQom7SAA&feature=emb_logo>`_
+
 Migrating data into your AWS databases
 **************************************

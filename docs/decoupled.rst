@@ -1,11 +1,8 @@
 Building decoupled architectures
 ################################
 
-Amazon SQS
-**********
-
 Asynchronous messaging
-======================
+**********************
 
 If loose-coupling is important, especially in a system that requires high resilience and has unpredictable scale, another option is asynchronous messaging. Asynchronous messaging is a fundamental approach for integrating independent systems, or building up a set of loosely coupled systems that can operate, scale, and evolve independently and flexibly. As Tim Bray said, "If your application is cloud-native, or large-scale, or distributed, and doesn't include a messaging component, that's probably a bug."
 
@@ -20,6 +17,9 @@ The AWS messaging services can be classified in terms of the use:
 * **App migration**, which are API-compatible, feature-rich and use standard protocols. We have Amazon MQ as a message broker.
 
 `AWS re:Invent 2018: Choosing the Right Messaging Service for Your Distributed App (API305) <https://www.youtube.com/watch?time_continue=2&v=4-JmX6MIDDI&feature=emb_logo>`_ 
+
+Amazon SQS
+**********
 
 Basic Amazon SQS Architecture
 =============================
@@ -166,5 +166,16 @@ The objective of SNS is to send something and deliver it to multiple destination
 
 With a topic, you can publish messages to it or configure subscriptions or destinations you want to deliver messages. The destinations that you can configure are Amazon SQS (except FIFO queue which are not supported yet), AWS Lambda, HTTP/s endpoint, mobile app, SMS, e-mail.
 
-You can configure filters in each destination
+When a producer publish a message, it gets an acknowledge, before even it is delivered to each destination. It means that you will see the same latency of publishing locations whether you have one destination or multiple destinations. 
 
+What happens internally in SNS is that a fanout is performed. For each subscribed destination, a copy of the message will be sent. You can configure filters in destinations that prevent to arrive a several destinations. You can interpret this stage as multiple internal queues that you do not see that keeps track of each individual destination. Finally, the copies of the messages are sent to the destinations. 
+
+If one of the channels fail for any reason (for instance, it was an HTTP endpoint and the web server was not running), we receive notifications for the successful deliveries and we keep track of the delivery that failed. We will retry the failed message sending, the number of retries depend on the destination. For an SQS queue or an AWS Lambda it will retry a large amount of times and the message will probably be delivered. For HTTP endpoints, you have to define a delivery policy. Each delivery policy is comprised of four phases:
+
+1. *Immediate Retry Phase (No Delay)*. This phase occurs immediately after the initial delivery attempt. There is no delay between retries in this phase.
+
+2. *Pre-Backoff Phase*. This phase follows the Immediate Retry Phase. Amazon SNS uses this phase to attempt a set of retries before applying a backoff function. This phase specifies the number of retries and the amount of delay between them.
+
+3. *Backoff Phase*. This phase controls the delay between retries by using the retry-backoff function. This phase sets a minimum delay, a maximum delay, and a retry-backoff function that defines how quickly the delay increases from the minimum to the maximum delay. The backoff function can be arithmetic, exponential, geometric, or linear.
+
+4. *Post-Backoff Phase*. This phase follows the backoff phase. It specifies a number of retries and the amount of delay between them. This is the final phase.

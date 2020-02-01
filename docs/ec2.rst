@@ -118,6 +118,8 @@ After the dot, you have the instance size (in this example ``xlarge``). From nan
 
 `EC2 Instance Types & Pricing <http://ec2pricing.net/>`_
 
+`EC2Instances.info <https://www.ec2instances.info/>`_
+
 .. _secAMI:
 
 Amazon Machine Images (AMIs)

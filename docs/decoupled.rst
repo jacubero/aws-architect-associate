@@ -65,9 +65,9 @@ You can get duplicate messages for instance in this scenario:
 
 1. A producer sends a message to the queue.
 
-2. There is a networking problem when the producer was calling send message.
+2. The queue stores the message durably.
 
-3. The queue stores the message durably.
+3. There is a networking problem when the producer was calling send message.
 
 4. The producer gets a timeout. It doesn't know if SQS got the message or it didn't.
 
@@ -128,9 +128,9 @@ Image an scenario where:
 
 1. A producer sends a message to the queue.
 
-2. There is a networking problem when the producer was calling send message.
+2. The queue stores the message durably.
 
-3. The queue stores the message durably.
+3. There is a networking problem when the producer was calling send message.
 
 4. The producer gets a timeout. It doesn't know if SQS got the message or it didn't.
 
@@ -138,7 +138,11 @@ Image an scenario where:
 
 6. SQS keeps track of the identifiers of the messages sent to it in the last 5 minutes, even if they are already consumed. As a consequence, it is able to detect that it is retry of sending the same message and no duplicate is introduced in the queue. An OK is returned to the producer, because the message is already present.
 
-When the consumer calls receive and FIFO decides the group you are are going to get messages.
+When the consumer calls receive and FIFO decides the group you are are going to get messages. The SQS get the message and gives it to the consumer. The consumer can start working on it, but notice that the message is still in the queue. It is not immediately removed, it is invisible, and you can control the invibility timeout. The difference with standard queues is that no other consumer can receive messages from the same group as selected for this message. This is how it is preserved the order of the messages within the group. The entire group is lock until the consumer finishes processing the message.
+
+When the consumer successfully consumes the message, call the delete message on the message that it got, which actually achieves the removal of the message. Only when the consumer acknowledges that it successfully consumed the message, the message is removed from it group within the queue. This guarantees that the message is consumed only once. The group is unlocked and another messages from this group can be consumed for the same or another consumer. You cannot guarantee which consumer is going to get the next message, there is no consumer affinity.
+
+When the consumer has a problem consuming the message, the easiest solution for the consumer is just forget about the message and do nothing. What happen next is that the invisibility timeout on the message it was working on expires, and the group is available for consumption again.
 
 Amazon SNS
 **********
@@ -154,4 +158,13 @@ The most important characteristics of SNS are the following:
 * It allows you to decouple and scale microservices, distributed systems and serverless communications.
 
 Amazon SNS allows you to have pub/sub messaging for different systems in Amazon, like AWS Lambda, HTTP/S and Amazon SQS. Amazon SNS Mobile Notifications allows you to do similar publishing but to different mobile systems, like ADM, APNS, Baidu, GCM, MPNS, and WNS.
+
+Amazon SNS topics
+=================
+
+The objective of SNS is to send something and deliver it to multiple destinations. It is a pub/sub model in which you publish something and you have multiple subscribers via SNS topics. In this case, we have producers but no consumers.
+
+With a topic, you can publish messages to it or configure subscriptions or destinations you want to deliver messages. The destinations that you can configure are Amazon SQS (except FIFO queue which are not supported yet), AWS Lambda, HTTP/s endpoint, mobile app, SMS, e-mail.
+
+You can configure filters in each destination
 

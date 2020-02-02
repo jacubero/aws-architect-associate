@@ -153,6 +153,13 @@ However, there are certain metrics that are not readily available in CloudWatch 
 
 * Log collection
 
+Take note that there is a multi-platform CloudWatch agent which can be installed on both Linux and Windows-based instances. You can use a single agent to collect both system metrics and log files from Amazon EC2 instances and on-premises servers. This agent supports both Windows Server and Linux and enables you to select the metrics to be collected, including sub-resource metrics such as per-CPU core. It is recommended that you use the new agent instead of the older monitoring scripts to collect metrics and logs.  
+
+.. figure:: /elasticity_d/agents.png
+   	:align: center
+
+	CloudWatch agent to collect both system metrics and log files
+
 `Collect Metrics and Logs from Amazon EC2 instances with the CloudWatch Agent <https://www.youtube.com/watch?time_continue=3&v=vAnIhIwE5hY&feature=emb_logo>`_
 
 `AWS re:Invent 2018: CloudWatch Logs Insights Customer Use Case <https://www.youtube.com/watch?time_continue=3&v=RnN1o4Zdego&feature=emb_logo>`_
@@ -348,6 +355,11 @@ The default termination policy is designed to help ensure that your instances sp
 4. 	After applying all of the above criteria, if there are multiple unprotected instances to terminate, determine which instances are closest to the next billing hour. If there are multiple unprotected instances closest to the next billing hour, terminate one of these instances at random.
 
 	Note that terminating the instance closest to the next billing hour helps you maximize the use of your instances that have an hourly charge. Alternatively, if your Auto Scaling group uses Amazon Linux or Ubuntu, your EC2 usage is billed in one-second increments.
+
+.. figure:: /elasticity_d/termination-policy-default-flowchart-diagram.png
+   	:align: center
+
+	Default termination policy flowchart
 
 Customizing the Termination Policy
 ----------------------------------

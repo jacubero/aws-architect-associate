@@ -283,9 +283,16 @@ To find subjects for which scores are available in our bucket, list the keys by 
 Restricting object access with pre-signed URL
 ---------------------------------------------
 
-All objects and buckets are private by default. Pre-signed URLs are useful if you want your user to be able to upload a specific object to your bucket without being required to have AWS security credentials or permissions. When you create a pre-signed URL, you must provide your security credentials, bucket name, an object key, an HTTP method (PUT for uploading objects, GET for retreiving objects), and an expiration date and time. The pre-signed URLs are valid only for the specified duration.
+In Amazon S3, all objects are private by default. Only the object owner has permission to access these objects. However, the object owner can optionally share objects with others by creating a pre-signed URL, using their own security credentials, to grant time-limited permission to download the objects.
 
-Share the pre-signed URL with users who need to access your S3 bucket to put or retrieve objects.
+Pre-signed URLs are useful if you want your user to be able to upload a specific object to your bucket without being required to have AWS security credentials or permissions. When you create a pre-signed URL, you must provide your security credentials, bucket name, an object key, an HTTP method (PUT for uploading objects, GET for retreiving objects), and an expiration date and time. The pre-signed URLs are valid only for the specified duration.
+
+Share the pre-signed URL with users who need to access your S3 bucket to put or retrieve objects. Anyone who receives the pre-signed URL can then access the object. For example, if you have a video in your bucket and both the bucket and the object are private, you can share the video with others by generating a pre-signed URL.
+
+.. figure:: /storage_d/presigned.jpg
+   :align: center
+
+   Pre-signed URL
 
 Cross-Origin Resource Sharing
 -----------------------------
@@ -899,6 +906,23 @@ You can automate function based on events. You can use notifications when object
 * *Speed*. For example, if you need processing to occur quickly when new objects arrive in your bucket. On average, notifications are sent in less that 1 second.
 
 * *Integration*. Use services to connect storage in S3 with workflows. You can architect an application in a new way, where blocks of code or workflows are invoked by changes in your data. 
+
+Avoid accidental deletion
+-------------------------
+
+To avoid accidental deletion in Amazon S3 bucket, you can:
+
+* Enable Versioning.
+
+* Enable MFA (Multi-Factor Authentication) Delete.
+
+Versioning is a means of keeping multiple variants of an object in the same bucket. You can use versioning to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket. With versioning, you can easily recover from both unintended user actions and application failures.
+
+If the MFA (Multi-Factor Authentication) Delete is enabled, it requires additional authentication for either of the following operations:
+
+* Change the versioning state of your bucket.
+
+* Permanently delete an object version.
 
 Monitoring and analyzing Amazon S3
 ==================================
@@ -1788,6 +1812,11 @@ The General Purpose SSD volume can handle most workloads, such as boot volumes, 
 
 The Throughput Optimized HDD volume can handle streaming workloads that require consistent and fast throughput at a low price. For example, big data, data warehouses, and log processing. The Colod HDD volume can handle throughput-oriented storage for large amounts of data that are infrequently accessed. Use this type of volume for scenarios in which achieving the lowest storage cost is important.
 
+.. figure:: /ec2_d/EBSfeatures.png
+   :align: center
+
+	 SSD and HDD volumes features
+
 `Amazon EBS features <https://aws.amazon.com/ebs/features/?nc1=h_ls>`_
 
 `Amazon EBS Volume Types <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html>`_
@@ -1860,6 +1889,8 @@ An EBS snapshot is a point-in-time backup copy of an EBS volume that is stored i
 Snapshots are incremental backups, which means that only the blocks on the device that have changed after your most recent snapshot are saved. The incremental backups minimize the time required to create the snapshot and save on storage costs by not duplicating data. When you delete a snapshot, only the data that's unique to that snapshot is removed. Each snapshot contains all the information needed to restore your data (from the moment when the snapshot was taken) to a new EBS volume.
 
 When you create an EBS volume from a snapshot, the new volume begins as an exact replica of the original volume that was used to create the snapshot. The replicated volume loads data lazily, that is, loads data when it's needed, in the background so that you can begin using it immediately.
+
+EBS snapshots occur asynchronously. This means that the point-in-time snapshot is created immediately, but the status of the snapshot is ``pending`` until the snapshot is complete (when all of the modified blocks have been transferred to Amazon S3), which can take several hours for large initial snapshots or subsequent snapshots where many blocks have changed. While it is completing, an in-progress snapshot is not affected by ongoing reads and writes to the volume hence, you can still use the volume.
 
 How does a snapshot work?
 -------------------------

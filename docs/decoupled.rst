@@ -179,3 +179,8 @@ If one of the channels fail for any reason (for instance, it was an HTTP endpoin
 3. *Backoff Phase*. This phase controls the delay between retries by using the retry-backoff function. This phase sets a minimum delay, a maximum delay, and a retry-backoff function that defines how quickly the delay increases from the minimum to the maximum delay. The backoff function can be arithmetic, exponential, geometric, or linear.
 
 4. *Post-Backoff Phase*. This phase follows the backoff phase. It specifies a number of retries and the amount of delay between them. This is the final phase.
+
+Amazon MQ
+*********
+
+If you're using messaging with existing applications and want to move your messaging service to the cloud quickly and easily, it is recommended that you consider Amazon MQ. It supports industry-standard APIs and protocols so you can switch from any standards-based message broker to Amazon MQ without rewriting the messaging code in your applications. 

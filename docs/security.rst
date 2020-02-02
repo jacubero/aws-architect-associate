@@ -14,7 +14,7 @@ Permissions happens in a separate object known as the **policy document**. A pol
 
 Identities in AWS exist in these forms:
 
-* **IAM users**: Users created within the account.
+* **IAM users**: Users created within the account. IAM users are created with no permissions by default. 
 
 * **Roles**: Temporary identities used by EC2 instances, Lambdas, and external users.
 

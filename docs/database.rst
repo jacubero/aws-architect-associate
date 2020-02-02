@@ -358,13 +358,50 @@ You can also save money by using Reverved Instances (RIs) that provide a discoun
 Amazon Aurora
 *************
 
-Amazon Aurora is a fully managed, relational DBaaS that combines the speed and reliability of high-end commercial DBs, with the simplicity and cost-effectiveness of open source databases. It is designed to be compatible with MySQL and PostgreSQL, so existing applications and tools, can run against it without modification.
+Introduction
+============
+
+Amazon Aurora is a fully managed, relational DBaaS that combines the speed and reliability of high-end commercial DBs, with the simplicity and cost-effectiveness of open source databases. It is designed to be compatible with MySQL and PostgreSQL, so existing applications and tools, can run against it without modification. It follows a simple pay as you go pricing model.
 
 It is part of Amazon RDS and it tightly integrated with an SSD-backend virtualized storage layer purposefully built to accelerate DB workloads. It delivers up to 5 times the throughput of standard MySQL and up to 3 times the throughput of standard PostgreSQL.
 
 It can scale automatically an non-disruptively, expanding up to 64 TB and rebalancing storage I/O to provide consistent performance, without the need for over-provisioning. Aurora storage is also fault-tolerant and self-healing, so any storage failures are repaired transparently. 
 
 It is a regional service that offers greater than 99.99% availability. The service is designed to automatically detect DB crashes and restart the DB without the need for crash recovery or DB rebuilds. If the entire instance fails, Amazon Aurora automatically fails over to one of up to 15 read replicas.
+
+`AWS re:Invent 2018: [REPEAT 1] Deep Dive on Amazon Aurora with MySQL Compatibility (DAT304-R1) <https://www.youtube.com/watch?v=U42mC_iKSBg&feature=emb_logo>`_
+
+Performance
+===========
+
+Aurora scale out, distributed architecture made two main contributions:
+
+1. Push log applicator to storage. That allows us to construct pages from the logs themselves. It is not necessary to write full pages anymore. Unlike traditional databases that have to write logs and pages, Aurora only writes logs. This means that there is significantly less I/O and warm up. There is no checkpointing, you don't have to worry about cache additions,...
+
+2. Instead of using heavy consistency protocols, Aurora uses 4/6 write quorum with local tracking.
+
+The benefits of this are:
+
+* Better write performance.
+
+* Read scale out because the replicas are sharing the storage with the master.
+
+* AZ+1 failure tolerance. Aurora stores 6 copies: 2 copies per AZ.
+
+* Instant database redo recovery, even if an entire AZ goes down.
+
+.. figure:: /database_d/aurora_arch.png
+   :align: center
+
+   Aurora architecture
+
+Amazon Aurora typically involves a cluster of DB instances instead of a single instance. Each connection is handled by a specific DB instance. When you connect to an Aurora cluster, the host name and port that you specify point to an intermediate handler called an endpoint. Aurora uses the endpoint mechanism to abstract these connections. Thus, you don't have to hardcode all the hostnames or write your own logic for load-balancing and rerouting connections when some DB instances aren't available.
+
+For certain Aurora tasks, different instances or groups of instances perform different roles. For example, the primary instance handles all data definition language (DDL) and data manipulation language (DML) statements. Up to 15 Aurora Replicas handle read-only query traffic.
+
+Using endpoints, you can map each connection to the appropriate instance or group of instances based on your use case. For example, to perform DDL statements you can connect to whichever instance is the primary instance. To perform queries, you can connect to the reader endpoint, with Aurora automatically performing load-balancing among all the Aurora Replicas. For clusters with DB instances of different capacities or configurations, you can connect to custom endpoints associated with different subsets of DB instances. For diagnosis or tuning, you can connect to a specific instance endpoint to examine details about a specific DB instance.
+
+The custom endpoint provides load-balanced database connections based on criteria other than the read-only or read-write capability of the DB instances. For example, you might define a custom endpoint to connect to instances that use a particular AWS instance class or a particular DB parameter group. Then you might tell particular groups of users about this custom endpoint. For example, you might direct internal users to low-capacity instances for report generation or ad hoc (one-time) querying, and direct production traffic to high-capacity instances. 
 
 Amazon DynamoDB
 ***************
@@ -423,6 +460,12 @@ DynamoDB supports two different kinds of primary keys:
    Partition: Sort key
 
 Partitions are three-way replicated. In DynamoDB, you get an acknowledge when two of these replicas has been done.
+
+The partition key portion of a table's primary key determines the logical partitions in which a table's data is stored. This in turn affects the underlying physical partitions. Provisioned I/O capacity for the table is divided evenly among these physical partitions. Therefore a partition key design that doesn't distribute I/O requests evenly can create "hot" partitions that result in throttling and use your provisioned I/O capacity inefficiently.
+
+The optimal usage of a table's provisioned throughput depends not only on the workload patterns of individual items, but also on the partition-key design. This doesn't mean that you must access all partition key values to achieve an efficient throughput level, or even that the percentage of accessed partition key values must be high. It does mean that the more distinct partition key values that your workload accesses, the more those requests will be spread across the partitioned space. In general, you will use your provisioned throughput more efficiently as the ratio of partition key values accessed to the total number of partition key values increases.
+
+One example for this is the use of partition keys with high-cardinality attributes, which have a large number of distinct values for each item. 
 
 `AWS re:Invent 2018: Amazon DynamoDB Deep Dive: Advanced Design Patterns for DynamoDB (DAT401) <https://www.youtube.com/watch?v=HaEPXoXVf2k&feature=emb_logo>`_
 

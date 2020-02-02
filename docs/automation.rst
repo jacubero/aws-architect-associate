@@ -56,8 +56,9 @@ The `AWS CloudFormation Template Schema <https://github.com/aws-cloudformation/a
 
 An example of pipeline for deploying AWS Cloudformation templates is illustrated below.
 
-.. figure:: /automation_d/pipeline.png
-
+.. figure:: /automation_d/cpipeline.png
+   :align: center
+   
 	CloudFormation pipeline
 
 **Macros** allows you to write short-hand, abbreviated instructions that expand automatically before deployment. For instance you can use it to:
@@ -98,9 +99,9 @@ AWS Elastic Beanstalk is a PaaS with the following features:
 The steps to deploy and update your servers are based only on the creation of your application. After that, you upload the versions to BeanStalk, then launch all the needed environments in the cloud according to the needs of your application. After that, you can manage your environment, and if you need to write a new version, you just update the version.
 
 .. figure:: /automation_d/deployupdates.png
+   :align: center
 
 	Deployment and updates
-
 
 `AWS re:Invent 2017: Manage Your Applications with AWS Elastic Beanstalk (DEV305) <https://www.youtube.com/watch?v=NhsELnv28NU>`_
 

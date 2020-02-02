@@ -4,11 +4,38 @@ Microservices and serverless architectures
 AWS Lambda 
 **********
 
+There are 4 main principles that allows us to identify if a service is serverless or not:
+
+* There are no servers to provision or manage.
+
+* It scales with usage.
+
+* You pay for value. You don't need to pay for the time the resource is idle.
+
+* It has availability and fault tolerance built in. In AWS, serverless take advantage of the availability and fault tolerance given by AWS global infrastructure.
+
+.. figure:: /microservices_d/lambda.png
+   :align: center
+
+   AWS Lambda
+
+AWS Lambda handles load balacing, auto scaling, failures, security isolation, OS management, ... for you.
+
+Serverless applications have 3 components: the event source, that triggers the AWS Lambda function, which calls some **services**.
+
+* **Event sources** can be changes in changes in data state, requests to endpoints, changes in resource state.
+
+* **Functions** that can be developed in Node.js, Python, Java, C#, Go, Ruby, Runtime API.
+
 Environment Variables
 ---------------------
 
 When you create or update Lambda functions that use environment variables, AWS Lambda encrypts them using the AWS Key Management Service. When your Lambda function is invoked, those values are decrypted and made available to the Lambda code.
 
+.. figure:: /microservices_d/environment.png
+   :align: center
+
+   AWS Lambda Environment Variables
 
 Lambda encrypts environment variables with a key that it creates in your account (an AWS managed customer master key). Use of this key is free. You can also choose to provide your own key for Lambda to use instead of the default key.
 

@@ -84,8 +84,18 @@ The fault tolerant service tools are the following:
 
 * **Amazon Relational Database Service (RDS)** which is web service tool for you to set up, operate and scale relational databases. It provides HA and fault tolerance by offering several features to enhance the realibility on your critical databases. Some of these features include automatic backups, snapshots, and multi-AZ deployments.
 
-Monitoring
-**********
+AWS management tools
+********************
+
+AWS management tools can be classified in 4 main categories with tools that all integrated and interoperable:
+
+* **Provisioning and entitlement**: AWS CloudFormation, AWS Service Catalog.
+
+* **Configuration management**: AWS OpsWorks.
+
+* **Monitoring**: Amazon CloudWatch, AWS Cost Explorer.
+
+* **Operations and compliance management**: AWS CloudTrail, AWS Config, AWS Systems Manager.
 
 AWS Cost Explorer
 =================
@@ -146,6 +156,48 @@ However, there are certain metrics that are not readily available in CloudWatch 
 `Collect Metrics and Logs from Amazon EC2 instances with the CloudWatch Agent <https://www.youtube.com/watch?time_continue=3&v=vAnIhIwE5hY&feature=emb_logo>`_
 
 `AWS re:Invent 2018: CloudWatch Logs Insights Customer Use Case <https://www.youtube.com/watch?time_continue=3&v=RnN1o4Zdego&feature=emb_logo>`_
+
+AWS CloudTrail
+==============
+
+AWS CloudTrail is a service which enables compliance, governance, operational auditing and risk auditing in your accounts. It enables to track public activity across teams, accounts, and organizations in one place, in a consistent format. It allows you to explore public activity using a single set of tools, and respond to activity in minutes.
+
+Use cases
+---------
+
+* **Simplify compliance workflows**. Keep track of API usage in a single location, simplifying audit and compliance processes.
+
+* **Enhance security analysis**. Perform security analysis and detecting user behavior patterns across services, users, and accounts.
+
+* **Monitor data exfiltration risks**. Stay alert to data exfiltration risks by collecting activity data on Amazon S3 objects through object-level API events.
+
+* **Perform operational troubleshooting**. Simplify root cause analysis using CloudTrail events, to reduce time to resolution. 
+
+AWS CloudTrail events
+---------------------
+
+An event in CloudTrail is the record of a single invocation of an AWS REST API and contains not only the name of the event but a lot of information related with this API invocation. This activity can be an action taken by a user, role, or service that is monitorable by CloudTrail. CloudTrail events provide a history of both API and non-API account activity made through the AWS Management Console, AWS SDKs, command line tools, and other AWS services. It is integrated with over 130 AWS services. It automatically gathers usage activity. It records event details, such as operation, principal, request and response attributes, the time it was made, etc. It delivers events to central locations.
+
+There are two types of events that can be logged in CloudTrail: management events and data events. Both of them can be categorized as a read event or a write event, where read events are generally more frequent than write events. By default, trails log management events, but not data events. 
+
+**Management events** are resource control actions, such as update and delete actions on an Amazon EC2 instance. They are generally infrequent compared to data events. It is available from nearly all services.
+
+**Data events** are fine-grained actions, such as reading from an object in Amazon S3. They can be very high frequency events. 
+
+The events are deliver to Amazon S3, and optionally, to Amazon CloudWatch logs. The central collection can be across accounts and regions if desired. The delivery takes typically less 15 minutes at 99th percentile, and some services have delivery times of less than 5 minutes at 99th percentile.
+
+Configuring trails
+------------------
+
+A trail is a resource which turns on event capture and delivery. It includes a set of event filters to define which events you are interested in, and defines a set of delivery destinations to select where you want the events stored. It can be set up through AWS Managment console, AWS API, or AWS CLI and you can define more than one trail.
+
+A trail can be applied to all regions or a single region. As a best practice, create a trail that applies to all regions in the AWS partition in which you are working. This is the default setting when you create a trail in the CloudTrail console.
+
+For most services, events are recorded in the region where the action occurred. For global services such as AWS Identity and Access Management (IAM), AWS STS, Amazon CloudFront, and Route 53, events are delivered to any trail that includes global services, and are logged as occurring in US East (N. Virginia) Region.
+
+Setting up your event logs
+--------------------------
+
 
 `AWS re:Invent 2018: Augmenting Security & Improving Operational Health w/ AWS CloudTrail (SEC323) <https://www.youtube.com/watch?v=YWzmoDzzg4U&feature=emb_logo>`_
 

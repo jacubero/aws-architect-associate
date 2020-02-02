@@ -369,6 +369,63 @@ It is a regional service that offers greater than 99.99% availability. The servi
 Amazon DynamoDB
 ***************
 
+Introduction
+============
+
+Amazon DynamoDB is a fully managed NoSQL database. It a document or key-value datastore. It scales to any workload. It is fast and consistent because it has a fully distributed request router. It provides fine-grained access control for accessing, for instance: the tables, the attributes within an item, etc. It allows event driven programming.
+
+.. list-table:: SQL vs NoSQL
+   :widths: 50 50
+   :header-rows: 1
+
+   * - SQL
+     - NoSQL
+   * - Optimized for storage
+     - Optimized for compute
+   * - Normalized/relational
+     - Denormalized/hierarchical
+   * - Ad hoc queries
+     - Instantiated views
+   * - Scale vertically
+     - Scale horizontally
+   * - Good for OLAP
+     - Built for OLTP at scale
+
+The following are the basic DynamoDB components:
+
+* **Tables**. Similar to other database systems, DynamoDB stores data in tables. A table is a collection of data. For example, see the example table called People that you could use to store personal contact information about friends, family, or anyone else of interest. You could also have a Cars table to store information about vehicles that people drive.
+
+* **Items**. Each table contains zero or more items. An item is a group of attributes that is uniquely identifiable among all of the other items. In a People table, each item represents a person. For a Cars table, each item represents one vehicle. Items in DynamoDB are similar in many ways to rows, records, or tuples in other database systems. In DynamoDB, there is no limit to the number of items you can store in a table.
+
+* **Attributes**. Each item is composed of one or more attributes. An attribute is a fundamental data element, something that does not need to be broken down any further. For example, an item in a People table contains attributes called PersonID, LastName, FirstName, and so on. For a Department table, an item might have attributes such as DepartmentID, Name, Manager, and so on. Attributes in DynamoDB are similar in many ways to fields or columns in other database systems.
+
+When you create a table, in addition to the table name, you must specify the primary key of the table. The primary key uniquely identifies each item in the table, so that no two items can have the same key.
+
+.. figure:: /database_d/dynamodb_table.png
+   :align: center
+
+   DynamoDB tables, items and attributes
+
+DynamoDB supports two different kinds of primary keys:
+
+* **Partition key** A simple primary key, composed of one attribute known as the partition key. DynamoDB uses the partition key's value as input to an internal hash function. The output from the hash function determines the partition (physical storage internal to DynamoDB) in which the item will be stored. In a table that has only a partition key, no two items can have the same partition key value. It allows table to be partitioned for scale.
+
+.. figure:: /database_d/partitionkeys.png
+   :align: center
+
+   Partition keys
+
+* **Partition key and sort key**. Referred to as a composite primary key, this type of key is composed of two attributes. The first attribute is the partition key, and the second attribute is the sort key.  All items with the same partition key value are stored together, in sorted order by sort key value. In a table that has a partition key and a sort key, it's possible for two items to have the same partition key value. However, those two items must have different sort key values. There is no limit on the number of items per partition key, except if you have local secondary indexes.
+
+.. figure:: /database_d/sortkeys.png
+   :align: center
+
+   Partition: Sort key
+
+Partitions are three-way replicated. In DynamoDB, you get an acknowledge when two of these replicas has been done.
+
+`AWS re:Invent 2018: Amazon DynamoDB Deep Dive: Advanced Design Patterns for DynamoDB (DAT401) <https://www.youtube.com/watch?v=HaEPXoXVf2k&feature=emb_logo>`_
+
 .. list-table:: RDBMS vs Amazon DynamoDB
    :widths: 20 50 50
    :header-rows: 1
@@ -382,16 +439,33 @@ Amazon DynamoDB
      - Web-scale applications, including social networks, gaming, media sharing, and IoT
    * - Data model
      - The relational model requires a well-defined schema, where data is normalized into tables, rows, and columns. In addition, all of the relationships are defined among tables, columns, indixes, and other database elements.
-	- DynamoDB has schema flexibility. Every table must have a primary key to uniquely identify each data item, but there are no similar constraints on other non-key attributes. It can manage structured or semi-structured data, including JSON documents.
+  - DynamoDB has schema flexibility. Every table must have a primary key to uniquely identify each data item, but there are no similar constraints on other non-key attributes. It can manage structured or semi-structured data, including JSON documents.
    * - Data access
      - SQL is the standard for storing and retriving data. RDBMS offer a rich set of tools for simplifying the development of database-driven applications using SQL
-	- You can use AWS Management console or the AWS CLI to work with DynamoDB and perform ad hoc tasks. Applications can leverage the AWS SDKs to work with DynamoDB using object-based, document-centric, or low-level interfaces.
+  - You can use AWS Management console or the AWS CLI to work with DynamoDB and perform ad hoc tasks. Applications can leverage the AWS SDKs to work with DynamoDB using object-based, document-centric, or low-level interfaces.
    * - Performance
      - RDBMS are optimized for storage so performance generally depends on the disk subsystem. Developers and database administrator must optimize queries, indexes, and table structures in order to achieve peak performance.
-	- DynamoDB is optimized for compute, so performance is mainly a function of the underlying hardware and network latency. As a managed service, DynamoDB insulates you and your applications from these implementation details, so that you can focus on designing and building robust, high-performance applications.
+  - DynamoDB is optimized for compute, so performance is mainly a function of the underlying hardware and network latency. As a managed service, DynamoDB insulates you and your applications from these implementation details, so that you can focus on designing and building robust, high-performance applications.
    * - Scaling
      - It is easy to scale up with faster HW. It is also possible for DB tables to span across multiple hosts in a distributed system, but this requires additional investment. Relational DBs have maximum sizes for the number and size of files, which imposes upper limits in scalability.
-	- DynamoDB is designed to scale out using distributed clusters of HW. This design also increased throughput without increasing latency. Customers specify the throughput requirements, and DynamoDB allocates sufficient resources to meet those requirements. There are no upper limits on the number of items per table, nor the total size of that table.
+  - DynamoDB is designed to scale out using distributed clusters of HW. This design also increased throughput without increasing latency. Customers specify the throughput requirements, and DynamoDB allocates sufficient resources to meet those requirements. There are no upper limits on the number of items per table, nor the total size of that table.
+
+DynamoDB Streams
+================
+
+A DynamoDB stream is an ordered flow of information about changes to items in an Amazon DynamoDB table. When you enable a stream on a table, DynamoDB captures information about every modification to data items in the table.
+
+Whenever an application creates, updates, or deletes items in the table, DynamoDB Streams writes a stream record with the primary key attribute(s) of the items that were modified. A stream record contains information about a data modification to a single item in a DynamoDB table. You can configure the stream so that the stream records capture additional information, such as the "before" and "after" images of modified items.
+
+Amazon DynamoDB is integrated with AWS Lambda so that you can create triggers—pieces of code that automatically respond to events in DynamoDB Streams. With triggers, you can build applications that react to data modifications in DynamoDB tables.
+
+If you enable DynamoDB Streams on a table, you can associate the stream ARN with a Lambda function that you write. Immediately after an item in the table is modified, a new record appears in the table's stream. AWS Lambda polls the stream and invokes your Lambda function synchronously when it detects new stream records. The Lambda function can perform any actions you specify, such as sending a notification or initiating a workflow. 
+
+.. figure:: /database_d/dynamo_lambda.png
+   :align: center
+
+   DynamoDB Streams and AWS Lambda
+
 
 Amazon DynamoDB Accelerator (DAX)
 =================================
@@ -528,11 +602,60 @@ The best practices are:
 
 * Use ``analyze compression`` command to find the optimal compression. If it returns a encoding tyoe of RAW, it means that there is no compression, it happens for sparse columns and small tables.
 
+* Changing column encoding requires a table rebuild: `<https://github.com/awslabs/amazon-redshift-utils/tree/master/src/ColumnEncodingUtility>`_. To verify if columns are compressed: 
+
+* Verify that columns are compressed:
+
+.. code-block:: postgresql
+
+  SELECT "column", type, encoding FROM pg_table_def WHERE tablename = 'deep_dive'
+
+  column |     type     | encoding
+  -------+--------------+----------
+  aid    | integer      | zstd
+  loc    | character(3) | bytedict
+  dt     | date         | runlength
+
+Blocks
+^^^^^^
+
+Column data is persisted to 1 MB immutable blocks. Blocks are individually encoded with 1 of 12 encodings. A full block con contain millions of values.
+
+Zone maps
+^^^^^^^^^
+
+Zone maps are in-memory block metadata that contains per-block min and max values. All blocks automatically have zone maps. They effectively prunes blocks that cannot contain data for a given query. Their goal is to eliminate unnecessary I/O.
+
 Data storage, ingestion, and ELT
 ================================
 
 Workload management and query monitoring
 ========================================
+
+Workload management (WLM)
+-------------------------
+
+Workload management (WLM) allows for separation of different query workloads. Their main goals are prioritize important queries and throttle/abort less important queries. It allows us to control concurrent number of executing of queries, divide cluster memory and set query timeouts to abort long running queries. 
+
+Every single query in Redshift will execute in one queue. Queues are assigned a percentage of cluster memory. SQL queries execute in queue based on user group (which groups the user belongs to) and query group session level variable. WLM allows us to define the number of query queues that are available and how queries are routed to those queues for processing. 
+
+When you create a parameter group, the default WLM configuration contains one queue that can run up to five queries concurrently. You can add additional queues and configure WLM properties in each of them if you want more control over query processing. Each queue that you add has the same default WLM configuration until you configure its properties. When you add additional queues, the last queue in the configuration is the default queue. Unless a query is routed to another queue based on criteria in the WLM configuration, it is processed by the default queue. You cannot specify user groups or query groups for the default queue.
+
+As with other parameters, you cannot modify the WLM configuration in the default parameter group. Clusters associated with the default parameter group always use the default WLM configuration. If you want to modify the WLM configuration, you must create a parameter group and then associate that parameter group with any clusters that require your custom WLM configuration.
+
+Short query acceleration (SQA) allows to automatically detect short running queries and run them within the short query queue if queuing occurs.
+
+Enhanced VPC Routing
+--------------------
+
+When you use Amazon Redshift Enhanced VPC Routing, Amazon Redshift forces all COPY and UNLOAD traffic between your cluster and your data repositories through your Amazon VPC. By using Enhanced VPC Routing, you can use standard VPC features, such as VPC security groups, network access control lists (ACLs), VPC endpoints, VPC endpoint policies, internet gateways, and Domain Name System (DNS) servers. Hence, Option 2 is the correct answer.
+
+You use these features to tightly manage the flow of data between your Amazon Redshift cluster and other resources. When you use Enhanced VPC Routing to route traffic through your VPC, you can also use VPC flow logs to monitor COPY and UNLOAD traffic. If Enhanced VPC Routing is not enabled, Amazon Redshift routes traffic through the Internet, including traffic to other services within the AWS network.
+
+.. figure:: /database_d/enhanced-routing-create.png
+   :align: center
+
+   Configure enhanced VPC routing
 
 Cluster sizing and resizing
 ===========================

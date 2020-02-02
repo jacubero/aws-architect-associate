@@ -409,7 +409,7 @@ Amazon DynamoDB
 Introduction
 ============
 
-Amazon DynamoDB is a fully managed NoSQL database. It a document or key-value datastore. It scales to any workload. It is fast and consistent because it has a fully distributed request router. It provides fine-grained access control for accessing, for instance: the tables, the attributes within an item, etc. It allows event driven programming.
+Amazon DynamoDB is a fast and flexible NoSQL database service for all applications that need consistent, single-digit millisecond latency at any scale. It is a fully managed cloud database and supports both document and key-value store models. Its flexible data model, reliable performance, and automatic scaling of throughput capacity makes it a great fit for mobile, web, gaming, ad tech, IoT, and many other applications. It is fast and consistent because it has a fully distributed request router. It provides fine-grained access control for accessing, for instance: the tables, the attributes within an item, etc. It allows event driven programming.
 
 .. list-table:: SQL vs NoSQL
    :widths: 50 50

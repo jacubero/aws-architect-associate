@@ -135,6 +135,10 @@ AMI is the software required to launch an EC2 instance. There are 3 different ty
 
 You can copy an Amazon Machine Image (AMI) within or across an AWS region using the AWS Management Console, the AWS command line tools or SDKs, or the Amazon EC2 API, all of which support the ``CopyImage`` action. You can copy both Amazon EBS-backed AMIs and instance store-backed AMIs. You can copy encrypted AMIs and AMIs with encrypted snapshots.
 
+Amazon EC2 uses public–key cryptography to encrypt and decrypt login information. Public–key cryptography uses a public key to encrypt a piece of data, such as a password, then the recipient uses the private key to decrypt the data. The public and private keys are known as a key pair.
+
+To log in to your instance, you must create a key pair, specify the name of the key pair when you launch the instance, and provide the private key when you connect to the instance. On a Linux instance, the public key content is placed in an entry within ``~/.ssh/authorized_keys`. This is done at boot time and enables you to securely access your instance using the private key instead of a password.
+
 The appropriate user names for connecting to a newly created Amazon EC2 instance are as follows:
 
 * For an Amazon Linux AMI, the user name is ``ec2-user``.

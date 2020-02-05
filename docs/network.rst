@@ -186,8 +186,6 @@ A **NAT gateway** is a managed address translation gateway.
 
 IPv6 addresses on EC2 instances are public addresses, so that if we connect them to internet gateway there would be reachable from Internet. The **egress-only internet gateway** is a gateway for IPv6 only, that allows EC2 instances with IPv6 addresses to reach Internet, but they are not reachable from Internet.
 
-**VPC peering connection**
-
 VPC Routing: Public subnet
 --------------------------
 
@@ -199,6 +197,16 @@ What makes a subnet public is its route table. It has an entry with destination 
 	  Example of public subnet route table
 
 You do not need to manage the Internet Gateway. It scales out or in depending on the amount the traffic it has to handle. The maximum throughtput it can support is 5Gbps.
+
+To enable access to or from the Internet for instances in a VPC subnet, you must do the following:
+
+* Attach an internet gateway to your VPC.
+
+* Ensure that your subnet's route table points to the Internet gateway.
+
+* Ensure that instances in your subnet have a globally unique IP address (public IPv4 address, Elastic IP address, or IPv6 address).
+
+* Ensure that your network access control lists and security groups allow the relevant traffic to flow to and from your instance.
 
 VPC Routing: Private subnet
 ---------------------------
@@ -562,7 +570,40 @@ Static VPN (policy-based VPN) is limited to one unique security association (SA)
 Connecting networks
 *******************
 
+VPC peering connection
+======================
+
+If you have two VPCs which have peering connections with each other, a VPC peering connection does not support edge to edge routing. This means that if either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
+
+* A VPN connection or an AWS Direct Connect connection to a corporate network.
+
+* An Internet connection through an Internet gateway.
+
+* An Internet connection in a private subnet through a NAT device.
+
+* A VPC endpoint to an AWS service; for example, an endpoint to Amazon S3.
+
+* (IPv6) A ClassicLink connection. You can enable IPv4 communication between a linked EC2-Classic instance and instances in a VPC on the other side of a VPC peering connection. However, IPv6 is not supported in EC2-Classic, so you cannot extend this connection for IPv6 communication.
+
+.. figure:: /network_d/peering.png
+   :align: center
+
+	 VPC peering connection
+
+For example, if VPC A and VPC B are peered, and VPC A has any of these connections, then instances in VPC B cannot use the connection to access resources on the other side of the connection. Similarly, resources on the other side of a connection cannot use the connection to access VPC B.
+
 `AWS re:Invent 2018: AWS Direct Connect: Deep Dive (NET403) <https://www.youtube.com/watch?v=DXFooR95BYc&feature=emb_logo>`_
+
+Bastion hosts
+=============
+
+The best way to implement a bastion host is to create a small EC2 instance which should only have a security group from a particular IP address for maximum security. This will block any SSH Brute Force attacks on your bastion host. It is also recommended to use a small instance rather than a large one because this host will only act as a jump server to connect to other instances in your VPC and nothing else.
+
+.. figure:: /network_d/linux-bastion-hosts-on-aws-architecture.png
+   :align: center
+
+	 Bastion hosts
+
 
 
 Load balancing on AWS

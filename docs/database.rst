@@ -87,6 +87,16 @@ Multi-AZ provides enterprise-grade fault-tolerance solution for production datab
 
 Running a DB instance with Multi-AZ can enhance availability during planned system maintenance and help protect your DBs against DB instance failure and AZ disruption. If the master DB instance fails, Amazon RDS automatically brings the standby DB online as the new primary. Failover can be initiated by automation or through the Amazon RDS API. Because of the synchronous replication, there should be no data loss. As your applications reference the DB by name using RDS DNS endpoint, you don't need to change anything in your application code to use the standby copy for failover. A new DB instance in the AZ where it was located the failed previous primary DB instance is provisioned as the new secondary DB instance.
 
+Amazon RDS automatically performs a failover in the event of any of the following:
+
+* Loss of availability in primary Availability Zone.
+
+* Loss of network connectivity to primary.
+
+* Compute unit failure on primary.
+
+* Storage failure on primary.
+
 .. Note::
 
 	It is important to have in mind that it detects infrastructure issues, not database engine problems.

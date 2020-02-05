@@ -4,6 +4,11 @@ AWS Identity and Access Management (IAM)
 IAM
 ***
 
+AWS Identity and Access Management (IAM) is a web service for securely controlling access to AWS services. With IAM, you can centrally manage users, security credentials such as access keys, and permissions that control which AWS resources users and applications can access.
+
+.. image:: /security_d/intro-diagram _policies_800.png
+   	:align: center
+
 A **user** is a permanent named operator. It could be a human or it could be a machine. Their credentials are permanent and they stay with that named user until there is a forced rotation, whether it's a name and password, whether it's an access key, secret key combination ,etc. This is my *authentication method* for named users in the system.
 
 A **group** is a collection of users. Groups can have many users, users can belong to many groups.

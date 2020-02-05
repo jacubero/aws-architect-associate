@@ -269,6 +269,10 @@ You can encapsulate all these parameters in a template, called **Launch template
 Launching Amazon EC2 instances with user data
 ---------------------------------------------
 
+Instance metadata is the data about your instance that you can use to configure or manage the running instance. You can get the instance ID, public keys, public IP address and many other information from the instance metadata by firing a URL command in your instance to this URL:
+
+`<http://169.254.169.254/latest/meta-data/>`_
+
 `Instance Metadata and User Data <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>`_
 
 Administration

@@ -1830,7 +1830,7 @@ Hard disk drive, or HDD-backed volumes are optimized for large streaming workloa
 
 There are 2 types of SSD-backed volumes: General Purpose (gp2) and Provisioned IOPS (io1). There are 2 types of HDD-backed volumes: Throughput Optimized (st1) and Cold HDD (sc1). This table describes and compares the 4 volume types.
 
-.. figure:: /ec2_d/ebs-types.png
+.. figure:: /storage_d/ebs-types.png
    :align: center
 
 	 Comparison of SSD and HDD volumes
@@ -1839,7 +1839,7 @@ The General Purpose SSD volume can handle most workloads, such as boot volumes, 
 
 The Throughput Optimized HDD volume can handle streaming workloads that require consistent and fast throughput at a low price. For example, big data, data warehouses, and log processing. The Colod HDD volume can handle throughput-oriented storage for large amounts of data that are infrequently accessed. Use this type of volume for scenarios in which achieving the lowest storage cost is important.
 
-.. figure:: /ec2_d/EBSfeatures.png
+.. figure:: /storage_d/EBSfeatures.png
    :align: center
 
 	 SSD and HDD volumes features

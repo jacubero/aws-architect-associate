@@ -42,6 +42,29 @@ SAML 2.0-based Federation
 
 AWS supports identity federation with SAML 2.0 (Security Assertion Markup Language 2.0), an open standard that many identity providers (IdPs) use, such as Active Directory. This feature enables federated single sign-on (SSO), so users can log into the AWS Management Console or call the AWS API operations without you having to create an IAM user for everyone in your organization. By using SAML, you can simplify the process of configuring federation with AWS, because you can use the IdP's service instead of writing custom identity proxy code.
 
+AWS Security Token Service
+**************************
+
+AWS Security Token Service (AWS STS) is the service that you can use to create and provide trusted users with temporary security credentials that can control access to your AWS resources. Temporary security credentials work almost identically to the long-term access key credentials that your IAM users can use.
+
+In this diagram, IAM user Alice in the Dev account (the role-assuming account) needs to access the Prod account (the role-owning account). Here’s how it works:
+
+1. Alice in the Dev account assumes an IAM role (WriteAccess) in the Prod account by calling AssumeRole.
+
+2. STS returns a set of temporary security credentials.
+
+3. Alice uses the temporary security credentials to access services and resources in the Prod account. Alice could, for example, make calls to Amazon S3 and Amazon EC2, which are granted by the WriteAccess role.
+
+.. figure:: /appendix_d/sts.png
+   :align: center
+
+	AWS Security Token Service
+
+Amazon Cognito
+**************
+
+You can use Amazon Cognito to deliver temporary, limited-privilege credentials to your application so that your users can access AWS resources. Amazon Cognito identity pools support both authenticated and unauthenticated identities. You can retrieve a unique Amazon Cognito identifier (identity ID) for your end user immediately if you're allowing unauthenticated users or after you've set the login tokens in the credentials provider if you're authenticating users.
+
 AWS Directory Service
 *********************
 
@@ -64,7 +87,7 @@ AWS Shield Standard
 
 AWS Shield is a managed DDoS protection service that safeguards applications running on AWS. There are 2 tiers of AWS Shield: Standard and Advanced.
 
-.. figure:: /appendix_d/standard.png
+.. figure:: /security_d/standard.png
    :align: center
 
 	AWS Shield Standard
@@ -76,7 +99,7 @@ A combination of traffic signatures, anaomaly alogorithms and other analysis tec
 AWS Shield Advanced
 ===================
 
-.. figure:: /appendix_d/advanced.png
+.. figure:: /security_d/advanced.png
    :align: center
 
 	AWS Shield Advanced

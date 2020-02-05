@@ -137,7 +137,7 @@ You can copy an Amazon Machine Image (AMI) within or across an AWS region using 
 
 Amazon EC2 uses public–key cryptography to encrypt and decrypt login information. Public–key cryptography uses a public key to encrypt a piece of data, such as a password, then the recipient uses the private key to decrypt the data. The public and private keys are known as a key pair.
 
-To log in to your instance, you must create a key pair, specify the name of the key pair when you launch the instance, and provide the private key when you connect to the instance. On a Linux instance, the public key content is placed in an entry within ``~/.ssh/authorized_keys`. This is done at boot time and enables you to securely access your instance using the private key instead of a password.
+To log in to your instance, you must create a key pair, specify the name of the key pair when you launch the instance, and provide the private key when you connect to the instance. On a Linux instance, the public key content is placed in an entry within ``~/.ssh/authorized_keys``. This is done at boot time and enables you to securely access your instance using the private key instead of a password.
 
 The appropriate user names for connecting to a newly created Amazon EC2 instance are as follows:
 
@@ -601,6 +601,7 @@ AWS tagging strategies
 Considerations
 **************
 
+Amazon EC2 has a soft limit of 20 instances per region, which can be easily resolved by completing the Amazon EC2 instance request form where your use case and your instance increase will be considered. Limit increases are tied to the region they were requested for.
 
 `Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
 

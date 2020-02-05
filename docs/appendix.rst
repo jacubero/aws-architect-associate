@@ -1,102 +1,15 @@
 Appendix
 ########
 
-Amazon Simple Workflow Service (SWF)
-************************************
+AWS IoT Core 
+************
 
-Introduction
-============
+AWS IoT Core is a managed cloud service that lets connected devices easily and securely interact with cloud applications and other devices. AWS IoT Core provides secure communication and data processing across different kinds of connected devices and locations so you can easily build IoT applications.
 
-It is a managed workflow service that helps developers build, run, and scale applications that coordinate work across distributed components. You can of Amazon SWF as a fully managed state tracker and task coordinator for your background jobs that requires sequential and parallel steps. An application can consists of several different tasks to be performed and a certain sequence driven by a set of conditions. SWF makes it easy to architect and implement and coordinate these tasks in AWS cloud. 
-
-When building solutions to coordinate tasks in a distributed environment, the developer has to account for several variables. Tasks that drive a processing steps can be long running and may fail, timeout or require a restart. They often complete with varying throughtputs and latencies. Tracking and visualization tasks in all these cases is not only challenging but also undifferentiated work. As applications and tasks scale up, you see different distributed system problems, for example: you must ensure that a task is assigned once and that the outcome is tracked reliably through unexpected failures and outages. 
-
-By using Amazon SWF you can easily manage your application tasks and how to coordinate them.
-
-.. figure:: /appendix_d/ecommerceSWF.png
+.. figure:: /appendix_d/iot.png
    :align: center
 
-	An e-commerce application workflow
-
-The tasks in this workflow are sequential. An order must be verified before making a charge in the credit card. A credit card must be charged successfully before an order must be shipped. An order must be shipped before being recorded. Even so, because SWF supports distributed processes, these tasks can be carried out in different locations. If the tasks are programmatic in nature, they can also be written in different programming languages or using different tools.
-
-In addition to sequential processing of tasks, SWF also supports workflow with parallel processing of tasks. Parallel tasks are performed at the same time and may be carried out independently by different applications or human workers. Your workflow makes decissions on how to proceed once one or more parallel tasks have been completed.
-
-The benefits of SWF are:
-
-* Logical separation. The service promotes the separation betwwen the control flow of your background jobs stepwise logic and the actual units of work that contains your unique business logic. This allows you to separately manage, maintain and scale state machinery of your application from the core business logic. As your business requirements change, you can easily change application logic without having to worry about your state machinery, tasks dispatch and flow control.
-
-* Reliable. It runs on Amazon HA data centers so the state tracking and tasks processing engine is available whenever application need them. SWF redundantly stores tasks, realiably dispatches them to application components, track the progress and keeps the related state.
-
-* Simple. It is simple to use and replaces the complexity of customed-coded solution and process automation software with a fully managed cloud web service. This eliminates the need for developers to manage infrastructure plumbing for the process automation so they can focus on the functionality of the application.
-
-* Scale. SWF scales with your application usage. No manual administration of your workflow service is required as you add more workflows to your application or increase the complexity of your workflows.
-
-* Flexible. It allows you write your application components and coordination logic in any programming language and run them in the cloud or on-premises.
-
-Overview
-========
-
-Domain is a collection of related workflows. A workflow starter is any application that can initiate workflow executions. Workflows are collections of actions and actions are tasks or workflow steps. Decider implements the workflow coordination logic. Activity workers implements actions. Workflow history is the detailed, complete and consistent record of every event that occur since the workflow execution started. Additionally, in the course of its operations SWF interacts with a number of different types of programmatic actors. Actors can be workflow starters, deciders or activity workers. These actors communicate with SWF through its API. You can develop these actors in any programming language.
-
-.. figure:: /appendix_d/swf-components.png
-   :align: center
-
-	SWF key components
-
-Each workflow runs on an AWS resource called the **Domain**. Domains provide a way of scoping SWF resources within your AWS account. All the components of your workflow such as workflow types and activities types must be specified to be in a domain. It is possible to have more than a workflow in a domain. However, workflows in different domains can interact one with another. When setting up a new workflow, before you set up any of the other workflow components you have to register a domain if you have not done so. When you register a domain you have to specify a workflow history retention period. This period is the length of time SWF would continue to retain information about the workflow execution after the workflow execution is complete.
-
-**Workflows** coordinate and manage the execution of activities that can be run asynchronously across multiple computing devices and that can feature both sequential and parallel processing. The workflow starter starts the workflow instance, also refered as the workflow execution, and can interact with an instance during execution for purposes such as pass additional data to the workflow worker or obtaining the current workflow state. The workflow starter uses a workflow client to start the workflow execution and interacts with the workflow as needed during execution and handles clean up. The workflow starter can be a locally run application, a web application, the AWS CLI or even the AWS management console. 
-
-SWF interacts with activity workers and deciders by providing them with work assigments known as **tasks**. There are 3 types of tasks in Amazon SWF:
-
-* *Activity task* tells an activity worker to perform its function, such as to check inventory or charge a credit card. The activity task contains all the information that the activity worker needs to perform its function. 
-
-* *Lambda task* is similar to an activity task but executes the a Lambda function an set up a traditional SWF activity.
-
-* *Decision task* tells the decider that the state of the workflow execution has changed, so that the decider can determine the next activity that needs to be performed. It contains to current workflow history. SWF schedule the decision task when the workflow starts and whenever the state of a workflow changes, such as when an activity task complete. 
-
-Each decision task contains a paginated view of the entire workflow execution history. The decider analyzes the workflow execution history and responds back to SWF with a set of decisions that specify what should occur next in the workflow execution. Essentially, every decision task gives the decider an opportunity to assess the workflow and provides direction back to SWF. To ensure that no conflicting decisions are processed, SWF assigns each decision task to exactly one decider and allows one decision task at a time to be active in a workflow execution.
-
-A **decider** is an implementation of a workflow coordination logic. Deciders control the flow of activity tasks in a workflow execution. Whenever a change occur in workflows executions, such as the completion of an activity task, SWF creates a decision task that contains the workflow history up to that point in time and assigns the task to a decider. When the decider receives the decision task from the SWF, it analyzes the workflow execution history to determine the next appropriate steps in the workflow execution. The decider communicates these steps back to SWF using decisions. A decision is a SWF data type that can represent next actions.
-
-An **activity worker** is a process or thread that performs the activity tasks that are part of your workflow. The activity tasks represent one of the tasks that you identified in your application. Each activity worker pulls SWF for new tasks that is appropriate for that activity worker to perform and certain tasks can only be performed by certain activity workers. After receiving a task, the activity worker processes the tasks to completion and reports SWF that the task was completed and provides the result. The activity worker polls then for a new task. The activity worker is associated with a workflow execution continuing this way: processing tasks until the workflow execution itself is complete. Multiple activity workers can process tasks of the same activity type.
-
-**Workflow history** is a detailed, complete, and consistent record of every event that occurred since the workflow execution started. An event represents a discete change in the workflow execution state, such as a new activity being scheduled or running activity being completed. The workflow history contains every event that causes the execution state of the workflow execution to change, such as scheduled completed activities, tasks timeouts and signals. Operations that don't change the state of the workflow execution don't typically appear in the workflow history. For example, the workflow history doesn't show pull attempts or the use of visibility operations. The Workflow history has a set of key benefits: 
-
-* It enables applications to be stateless because all information about a workflow execution is stored in the Workflow history.
-
-* For each worflow execution the Workflow history provides of what activities were scheduled, the current status, and the results. The workflow execution uses this information to determine the next steps. 
-
-* The history provides the detailed auditrail that you can use to monitor running workflow executions and verify completed workflow executions.
-
-The process that SWF follows is the following:
-
-1. A workflow starter kick outs your workflow execution. For example, this can be a web server front end.
-
-2. SWF receives the start workflow execution request and then scheduled a Decision task.
-
-3. The decider receives the task from SWF, reviews the history and applies the coordination logic to determine the activity that needs to be performed.
-
-4. SWF receives the decision, schedule the activity task and waits the activity task to complete or time out.
-
-5. SWF assigns the activity to a worker that performs the tasks and returns the results to SWF. 
-
-6. SWF receives the results of the activity, add them to the workflow history, and schedule the decision task.
-
-7. This process repeats itself for each activity in your workflow.
-
-.. figure:: /appendix_d/swf-process.png
-   :align: center
-
-	SWF process
-
-Deciders and activity workers communicates with SWF using long polling. With this approach, the decider or activity worker periodically initiates communication with SWF notifying SWF of visibility to accept the task and then specify the tasks list to get tasks from. If the task is available in a specified task list, SWF returns it immediately in the response. If no task is available, SWF holds the TCP connection open up to 60 seconds, so that if a task becomes available during that time, it can be returned in the same connection. 
-
-Use Cases
-=========
-
-In general, customers have used SWF to build applications for video encoding, social commerce, infrastructure provisioning, mapreduce pipelines, business process management, and several other use cases.
+	AWS IoT Core 
 
 Cloud Migration
 ***************

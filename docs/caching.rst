@@ -9,6 +9,20 @@ CloudFront
 
 CloudFront provides improved latency, packet loss and overall quality. It avoids conflicts and network interconnect capacity. It offers greater operational control.
 
+SNI Custom SSL 
+==============
+
+SNI Custom SSL relies on the SNI extension of the Transport Layer Security protocol, which allows multiple domains to serve SSL traffic over the same IP address by including the hostname which the viewers are trying to connect to.
+
+Amazon CloudFront delivers your content from each edge location and offers the same security as the Dedicated IP Custom SSL feature. SNI Custom SSL works with most modern browsers, including Chrome version 6 and later (running on Windows XP and later or OS X 10.5.7 and later), Safari version 3 and later (running on Windows Vista and later or Mac OS X 10.5.6. and later), Firefox 2.0 and later, and Internet Explorer 7 and later (running on Windows Vista and later).
+
+.. figure:: /caching_d/sni.png
+   	:align: center
+
+	SNI Custom SSL 
+
+Some users may not be able to access your content because some older browsers do not support SNI and will not be able to establish a connection with CloudFront to load the HTTPS version of your content. If you need to support non-SNI compliant browsers for HTTPS content, it is recommended to use the Dedicated IP Custom SSL feature.
+
 Lambda@Edge
 ===========
 
@@ -26,7 +40,6 @@ Lambda@Edge lets you run Lambda functions to customize the content that CloudFro
    	:align: center
 
 	Cloudfront events that trigger Lambda functions
-
 
 CloudFront signed URLs and signed cookies
 =========================================

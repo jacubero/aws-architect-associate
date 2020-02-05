@@ -714,6 +714,15 @@ Enabling this option allows you to host static websites using just your S3 bucke
 
 There are several ways you can manae your bucket's website configuration. You can use the AWS Management Console to manage configuration without writing any code or you can programmatically create, update, an delete the website configuration by using the AWS SDKs.
 
+Here are the prerequisites for routing traffic to a website that is hosted in an Amazon S3 Bucket:
+
+* An S3 bucket that is configured to host a static website. The bucket must have the same name as your domain or subdomain. For example, if you want to use the subdomain 
+``<bucket-name>.s3-website-<AWS-region>.amazonaws.com``, the name of the bucket must be ``<bucket-name>``.
+
+* A registered domain name. You can use Route 53 as your domain registrar, or you can use a different registrar.
+
+* Route 53 as the DNS service for the domain. If you register your domain name by using Route 53, AWS configure Route 53 as the DNS service for the domain.
+
 Object tags
 -----------
 
@@ -762,6 +771,18 @@ Event notifications
 Events will enable you to receive notifications based on events that occur in your bucket. The S3 notification feature enables you to receive notifications when certain events happen in your bucket, for example: you can receive a notification when someone uploads new data to your bucket. 
 
 To enable notifications, you must first add a notification configuration identifying the events you want Amazon S3 to publich, and the destinations where you want S3 to send the event notifications. S3 events integrate with SNS, SQS and AWS Lambda to send notifications.
+
+Here’s what you need to do in order to start using this event notifications with your application:
+
+1. Create the queue, topic, or Lambda function (which I’ll call the target for brevity) if necessary.
+
+2. Grant S3 permission to publish to the target or invoke the Lambda function. For SNS or SQS, you do this by applying an appropriate policy to the topic or the queue. For Lambda, you must create and supply an IAM role, then associate it with the Lambda function.
+
+3. Arrange for your application to be invoked in response to activity on the target. As you will see in a moment, you have several options here.
+
+4. Set the bucket’s Notification Configuration to point to the target.
+
+.. image:: /storage_d/notification.png
 
 Requester pays
 --------------
@@ -1170,6 +1191,8 @@ Amazon Glacier's comprehensive security capabilities begin with AES 256-bit serv
 
 Amazon Glacier supports many security standards and compliance certifications including PCI-DSS, HIPAA/HOTECH, FedRAMP, SEC Rule 17-a-4, EU Data Protection Directive, and FISMA, helping to satisfy compliance requirements for virtually evey regulatory agency aroung the globe. Amazon Glacier integrates with AWS CloudTrail to log, monitor, and retain storage API call activities for auditing. 
 
+Amazon Glacier encrypts your data at rest by default and supports secure data transit with SSL. 
+
 Query in place
 ^^^^^^^^^^^^^^
 
@@ -1537,11 +1560,15 @@ AWS Snow family
 
 The AWS Snow family is a collection of data transfer appliances that accelerates the transfer of large amounts of data in an out of AWS without using the Internet. Each Snowball appliance can transfer data tranfer than Internet speeds. The transfer is done by shipping the appliance directly to customers by using a regional carrier. The appliances are rugged shipping containers with tamper-proof electronic ink labels.
 
-With AWS Snowball, you can move batches of data between your on-premises data storage locations and S3. AWS Snowball has an 80-TB model available in all regions, and a 50-TB model available only in US. Snowball devices are encrypted at rest and are physically secured while in transit. Data transers are performed via the downloadable AWS Snowball client, or programmatically using the Amazon S3 REST API. It has 10G network interfaces (RJ45 and SFP+, fiber/copper).
+With **AWS Snowball**, you can move batches of data between your on-premises data storage locations and S3. AWS Snowball has an 80-TB model available in all regions, and a 50-TB model available only in US. Snowball devices are encrypted at rest and are physically secured while in transit. Data transers are performed via the downloadable AWS Snowball client, or programmatically using the Amazon S3 REST API. It has 10G network interfaces (RJ45 and SFP+, fiber/copper).
 
-Snowball Edge is a more advanced appliance in the Snow family that comes with 100 TB of local storage with built-in local compute that is equivalent to an *m4.4xlarge* instance. Snowball Edge appliances can run AWS Lambda functions or perform local processing on the data while being shuttled between locations. AWS Snowball Edge has multiple interfaces that support S3, HDFS, and NFS endpoints that simplify moving your data to AWS. It has 10GBase-T, 10/25Gb SFP28, and 40Gb QSFP+ network interfaces.
+**Snowball Edge** is a more advanced appliance in the Snow family that comes with 100 TB of local storage with built-in local compute that is equivalent to an *m4.4xlarge* instance. Snowball Edge appliances can run AWS Lambda functions or perform local processing on the data while being shuttled between locations. AWS Snowball Edge has multiple interfaces that support S3, HDFS, and NFS endpoints that simplify moving your data to AWS. It has 10GBase-T, 10/25Gb SFP28, and 40Gb QSFP+ network interfaces.
 
-If your data migration needs are on an exabyte-scale, AWS Snowmobile is available as the transfer device for the large amounts of data. AWS Snowmobile is a 45-foot long rugged shipping container that has an internal capacity of 100 PB and 1 TB/s networking. AWS Snowmobile is designed to shuttle 100 PB of data in under a month and connects to NFS endpoints.
+Although an AWS Snowball device costs less than AWS Snowball Edge, it cannot store 80 TB of data in one device. Take note that the storage capacity is different from the usable capacity for Snowball and Snowball Edge. Remember that an 80 TB Snowball appliance and 100 TB Snowball Edge appliance only have 72 TB and 83 TB of usable capacity respectively. Hence, it would be costly if you use two Snowball devices compared to using just one AWS Snowball Edge device.
+
+Snowball Edge devices have three options for device configurations – storage optimized, compute optimized, and with GPU. When this guide refers to Snowball Edge devices, it's referring to all options of the device. Whenever specific information applies only to one or more optional configurations of devices, like how the Snowball Edge with GPU has an on-board GPU, it will be called out.
+
+If your data migration needs are on an exabyte-scale, **AWS Snowmobile** is available as the transfer device for the large amounts of data. AWS Snowmobile is a 45-foot long rugged shipping container that has an internal capacity of 100 PB and 1 TB/s networking. AWS Snowmobile is designed to shuttle 100 PB of data in under a month and connects to NFS endpoints.
 
 Snow family appliances have many uses cases, including: Cloud migration, Disaster Recovery, Data Center decommissioning, and content distribution.
 
@@ -1911,6 +1938,23 @@ Creating snapshots
 1. You can use snapshots as an easy way to back up and share data on EBS volumes among multiple AZs within the same region. 
 
 2. Another possible scenario is that you want to use snapshots in a different region or share with a different account. You can use copy-snapshot API operation, or the snapshot copy action from the AWS management console to copu snapshots to different regions. You can share sanpshots by modifying the permissions of the snapshot and granting different AWS accounts permission to use that snapshot. From that snapshot, others can create EBS volumes and get access to a copy of the snapshot data. The copy of snapshots to a different regions can be part of your disaster recovery strategy.
+
+Snapshots and RAID
+------------------
+
+When the instance is using a RAID configuration, the snapshot process is different. You should stop all I/O activity of the volumes before creating a snapshot: 
+
+1. Stop all applications from writing to the RAID array.
+
+2. Flush all caches to the disk.
+
+3. Confirm that the associated EC2 instance is no longer writing to the RAID array by taking actions such as freezing the file system, unmounting the RAID array, or even shutting down the EC2 instance.
+
+4. After taking steps to halt all disk-related activity to the RAID array, take a snapshot of each EBS volume in the array.
+ 
+When you take a snapshot of an attached Amazon EBS volume that is in use, the snapshot excludes data cached by applications or the operating system. For a single EBS volume, this is often not a problem. However, when cached data is excluded from snapshots of multiple EBS volumes in a RAID array, restoring the volumes from the snapshots can degrade the integrity of the array.
+
+When creating snapshots of EBS volumes that are configured in a RAID array, it is critical that there is no data I/O to or from the volumes when the snapshots are created. RAID arrays introduce data interdependencies and a level of complexity not present in a single EBS volume configuration.
 
 Amazon Data Lifecycle Manager (DLM)
 -----------------------------------
@@ -2340,6 +2384,25 @@ Tagging is an important feature that enables you to better manage your AWS resou
 
 You can activate tags as *cost allocation* tags in the Amazon S3 Billing dashboard. By activating cost allocation tags, you can generate reports on cost and usage, broken down by tag values, such as dev, test, or backup. The same dataset that is used to generate AWS Cost and Usage reports is visible in the Cost Explorer for additional visualization. In Cost Explorer, you can view patterns in how much you spend on EBS snapshots. Cost Explorer is enabled from the Billing and Cost Management console in the AWS Management Console.
 
+Amazon EBS important facts
+==========================
+
+Here is a list of important information about EBS Volumes:
+
+* When you create an EBS volume in an Availability Zone, it is automatically replicated within that zone to prevent data loss due to a failure of any single hardware component.
+
+* An EBS volume can only be attached to one EC2 instance at a time.
+
+* After you create a volume, you can attach it to any EC2 instance in the same Availability Zone.
+
+* An EBS volume is off-instance storage that can persist independently from the life of an instance. You can specify not to terminate the EBS volume when you terminate the EC2 instance during instance creation.
+
+* EBS volumes support live configuration changes while in production which means that you can modify the volume type, volume size, and IOPS capacity without service interruptions.
+
+* Amazon EBS encryption uses 256-bit Advanced Encryption Standard algorithms (AES-256).
+
+* EBS Volumes offer 99.999% SLA.
+
 Amazon EFS
 **********
 
@@ -2596,7 +2659,7 @@ Performance modes
 
 The default general purpose mode, is suitable for most workloads, general purpose mode provides the lowest latency operations, but has a limit of 7000 operations per second. Mas I/O mode is suitable for workloads that require more than 7000 operations per second, but there are some tradeoff to consider. The increase in operations per second often results in higher latency times for file operations. If a change in performance mode is needed after creation, you must create a new file system, select the correct mode, and then copy your data to the new resource.
 
-.. figure:: /ec2_d/performance.png
+.. figure:: /storage_d/performance.png
    :align: center
 
    Amazon EFS performance modes
@@ -2625,7 +2688,7 @@ When file systems are running in Provisioned Throughput mode, you are billed for
 
 You can increase Provisioned Throughput as often as you need. You can decrease Provisioned Throughput or switch throughput modes as long as it's been more then 24 hours since the last decrease or throughput mode change.
 
-.. figure:: /ec2_d/throughput.png
+.. figure:: /storage_d/throughput.png
    :align: center
 
    Amazon EFS throughput modes
@@ -2724,4 +2787,14 @@ EFS pricing is based on paying for what you use. If Provisioned Throughput mode 
 `Amazon EFS now Supports Access Across Accounts and VPCs <https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-efs-now-supports-access-across-accounts-and-vpcs/?nc1=h_ls>`_
 
 `Mounting EFS File Systems from Another Account or VPC <https://docs.aws.amazon.com/efs/latest/ug/manage-fs-access-vpc-peering.html>`_
+
+AWS Storage Gateway
+*******************
+
+All data transferred between any type of gateway appliance and AWS storage is encrypted using SSL. By default, all data stored by AWS Storage Gateway in S3 is encrypted server-side with Amazon S3-Managed Encryption Keys (SSE-S3). Also, when using the file gateway, you can optionally configure each file share to have your objects encrypted with AWS KMS-Managed Keys using SSE-KMS.
+
+.. figure:: /storage_d/gateway.png
+   :align: center
+
+   AWS Storage Gateway
 

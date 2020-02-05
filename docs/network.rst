@@ -160,9 +160,9 @@ A security group acts as a virtual firewall for your instance to control inbound
 Network ACLs
 ------------
 
-Network ACLs are stateless firewall rules. If you have a client that wants to communicate with an EC2 instance within a subnet in which the NACLs applied, some inbound rules allowing this traffic need to be presnt. When the EC2 replies, the outbound rules of the NACLs applied as well because it is a stateless firewall. As the response can use ephemeral ports, the outbound rules should allow all ports. 
+Network ACLs are stateless firewall rules. If you have a client that wants to communicate with an EC2 instance within a subnet in which the NACLs applied, some inbound rules allowing this traffic need to be present. When the EC2 replies, the outbound rules of the NACLs applied as well because it is a stateless firewall. As the response can use ephemeral ports, the outbound rules should allow all ports. 
 
-With NACLs, you can define ALLOW and DENY rules. The default ACLs allow all traffic in and all traffic out. Most customers use NACLs rules with DENY. In security groups, there are no ALLOW, if it is not allowed, is denied by default. They have a rule number that defines the priority, that is, the order in which they are applied.
+With NACLs, you can define ALLOW and DENY rules. The default ACLs allow all traffic in and all traffic out. Most customers use NACLs rules with DENY. In security groups, there are no ALLOW, if it is not allowed, is denied by default. They have a rule number that defines the priority, that is, the order in which they are applied. Network ACL Rules are evaluated by rule number, from lowest to highest, and executed immediately when a matching allow/deny rule is found.
 
 `AWS re:Invent 2018: Your Virtual Data Center: VPC Fundamentals and Connectivity Options (NET201) <https://www.youtube.com/watch?time_continue=1&v=jZAvKgqlrjY&feature=emb_logo>`_
 
@@ -396,6 +396,14 @@ Amazon EC2 networking
 Elastic network interface
 -------------------------
 
+An elastic network interface (ENI) is a logical networking component in a VPC that represents a virtual network card. You can attach a network interface to an EC2 instance in the following ways:
+
+* When it's running (hot attach).
+
+* When it's stopped (warm attach).
+
+* When the instance is being launched (cold attach).
+
 You always have an ENI attached to an instance, it is the default ENI and cannot be modified. You can attach more than one ENI to an EC2 instance and they can be moved to another EC2 instance. In general, the ENIs of an EC2 instance are attached to different subnets. Each ENI have a private IP address and a public IP address, optionally you can have up to 4 private IP addresses and 4 public IP addresses.
 
 .. figure:: /network_d/eniv.png
@@ -604,13 +612,28 @@ The best way to implement a bastion host is to create a small EC2 instance which
 
 	 Bastion hosts
 
-
-
 Load balancing on AWS
 *********************
 
 Elastic Load Balancing (ELB)
 ============================
+
+In Elastic Load Balancing, there are various security features that you can use such as Server Order Preference, Predefined Security Policy, Perfect Forward Secrecy and many others. 
+
+Perfect Forward Secrecy is a feature that provides additional safeguards against the eavesdropping of encrypted data through the use of a unique random session key. This prevents the decoding of captured data, even if the secret long-term key is compromised. Perfect Forward Secrecy is used to offer SSL/TLS cipher suites for CloudFront and Elastic Load Balancing.
+
+Elastic Load Balancing supports three types of load balancers. You can select the appropriate load balancer based on your application needs.
+
+If you need flexible application management and TLS termination then we recommend that you use Application Load Balancer. If extreme performance and static IP is needed for your application then we recommend that you use Network Load Balancer. If your application is built within the EC2 Classic network then you should use Classic Load Balancer.
+
+An Application Load Balancer functions at the application layer, the seventh layer of the Open Systems Interconnection (OSI) model. After the load balancer receives a request, it evaluates the listener rules in priority order to determine which rule to apply, and then selects a target from the target group for the rule action. You can configure listener rules to route requests to different target groups based on the content of the application traffic. Routing is performed independently for each target group, even when a target is registered with multiple target groups.
+
+.. figure:: /network_d/redirect_path.png
+   :align: center
+
+	 Application Load Balancer
+
+Application Load Balancers support path-based routing, host-based routing and support for containerized applications.
 
 `AWS re:Invent 2018: [REPEAT 1] Elastic Load Balancing: Deep Dive and Best Practices (NET404-R1) <https://www.youtube.com/watch?v=VIgAT7vjol8&feature=youtu.be>`_
 

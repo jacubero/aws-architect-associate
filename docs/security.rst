@@ -43,6 +43,17 @@ SAML 2.0-based Federation
 
 AWS supports identity federation with SAML 2.0 (Security Assertion Markup Language 2.0), an open standard that many identity providers (IdPs) use, such as Active Directory. This feature enables federated single sign-on (SSO), so users can log into the AWS Management Console or call the AWS API operations without you having to create an IAM user for everyone in your organization. By using SAML, you can simplify the process of configuring federation with AWS, because you can use the IdP's service instead of writing custom identity proxy code.
 
+If your identity store is not compatible with SAML 2.0, then you can build a custom identity broker application to perform a similar function. The broker application authenticates users, requests temporary credentials for users from AWS, and then provides them to the user to access AWS resources.
+
+The application verifies that employees are signed into the existing corporate network's identity and authentication system, which might use LDAP, Active Directory, or another system. The identity broker application then obtains temporary security credentials for the employees.
+
+To get temporary security credentials, the identity broker application calls either ``AssumeRole`` or ``GetFederationToken`` to obtain temporary security credentials, depending on how you want to manage the policies for users and when the temporary credentials should expire. The call returns temporary security credentials consisting of an AWS access key ID, a secret access key, and a session token. The identity broker application makes these temporary security credentials available to the internal company application. The app can then use the temporary credentials to make calls to AWS directly. The app caches the credentials until they expire, and then requests a new set of temporary credentials.
+
+.. figure:: /security_d/enterprise-authentication-with-identity-broker-application.diagram.png
+   :align: center
+
+	Enterprise authentication with identity broker application
+
 AWS Security Token Service
 **************************
 
@@ -56,7 +67,7 @@ In this diagram, IAM user Alice in the Dev account (the role-assuming account) n
 
 3. Alice uses the temporary security credentials to access services and resources in the Prod account. Alice could, for example, make calls to Amazon S3 and Amazon EC2, which are granted by the WriteAccess role.
 
-.. figure:: /appendix_d/sts.png
+.. figure:: /security_d/sts.png
    :align: center
 
 	AWS Security Token Service

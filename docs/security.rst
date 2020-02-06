@@ -27,6 +27,7 @@ Identities in AWS exist in these forms:
 
 * **Web Identity Federation**: Users with web identities from Amazon.com or other Open ID provier have role assigned using Security Token System (STS).
 
+Amazon Resource Names (ARNs) uniquely identify AWS resources. We require an ARN when you need to specify a resource unambiguously across all of AWS, such as in IAM policies, Amazon Relational Database Service (Amazon RDS) tags, and API calls.
 
 `Secure Access to AWS Services Using AWS Identity and Access Management (IAM) Roles <https://www.youtube.com/watch?v=wY7FOFaPNuE&feature=emb_logo>`_ 
 
@@ -132,6 +133,29 @@ For other custom applications, not based on TCP (for example UDP and SIP), you c
 AWS Shield Standard protects your EC2 instance from common infrastructure layer 3 or 4 attacks, such as UDP reflection attacks that include DNS, NTP, and SSDP reflection attacks. Techniques, such as priority-based traffic shaping, are automatically engaged when a well-defined DDoS attack signature is detected.
 
 With AWS Shield Advanced on Elastic IP address, you have enhanced detection that automatically recognizes the type of AWS resource and size of EC2 instance and applies pre-defined mitigators. You can create custom mitigation profiles, and during the attack, all your Amazon VPC NACLs are automatically enforced at the border of the AWS network, giving you access to additional bandwidth and scrubbing capacity to mitigate large volumetric DDoS attacks. It also protects against SYN floods or other vectors, such as UDP floods.
+
+DoS attack mitigation techniques
+================================
+
+Apart from using the managed DDoS protection service AWS Shield, you can protect your system from DoS attack by doing the following:
+
+* Use an Amazon CloudFront service for distributing both static and dynamic content.
+
+* Use an Application Load Balancer with Auto Scaling groups for your EC2 instances then restrict direct Internet traffic to the rest of resources by deploying them to a private subnet.
+
+* Setup alerts in Amazon CloudWatch to look for high ``Network In`` and CPU utilization metrics.
+
+`Best Practices for DDoS Mitigation on AWS <https://www.youtube.com/watch?v=HnoZS5jj7pk&feature=emb_logo>`_
+
+AWS Certificate Manager
+***********************
+
+AWS Certificate Manager lets you import third-party certificates from the AWS Certificate Manager console, as well as programmatically. If AWS Certificate Manager is not available in your region, use AWS CLI to upload your third-party certificate to the IAM certificate store.
+
+.. figure:: /security_d/acm.png
+   :align: center
+
+	AWS Certificate Manager
 
 Amazon Inspector
 ****************

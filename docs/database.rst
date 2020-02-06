@@ -103,6 +103,12 @@ Amazon RDS automatically performs a failover in the event of any of the followin
 
 	It is important to have in mind that it detects infrastructure issues, not database engine problems.
 
+.. Important::
+
+	The standby instance will not perform any read and write operations while the primary instance is running.
+
+In case of a Single-AZ database failure, a user-initiated point-in-time-restore operation will be required. This operation can take several hours to complete, and any data updates that occurred after the latest restorable time (typically within the last five minutes) will not be available.
+
 Read scalability with Amazon RDS Read Replicas
 ----------------------------------------------
 
@@ -116,6 +122,8 @@ Amazon RDS can gain read scalability with the creation of read replicas for MySQ
 You can create up to 5 replicas per source database. You can monitor replication lag in Amazon CloudWatch or Amazon RDS console. Read replicas can be created in a different region than the master DB. This feature can help satisfy DR requirements or cutting down on latency by directing reads to a read replica closer to the user. Single-region read replicas is supported for Oracle EE and is coming soon for SQL Server.
 
 Read replicas can also be promoted to become the master DB instance, but due to the asynchronous replication, this requires manual action. You can do it for faster recovery in the event of a disaster. You can upgrade a read replica to a new engine version.
+
+Amazon RDS Read Replicas provide enhanced performance and durability for database (DB) instances. This feature makes it easy to elastically scale out beyond the capacity constraints of a single DB instance for read-heavy database workloads. You can create one or more replicas of a given source DB Instance and serve high-volume application read traffic from multiple copies of your data, thereby increasing aggregate read throughput. 
 
 .. list-table:: Multi-AZ vs Read Replicas
    :widths: 50 50
@@ -144,6 +152,8 @@ Read replicas can also be promoted to become the master DB instance, but due to 
        is detected
      - It can be manually promoted to a
        standalone database
+
+`How do I make my RDS MySQL read replica writable? <https://www.youtube.com/watch?v=j5da6d2TIPc&feature=emb_logo>`_
 
 Plan for DR
 -----------
@@ -310,6 +320,14 @@ The differences can be greater if your DB instances use smaller instance classes
    :align: center
 
    Use of CPU and memory of processes or threads on a DB instance 
+
+In RDS, the Enhanced Monitoring metrics shown in the Process List view are organized as follows:
+
+  * *RDS child processes*. Shows a summary of the RDS processes that support the DB instance, for example ``aurora`` for Amazon Aurora DB clusters and ``mysqld`` for MySQL DB instances. Process threads appear nested beneath the parent process. Process threads show CPU utilization only as other metrics are the same for all threads for the process. The console displays a maximum of 100 processes and threads. The results are a combination of the top CPU consuming and memory consuming processes and threads. If there are more than 50 processes and more than 50 threads, the console displays the top 50 consumers in each category. This display helps you identify which processes are having the greatest impact on performance.
+
+  * *RDS processes*. Shows a summary of the resources used by the RDS management agent, diagnostics monitoring processes, and other AWS processes that are required to support RDS DB instances.
+
+  * *OS processes*. Shows a summary of the kernel and system processes, which generally have minimal impact on performance.
 
 * **Performance Insights** uses lightweight data collection methods that don’t impact the performance of your applications, and makes it easy to see which SQL statements are causing the load, and why. It requires no configuration or maintenance, and is currently available for Amazon Aurora (PostgreSQL- and MySQL-compatible editions), Amazon RDS for PostgreSQL, MySQL, MariaDB, SQL Server and Oracle. It provides an easy and powerful dashboard showing load on your database. It helps you identify source of bottlenecks: top SQL queries, wait statistics. It has an adjustable time frame (hour, day week, month). With 7 days of free performance history retention, it's easy to track down and solve a wide variety of issues. If you need longer-term retention, you can choose to pay for up to two years of performance history retention.
 
@@ -514,12 +532,19 @@ Whenever an application creates, updates, or deletes items in the table, DynamoD
 
 Amazon DynamoDB is integrated with AWS Lambda so that you can create triggers—pieces of code that automatically respond to events in DynamoDB Streams. With triggers, you can build applications that react to data modifications in DynamoDB tables.
 
-If you enable DynamoDB Streams on a table, you can associate the stream ARN with a Lambda function that you write. Immediately after an item in the table is modified, a new record appears in the table's stream. AWS Lambda polls the stream and invokes your Lambda function synchronously when it detects new stream records. The Lambda function can perform any actions you specify, such as sending a notification or initiating a workflow. 
+If you enable DynamoDB Streams on a table, you can associate the stream ARN with a Lambda function that you write. Immediately after an item in the table is modified, a new record appears in the table's stream. AWS Lambda polls the stream and invokes your Lambda function synchronously when it detects new stream records.
 
 .. figure:: /database_d/dynamo_lambda.png
    :align: center
 
    DynamoDB Streams and AWS Lambda
+
+You can create a Lambda function which can perform a specific action that you specify, such as sending a notification or initiating a workflow. For instance, you can set up a Lambda function to simply copy each stream record to persistent storage, such as EFS or S3, to create a permanent audit trail of write activity in your table.
+
+DynamoDB auto scaling
+=====================
+
+DynamoDB auto scaling uses the AWS Application Auto Scaling service to dynamically adjust provisioned throughput capacity on your behalf, in response to actual traffic patterns. This enables a table or a global secondary index to increase its provisioned read and write capacity to handle sudden increases in traffic, without throttling. When the workload decreases, Application Auto Scaling decreases the throughput so that you don't pay for unused provisioned capacity.
 
 Use cases
 =========
@@ -532,6 +557,13 @@ To speed up access to relevant data, you can pair Amazon S3 with a search engine
 
 Amazon DynamoDB Accelerator (DAX)
 =================================
+
+Amazon DynamoDB Accelerator (DAX) is a fully managed, highly available, in-memory cache for DynamoDB that delivers up to a 10x performance improvement ? from milliseconds to microseconds ? even at millions of requests per second. DAX does all the heavy lifting required to add in-memory acceleration to your DynamoDB tables, without requiring developers to manage cache invalidation, data population, or cluster management.
+
+.. figure:: /database_d/ddb_as_set_read_1.png
+   :align: center
+
+   Amazon DynamoDB Accelerator (DAX) configuration
 
 DAX is a DynamoDB-compatible caching service that enables you to benefit from fast in-memory performance for demanding applications. DAX addresses three core scenarios:
 
@@ -726,7 +758,19 @@ Cluster sizing and resizing
 Additional resources
 ====================
 
+You can configure Amazon Redshift to copy snapshots for a cluster to another region. To configure cross-region snapshot copy, you need to enable this copy feature for each cluster and configure where to copy snapshots and how long to keep copied automated snapshots in the destination region. When cross-region copy is enabled for a cluster, all new manual and automatic snapshots are copied to the specified region. 
+
+.. figure:: /database_d/rs-mgmt-restore-table-from-snapshot.png
+   :align: center
+
+   Restore table from snapshot on Redshift 
+
 `AWS re:Invent 2018: [REPEAT 1] Deep Dive and Best Practices for Amazon Redshift (ANT401-R1) <https://www.youtube.com/watch?v=TJDtQom7SAA&feature=emb_logo>`_
+
+Amazon Redshift Spectrum
+========================
+
+Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries against exabytes of unstructured data in Amazon S3. No loading or transformation is required, and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, SequenceFile, TextFile, and TSV. Redshift Spectrum automatically scales query compute capacity based on the data being retrieved, so queries against Amazon S3 run fast, regardless of data set size.
 
 Migrating data into your AWS databases
 **************************************

@@ -89,12 +89,44 @@ When you provide the key, only users in your account with access to the key can 
 
 You can also encrypt environment variable values client-side before sending them to Lambda, and decrypt them in your function code. This obscures secret values in the Lambda console and API output, even for users who have permission to use the key. In your code, you retrieve the encrypted value from the environment and decrypt it by using the AWS KMS API.
 
+Networking
+==========
+
+You can configure a function to connect to a virtual private cloud (VPC) in your account. Use Amazon Virtual Private Cloud (Amazon VPC) to create a private network for resources such as databases, cache instances, or internal services. Connect your function to the VPC to access private resources during execution.
+
+AWS Lambda runs your function code securely within a VPC by default. However, to enable your Lambda function to access resources inside your private VPC, you must provide additional VPC-specific configuration information that includes VPC subnet IDs and security group IDs. AWS Lambda uses this information to set up elastic network interfaces (ENIs) that enable your function to connect securely to other resources within your private VPC.
+
+Lambda functions cannot connect directly to a VPC with dedicated instance tenancy. To connect to resources in a dedicated VPC, peer it to a second VPC with default tenancy.
+
+Your Lambda function automatically scales based on the number of events it processes. If your Lambda function accesses a VPC, you must make sure that your VPC has sufficient ENI capacity to support the scale requirements of your Lambda function. It is also recommended that you specify at least one subnet in each Availability Zone in your Lambda function configuration. 
+
+By specifying subnets in each of the Availability Zones, your Lambda function can run in another Availability Zone if one goes down or runs out of IP addresses. If your VPC does not have sufficient ENIs or subnet IPs, your Lambda function will not scale as requests increase, and you will see an increase in invocation errors with EC2 error types like ``EC2ThrottledException``. For asynchronous invocation, if you see an increase in errors without corresponding CloudWatch Logs, invoke the Lambda function synchronously in the console to get the error responses.
+
+Monitoring
+==========
+
+AWS Lambda automatically monitors functions on your behalf, reporting metrics through Amazon CloudWatch. These metrics include total invocation requests, latency, and error rates. The throttles, Dead Letter Queues errors and Iterator age for stream-based invocations are also monitored.
+
+You can monitor metrics for Lambda and view logs by using the Lambda console, the CloudWatch console, the AWS CLI, or the CloudWatch API. 
+
+.. figure:: /microservices_d/metrics-functions-list.png
+   :align: center
+
+   AWS Lambda metrics functions list
+
 Pricing
 =======
 
 You buy compute time in 100ms increments. There is no hourly, daily, or monthly minimums and no per-device fees. You never pay for idle time. The free tier covers 1 million requests and 400,000 GBs of compute every month, every customer.
 
 Lambda exposes only a memory control, with the percentage of CPU core and network capacity allocated to a function proportionally. If your code is CPU, network or memory-bound, then it could be cheaper to choose more memory.
+
+AWS Step Functions 
+******************
+
+AWS Step Functions provides serverless orchestration for modern applications. Orchestration centrally manages a workflow by breaking it into multiple steps, adding flow logic, and tracking the inputs and outputs between the steps. As your applications execute, Step Functions maintains application state, tracking exactly which workflow step your application is in, and stores an event log of data that is passed between application components. That means that if networks fail or components hang, your application can pick up right where it left off.
+
+Application development is faster and more intuitive with Step Functions, because you can define and manage the workflow of your application independently from its business logic. Making changes to one does not affect the other. You can easily update and modify workflows in one place, without having to struggle with managing, monitoring and maintaining multiple point-to-point integrations. Step Functions frees your functions and containers from excess code, so your applications are faster to write, more resilient, and easier to maintain.
 
 Amazon API Gateway
 ******************
@@ -115,3 +147,17 @@ You can add caching to API calls by provisioning an Amazon API Gateway cache and
    Amazon API Gateway settings
 
 `Building APIs with Amazon API Gateway <https://www.youtube.com/watch?time_continue=91&v=XwfpPEFHKtQ&feature=emb_logo>`_
+
+AWS X-Ray 
+*********
+
+You can use AWS X-Ray to trace and analyze user requests as they travel through your Amazon API Gateway APIs to the underlying services. API Gateway supports AWS X-Ray tracing for all API Gateway endpoint types: regional, edge-optimized, and private. You can use AWS X-Ray with Amazon API Gateway in all regions where X-Ray is available.
+
+X-Ray gives you an end-to-end view of an entire request, so you can analyze latencies in your APIs and their backend services. You can use an X-Ray service map to view the latency of an entire request and that of the downstream services that are integrated with X-Ray. And you can configure sampling rules to tell X-Ray which requests to record, at what sampling rates, according to criteria that you specify. If you call an API Gateway API from a service that's already being traced, API Gateway passes the trace through, even if X-Ray tracing is not enabled on the API.
+
+You can enable X-Ray for an API stage by using the API Gateway management console, or by using the API Gateway API or CLI.
+
+.. figure:: /microservices_d/apigateway-xray-traceview-1.png
+   :align: center
+
+   Amazon API Gateway trace view with AWS X-Ray

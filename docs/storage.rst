@@ -566,9 +566,16 @@ When using server-side encryption, your request S3 to encrypt your object saving
 
 * Amazon S3-Managed Keys (**SSE-S3**). This method uses keys that are managed by S3. Each object is encrypted with a unique key. Additionally a master key, which is rotated regularly, encrypts each unique key. This method uses AES-256 algorithm to encrypt your data. This option can also be used when setting the default encryption option.
 
-* AWS KMS-Managed keys (**SSE-KMS**) is similar to SSE-S3, but with some additional benefits along with some additional charges for using service. In this model, the AWS Key Management Service (AWS KMS) is utilized to fully manage the keys and encryption and decryption. AWS KMS encrypts your objects similar to the way SSE-S3 does. There is a unique per-object data key, which is encrypted with customer master keys (CMK) in KMS. This scheme is called envelop encryption. You use AWS KMS via the Encryption Keys section in the IAM console or via AWS KMS APIs to centrally create encryption keys, define the policies that control how keys can be used, and audit key usage to prove they are being used correctly. The first time you add an SSE-KMS-encrypted object to a bucket in a region, a default CMK is created for you automatically. This key is used for SSE-KMS-encryption unless you select a CMK that you created separately using AWS KMS. Creating your own CMK gives you more flexibility, including the ability to create, rotate, disable, and define access controls, and to audit the encryption keys used to protect your data. Using SSE-KMS also adds a layer of security in that any user that attempts to access an object that is SSE-KMS encrypted will also require access to the KMS key to decrypt the object. You can configure access to the KMS encryption keys using AWS IAM. This option can also be used when setting the default encryption option.
+* AWS KMS-Managed keys (**SSE-KMS**) is similar to SSE-S3, but with some additional benefits along with some additional charges for using service. SSE-KMS encrypts only the object data, any object metadata is not encrypted. In this model, the AWS Key Management Service (AWS KMS) is utilized to fully manage the keys and encryption and decryption. AWS KMS encrypts your objects similar to the way SSE-S3 does. There is a unique per-object data key, which is encrypted with customer master keys (CMK) in KMS. This scheme is called envelop encryption. You use AWS KMS via the Encryption Keys section in the IAM console or via AWS KMS APIs to centrally create encryption keys, define the policies that control how keys can be used, and audit key usage to prove they are being used correctly. The first time you add an SSE-KMS-encrypted object to a bucket in a region, a default CMK is created for you automatically. This key is used for SSE-KMS-encryption unless you select a CMK that you created separately using AWS KMS. Creating your own CMK gives you more flexibility, including the ability to create, rotate, disable, and define access controls, and to audit the encryption keys used to protect your data. Using SSE-KMS also adds a layer of security in that any user that attempts to access an object that is SSE-KMS encrypted will also require access to the KMS key to decrypt the object. You can configure access to the KMS encryption keys using AWS IAM. This option can also be used when setting the default encryption option.
+
+.. figure:: /storage_d/key-hierarchy-cmk.png
+   :align: center
+
+   SSE-KMS
 
 You should be aware that when using AWS KMS there some limits on requests per second. AWS KMS throttles API requests at different limits depending on the API operation. Throttling means that AWS KMS rejects an otherwise valid request because the request exceeeds the limit for the number of requests per second, `AWS KMS Limits <https://docs.aws.amazon.com/kms/latest/developerguide/limits.html>`_. When a request is throttled, AWS KMS returns a ThrottlingException error.
+
+A customer master key (CMK) is a logical representation of a master key. The CMK includes metadata, such as the key ID, creation date, description, and key state. The CMK also contains the key material used to encrypt and decrypt data. You can use a CMK to encrypt and decrypt up to 4 KB (4096 bytes) of data. Typically, you use CMKs to generate, encrypt, and decrypt the data keys that you use outside of AWS KMS to encrypt your data.
 
 * Customer provided keys (**SSE-C**). In this model, you manage the encryption keys and S3 manages the encryption, as it writes to disks, and decryption, when you access your objects. Therefore, you don't need to maintain any code to perform data encryption and decryption. The only thing you do is manage the encryption keys you provide. When you upload and object, S3 uses the encryption key you provide to apply AES-256 encryption to your data and then removes the encryption key from memory. When you retrieve an object, you must provide the same encryption key as part of your request, S3 first werifies that the encryption key you provided matches, and then decrypts the object before returning the object data to you.
 
@@ -763,7 +770,11 @@ This simplifies some of your security by being able to easily allow and deny use
 Transfer Acceleration
 ---------------------
 
-Transfer Acceleration helps increase your transfer speeds. Enabling Transfer Acceleration provides you with a new URL to use with your application.
+Amazon S3 Transfer Acceleration enables fast, easy, and secure transfers of files over long distances between your client and your Amazon S3 bucket. Transfer Acceleration leverages Amazon CloudFront's globally distributed AWS Edge Locations. As data arrives at an AWS Edge Location, data is routed to your Amazon S3 bucket over an optimized network path. 
+
+.. image:: /storage_d/ta.png
+
+Amazon S3 Transfer Acceleration can speed up content transfers to and from Amazon S3 by as much as 50-500% for long-distance transfer of larger objects. Customers who have either web or mobile applications with widespread users or applications hosted far away from their S3 bucket can experience long and variable upload and download speeds over the Internet. S3 Transfer Acceleration (S3TA) reduces the variability in Internet routing, congestion and speeds that can affect transfers, and logically shortens the distance to S3 for remote applications. S3TA improves transfer performance by routing traffic through Amazon CloudFront’s globally distributed Edge Locations and over AWS backbone networks, and by using network protocol optimizations. Enabling Transfer Acceleration provides you with a new URL to use with your application.
 
 Event notifications
 -------------------
@@ -944,6 +955,32 @@ If the MFA (Multi-Factor Authentication) Delete is enabled, it requires addition
 * Change the versioning state of your bucket.
 
 * Permanently delete an object version.
+
+S3 consistency
+--------------
+
+Amazon S3 provides read-after-write consistency for PUTS of new objects in your S3 bucket in all regions with one caveat: if you make a HEAD or GET request to the key name (to find if the object exists) before creating the object, Amazon S3 provides eventual consistency for read-after-write. Amazon S3 offers eventual consistency for overwrite PUTS and DELETES in all regions.
+
+.. figure:: /storage_d/consistency2.png
+   :align: center
+
+   S3 consistency
+
+Updates to a single key are atomic. For example, if you PUT to an existing key, a subsequent read might return the old data or the updated data, but it will never return corrupted or partial data. This usually happens if your application is using parallel requests on the same object.
+
+Amazon S3 achieves high availability by replicating data across multiple servers within Amazon's data centers. If a PUT request is successful, your data is safely stored. However, information about the changes must replicate across Amazon S3, which can take some time, and so you might observe the following behaviors:
+
+* A process writes a new object to Amazon S3 and immediately lists keys within its bucket. Until the change is fully propagated, the object might not appear in the list.
+
+* A process replaces an existing object and immediately attempts to read it. Until the change is fully propagated, Amazon S3 might return the prior data.
+
+* A process deletes an existing object and immediately attempts to read it. Until the deletion is fully propagated, Amazon S3 might return the deleted data.
+
+* A process deletes an existing object and immediately lists keys within its bucket. Until the deletion is fully propagated, Amazon S3 might list the deleted object.
+
+Amazon S3?s support for parallel requests means you can scale your S3 performance by the factor of your compute cluster, without making any customizations to your application. Amazon S3 does not currently support Object Locking. If two PUT requests are simultaneously made to the same key, the request with the latest timestamp wins. If this is an issue, you will need to build an object-locking mechanism into your application.
+
+Updates are key-based; there is no way to make atomic updates across keys. For example, you cannot make the update of one key dependent on the update of another key unless you design this functionality into your application.
 
 Monitoring and analyzing Amazon S3
 ==================================
@@ -1638,9 +1675,13 @@ Amazon Glacier provides 3 retrieval methods that may be specified when retrievin
 
 **Expedited* retrievals are often used in situations when access to an archive is urgent. You can retrieve a single file from an archive from 1 to 5 minutes.
 
+Expedited retrievals allow you to quickly access your data when occasional urgent requests for a subset of archives are required. For all but the largest archives (250 MB+), data accessed using Expedited retrievals are typically made available within 1?5 minutes. Provisioned Capacity ensures that retrieval capacity for Expedited retrievals is available when you need it.
+
 **Standard** retrievals grants access to archives in about 3-5 hours, which is a good fit for DR situations or when thre is not an immediate need for an archive. 
 
 **Bulk** retrievals grant access to archives from 5 to 12 hours. This tier is primarily for batch processing workloads, such as log files analysis, video transcoding, or large data lakes that require background processing. You can use bulk retrievals to comb through data slowly and pull back PBs of data at a low cost that can be processed by elastic compute or sport instances.
+
+To make an Expedited, Standard, or Bulk retrieval, set the Tier parameter in the Initiate Job (POST jobs) REST API request to the option you want, or the equivalent in the AWS CLI or AWS SDKs. If you have purchased provisioned capacity, then all expedited retrievals are automatically served through your provisioned capacity.
 
 Performance
 ^^^^^^^^^^^
@@ -1662,6 +1703,11 @@ Provisioned capacity units
 --------------------------
 
 Provisioned capacity units (PCUs) are a way to reserve I/O capacity for Glacier expedited retrievals and guarantees that restore requests will not be throttled. Performance guidance for PCUs is that 1 PCU can deliver up to 3 expedited retrievals and up to 250 MB in 5 minutes, and provide up to 150 MB/s of retrieval throughput for a best-case sequential read. Note that there is no maximum file size restriction for Glacier Expedited retrievals. A large file, however, will take somewhat longer to restore. For example, most 25 GB archive retrievals should complete in under 10 minutes.
+
+.. figure:: /storage_d/gl-purchase-provisoned-capacity.png
+   :align: center
+
+   Data retrieval settings
 
 Without PCUs, expedited retrieval requests are accepted only if capacity is available at the time the request is made. It's possible that your workload will see performance variability or API-level pushback. PCUs are not guaranteed to improve Glacier performance, but PCUs will reduce variability, and may improve performance if the system is under heavy load. It's important to note, however, that when you enable provisioned capacity units in Glacier, all I/O retrieval requests are routed through provisioned units. None of your Glacier I/O will go through the traditional I/O pool. Consequently you must ensure that you have provisioned enough units to handle your workload peaks.
 
@@ -1836,6 +1882,19 @@ There are 2 types of SSD-backed volumes: General Purpose (gp2) and Provisioned I
 	 Comparison of SSD and HDD volumes
 
 The General Purpose SSD volume can handle most workloads, such as boot volumes, virtual machines, interactive applications, and development environments. The Provisiones IOPS SSD volume can handle critical business applications that require nearly continuous IOPS performance. This type of volume is used for large database workloads.
+
+An ``io1`` volume can range in size from 4 GiB to 16 TiB. You can provision from 100 IOPS up to 64,000 IOPS per volume on Nitro system instance families and up to 32,000 on other instance families. The maximum ratio of provisioned IOPS to requested volume size (in GiB) is 50:1.
+
+For example, a 100 GiB volume can be provisioned with up to 5,000 IOPS. On a supported instance type, any volume 1,280 GiB in size or greater allows provisioning up to the 64,000 IOPS maximum (50 × 1,280 GiB = 64,000).
+
+.. figure:: /storage_d/io1_throughput.png
+   :align: center
+
+	 io1 throughput
+
+An io1 volume provisioned with up to 32,000 IOPS supports a maximum I/O size of 256 KiB and yields as much as 500 MiB/s of throughput. With the I/O size at the maximum, peak throughput is reached at 2,000 IOPS. A volume provisioned with more than 32,000 IOPS (up to the cap of 64,000 IOPS) supports a maximum I/O size of 16 KiB and yields as much as 1,000 MiB/s of throughput.
+
+Therefore, for instance, a 10 GiB volume can be provisioned with up to 500 IOPS. Any volume 640 GiB in size or greater allows provisioning up to a maximum of 32,000 IOPS (50 × 640 GiB = 32,000). 
 
 The Throughput Optimized HDD volume can handle streaming workloads that require consistent and fast throughput at a low price. For example, big data, data warehouses, and log processing. The Colod HDD volume can handle throughput-oriented storage for large amounts of data that are infrequently accessed. Use this type of volume for scenarios in which achieving the lowest storage cost is important.
 
@@ -2359,6 +2418,14 @@ A number of performance metrics are available for Amazon EBS. The CloudWatch win
 
 You can retrieve data from CloudWatch by using either the CloudWatch API or the Amazon EC2 console. Use the ``get-metric-data`` API to retrieve as many as 100 different metrics in a single request and ``get-metric-statistics`` for getting statistics for the specified metric. The console uses the raw data that the CloudWatch API  return to display a series of graphs that represent the data. Data is reported to CloudWatch only when the volume is active. If the volume is not attached to an EC2 instance, no data is reported.
 
+Volume status checks are automated tests that run every 5 minutes and return a pass or fail status:
+
+* If all checks pass, the status of the volume is ``ok``. 
+
+* If a check fails, the status of the volume is ``impaired``.
+
+* If the status is ``insufficient-data``, the checks may still be in progress on the volume.
+
 Tracking Amazon EBS usage and costs
 ===================================
 
@@ -2787,6 +2854,14 @@ EFS pricing is based on paying for what you use. If Provisioned Throughput mode 
 `Amazon EFS now Supports Access Across Accounts and VPCs <https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-efs-now-supports-access-across-accounts-and-vpcs/?nc1=h_ls>`_
 
 `Mounting EFS File Systems from Another Account or VPC <https://docs.aws.amazon.com/efs/latest/ug/manage-fs-access-vpc-peering.html>`_
+
+Amazon storage comparison
+*************************
+
+.. figure:: /storage_d/storagecomp.png
+   :align: center
+
+   Amazon storage comparison
 
 AWS Storage Gateway
 *******************

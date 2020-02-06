@@ -1,5 +1,5 @@
 Networking in AWS
-########################################
+#################
 
 Design and implement AWS networks
 *********************************
@@ -581,7 +581,58 @@ Connecting networks
 VPC peering connection
 ======================
 
-If you have two VPCs which have peering connections with each other, a VPC peering connection does not support edge to edge routing. This means that if either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
+A VPC peering connection is a network connection between two VPCs that enables you to route traffic between them using private IP addresses. Instances in either VPC can communicate with each other as if they are within the same network. You can create a VPC peering connection between your own VPCs, with a VPC in another AWS account, or with a VPC in a different AWS Region.
+
+.. figure:: /network_d/peering-intro-diagram.png
+   :align: center
+
+	 VPC peering connection
+
+AWS uses the existing infrastructure of a VPC to create a VPC peering connection; it is neither a gateway nor a VPN connection, and does not rely on a separate piece of physical hardware. There is no single point of failure for communication or a bandwidth bottleneck.
+
+`AWS Knowledge Center Videos: "What is VPC Peering?" <https://www.youtube.com/watch?v=i1A1eH8vLtk&feature=emb_logo>`_
+
+The following VPC peering connection configurations are not supported.
+
+* Overlapping CIDR Blocks.
+
+* Transitive Peering.
+
+* Edge to Edge Routing Through a Gateway or Private Connection.
+
+Overlapping CIDR Blocks
+-----------------------
+
+You cannot create a VPC peering connection between VPCs with matching or overlapping IPv4 CIDR blocks.
+
+.. figure:: /network_d/overlapping-cidrs-diagram.png
+   :align: center
+
+	 Overlapping CIDR Blocks
+
+If the VPCs have multiple IPv4 CIDR blocks, you cannot create a VPC peering connection if any of the CIDR blocks overlap (regardless of whether you intend to use the VPC peering connection for communication between the non-overlapping CIDR blocks only). 
+
+.. figure:: /network_d/overlapping-multiple-cidrs-diagram.png
+   :align: center
+
+	 Overlapping CIDR Blocks
+
+This limitation also applies to VPCs that have non-overlapping IPv6 CIDR blocks. Even if you intend to use the VPC peering connection for IPv6 communication only, you cannot create a VPC peering connection if the VPCs have matching or overlapping IPv4 CIDR blocks. Communication over IPv6 is not supported for an inter-region VPC peering connection.
+
+Transitive Peering
+------------------
+
+You have a VPC peering connection between VPC A and VPC B (pcx-aaaabbbb), and between VPC A and VPC C (pcx-aaaacccc). There is no VPC peering connection between VPC B and VPC C. You cannot route packets directly from VPC B to VPC C through VPC A.
+
+.. figure:: /network_d/transitive-peering-diagram.png
+   :align: center
+
+	 Transitive Peering
+
+Edge to Edge Routing Through a Gateway or Private Connection
+------------------------------------------------------------
+
+If either VPC in a peering relationship has one of the following connections, you cannot extend the peering relationship to that connection:
 
 * A VPN connection or an AWS Direct Connect connection to a corporate network.
 
@@ -612,11 +663,8 @@ The best way to implement a bastion host is to create a small EC2 instance which
 
 	 Bastion hosts
 
-Load balancing on AWS
-*********************
-
 Elastic Load Balancing (ELB)
-============================
+****************************
 
 In Elastic Load Balancing, there are various security features that you can use such as Server Order Preference, Predefined Security Policy, Perfect Forward Secrecy and many others. 
 
@@ -636,6 +684,29 @@ An Application Load Balancer functions at the application layer, the seventh lay
 Application Load Balancers support path-based routing, host-based routing and support for containerized applications.
 
 `AWS re:Invent 2018: [REPEAT 1] Elastic Load Balancing: Deep Dive and Best Practices (NET404-R1) <https://www.youtube.com/watch?v=VIgAT7vjol8&feature=youtu.be>`_
+
+Cross-zone load balancing
+=========================
+
+Cross-zone load balancing reduces the need to maintain equivalent numbers of instances in each enabled Availability Zone, and improves your application's ability to handle the loss of one or more instances. 
+
+When you create a Classic Load Balancer, the default for cross-zone load balancing depends on how you create the load balancer. With the API or CLI, cross-zone load balancing is disabled by default. With the AWS Management Console, the option to enable cross-zone load balancing is selected by default. After you create a Classic Load Balancer, you can enable or disable cross-zone load balancing at any time.
+
+The following diagrams demonstrate the effect of cross-zone load balancing. There are two enabled Availability Zones, with 2 targets in Availability Zone A and 8 targets in Availability Zone B. Clients send requests, and Amazon Route 53 responds to each request with the IP address of one of the load balancer nodes. This distributes traffic such that each load balancer node receives 50% of the traffic from the clients. Each load balancer node distributes its share of the traffic across the registered targets in its scope.
+
+If cross-zone load balancing is enabled, each of the 10 targets receives 10% of the traffic. This is because each load balancer node can route its 50% of the client traffic to all 10 targets.
+
+.. figure:: /network_d/cross_zone_load_balancing_enabled.png
+   :align: center
+
+	 Cross-zone load balancing enabled
+
+If cross-zone load balancing is disabled, each of the 2 targets in Availability Zone A receives 25% of the traffic and each of the 8 targets in Availability Zone B receives 6.25% of the traffic. This is because each load balancer node can route its 50% of the client traffic only to targets in its Availability Zone.
+
+.. figure:: /network_d/cross_zone_load_balancing_disabled.png
+   :align: center
+
+	 Cross-zone load balancing disabled
 
 High availability
 *****************

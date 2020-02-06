@@ -214,6 +214,8 @@ AWS privatelink allows you the ability to have an endpoint from any VPC to share
 
 When you have many VPCs in your application, you can simplify the network with AWS Transit Gateway. It provides hub and spoke for managing VPCs. You essentially connect each of your VPCs to the AWS Transit Gateway, as well as the AWS Direct connect gateway and the customer gateway, all talking to each other via the AWS Transit Gateway. 
 
+If the instance is stopped, its **Elastic IP address** is disassociated from the instance if it is an EC2-Classic instance. Otherwise, if it is an EC2-VPC instance, the Elastic IP address remains associated.
+
 Availability
 ************
 
@@ -452,9 +454,30 @@ To estimate the cost of using EC2, you need to consider the following:
 
 * **Load balancing**. An elastic load balancer can be used to distribute traffic among EC2 instances. The number of hours the ELB runs and the amount of data it processes contribute to the monthly cost.
 
-* **Data transfer**.
+* **Data transfer**. Data transferred between Amazon S3, Amazon Glacier, Amazon DynamoDB, Amazon SES, Amazon SQS, Amazon Kinesis, Amazon ECR, Amazon SNS or Amazon SimpleDB and Amazon EC2 instances in the same AWS Region is free. AWS Services accessed via PrivateLink endpoints will incur standard PrivateLink charges as explained here.
 
-Data transferred between Amazon S3, Amazon Glacier, Amazon DynamoDB, Amazon SES, Amazon SQS, Amazon Kinesis, Amazon ECR, Amazon SNS or Amazon SimpleDB and Amazon EC2 instances in the same AWS Region is free. AWS Services accessed via PrivateLink endpoints will incur standard PrivateLink charges as explained here.
+The following illustration represents the transitions between instance states. 
+
+.. figure:: /ec2_d/instance_lifecycle.png
+	:align: center
+
+	EC2 instance lifecycle
+
+Below are the valid EC2 lifecycle instance states: 
+
+* ``pending``. The instance is preparing to enter the running state. An instance enters the pending state when it launches for the first time, or when it is restarted after being in the stopped state.
+
+* ``running``. The instance is running and ready for use.
+
+* ``stopping``. The instance is preparing to be stopped. Take note that you will not billed if it is preparing to stop however, you will still be billed if it is just preparing to hibernate.
+
+* ``stopped``. The instance is shut down and cannot be used. The instance can be restarted at any time.
+
+* ``shutting-down``. The instance is preparing to be terminated.
+
+* ``terminated``. The instance has been permanently deleted and cannot be restarted. Take note that Reserved Instances that applied to terminated instances are still billed until the end of their term according to their payment option.
+
+`Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
 
 The product options are the following:
 
@@ -560,7 +583,20 @@ With the integration of EC2 fleet, customers also get all the benefits of fleet,
 
 The integration of EC2 Auto Scaling and EC2 fleet helps customers to drive down costs, optimize performance, and eliminate operational overhead.
 
+You can choose to have your Spot instances terminated, stopped, or hibernated upon interruption. Stop and hibernate options are available for persistent Spot requests and Spot Fleets with the maintain option enabled. By default, your instances are terminated.
+
 Amazon EC2 Spot instances integrate natively with a number of other AWS services, such as: AWS Batch, Data Pipeline and CloudFormation, Amazon EMR, ECS and EKS.
+
+To use Spot Instances, you create a Spot Instance request that includes the number of instances, the instance type, the Availability Zone, and the maximum price that you are willing to pay per instance hour. If your maximum price exceeds the current Spot price, Amazon EC2 fulfills your request immediately if capacity is available. Otherwise, Amazon EC2 waits until your request can be fulfilled or until you cancel the request.
+
+.. figure:: /ec2_d/spot_lifecycle.png
+	:align: center
+
+	Spot instance lifecycle 
+
+You can specify whether Amazon EC2 should hibernate, stop, or terminate Spot Instances when they are interrupted. You can choose the interruption behavior that meets your needs.
+
+Take note that there is no "bid price" anymore for Spot EC2 instances since March 2018. You simply have to set your maximum price instead.
 
 `Spot Instance Advisor <https://aws.amazon.com/ec2/spot/instance-advisor/>`_
 
@@ -602,8 +638,6 @@ Considerations
 **************
 
 Amazon EC2 has a soft limit of 20 instances per region, which can be easily resolved by completing the Amazon EC2 instance request form where your use case and your instance increase will be considered. Limit increases are tied to the region they were requested for.
-
-`Instance Lifecycle <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html>`_
 
 
 `Resource Locations <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/resources.html>`_

@@ -164,6 +164,9 @@ Take note that there is a multi-platform CloudWatch agent which can be installed
 
 `Collect Metrics and Logs from Amazon EC2 instances with the CloudWatch Agent <https://www.youtube.com/watch?time_continue=3&v=vAnIhIwE5hY&feature=emb_logo>`_
 
+CloudWatch Logs
+---------------
+
 `AWS re:Invent 2018: CloudWatch Logs Insights Customer Use Case <https://www.youtube.com/watch?time_continue=3&v=RnN1o4Zdego&feature=emb_logo>`_
 
 AWS CloudTrail

@@ -244,6 +244,15 @@ To create a NAT gateway, you must specify the public subnet in which the NAT gat
 
 After you've created a NAT gateway, you must update the route table associated with one or more of your private subnets to point Internet-bound traffic to the NAT gateway. This enables instances in your private subnets to communicate with the internet. Each NAT gateway is created in a specific Availability Zone and implemented with redundancy in that zone. You have a limit on the number of NAT gateways you can create in an Availability Zone.
 
+AWS offers two kinds of NAT devices: a NAT gateway or a NAT instance. It is recommended to use NAT gateways, as they provide better availability and bandwidth over NAT instances. The NAT Gateway service is also a managed service that does not require your administration efforts. A NAT instance is launched from a NAT AMI.
+
+Here is a diagram showing the differences between NAT gateway and NAT instance:
+
+.. figure:: /network_d/Natcomparison.jpg
+   :align: center
+
+	  NAT gateway vs NAT instance
+
 EC2 instance as in-line next-hop
 --------------------------------
 
@@ -526,6 +535,13 @@ Every single device in between the EC2 instances must support 9001 MTU, which is
 .. Note:: 
 	Enable the ICMP message Type 3, Code 4 (Destination Unreachable: fragmentation needed and don't fragment set). This setting instructs the original host to adjust the MTU until the packet can be transmitted.
 
+Multicast
+---------
+
+Multicast is a network capability that allows one-to-many distribution of data. With multicasting, one or more sources can transmit network packets to subscribers that typically reside within a multicast group. However, take note that Amazon VPC does not support multicast or broadcast networking.
+
+If you need multicast, then you can use an overlay multicast. An overlay multicast is a method of building IP level multicast across a network fabric supporting unicast IP routing, such as Amazon Virtual Private Cloud (Amazon VPC).
+
 Design and implement hybrid IT network architects ad scale
 **********************************************************
 
@@ -705,6 +721,33 @@ Elastic Load Balancing supports three types of load balancers. You can select th
 
 If you need flexible application management and TLS termination then we recommend that you use Application Load Balancer. If extreme performance and static IP is needed for your application then we recommend that you use Network Load Balancer. If your application is built within the EC2 Classic network then you should use Classic Load Balancer.
 
+Classic Load Balancers 
+----------------------
+
+Connection draining
+^^^^^^^^^^^^^^^^^^^
+
+To ensure that a Classic Load Balancer stops sending requests to instances that are de-registering or unhealthy while keeping the existing connections open, use connection draining. This enables the load balancer to complete in-flight requests made to instances that are de-registering or unhealthy. 
+
+When you enable connection draining, you can specify a maximum time for the load balancer to keep connections alive before reporting the instance as de-registered. The maximum timeout value can be set between 1 and 3,600 seconds (the default is 300 seconds). When the maximum time limit is reached, the load balancer forcibly closes connections to the de-registering instance.
+
+Sticky sessions
+^^^^^^^^^^^^^^^
+
+By default, a Classic Load Balancer routes each request independently to the registered instance with the smallest load. However, you can use the sticky session feature (also known as session affinity), which enables the load balancer to bind a user's session to a specific instance. This ensures that all requests from the user during the session are sent to the same instance.
+
+.. figure:: /network_d/sticky.png
+   :align: center
+
+	 Sticky sessions
+
+The key to managing sticky sessions is to determine how long your load balancer should consistently route the user's request to the same instance. If your application has its own session cookie, then you can configure Elastic Load Balancing so that the session cookie follows the duration specified. If your application does not have its own session cookie, then you can configure Elastic Load Balancing to create a session cookie by specifying your own stickiness duration.
+
+Sticky session feature of the Classic Load Balancer can provide session management, however, take note that this feature has its limitations such as, in the event of a failure, you are likely to lose the sessions that were resident on the failed node. In the event that the number of your web servers change when your Auto Scaling kicks in, it's possible that the traffic may be unequally spread across the web servers as active sessions may exist on particular servers. If not mitigated properly, this can hinder the scalability of your applications.
+
+Application Load Balancers 
+--------------------------
+
 An Application Load Balancer functions at the application layer, the seventh layer of the Open Systems Interconnection (OSI) model. After the load balancer receives a request, it evaluates the listener rules in priority order to determine which rule to apply, and then selects a target from the target group for the rule action. You can configure listener rules to route requests to different target groups based on the content of the application traffic. Routing is performed independently for each target group, even when a target is registered with multiple target groups.
 
 .. figure:: /network_d/redirect_path.png
@@ -714,18 +757,30 @@ An Application Load Balancer functions at the application layer, the seventh lay
 
 Application Load Balancers support path-based routing, host-based routing and support for containerized applications.
 
-To ensure that a Classic Load Balancer stops sending requests to instances that are de-registering or unhealthy while keeping the existing connections open, use connection draining. This enables the load balancer to complete in-flight requests made to instances that are de-registering or unhealthy. 
-
-When you enable connection draining, you can specify a maximum time for the load balancer to keep connections alive before reporting the instance as de-registered. The maximum timeout value can be set between 1 and 3,600 seconds (the default is 300 seconds). When the maximum time limit is reached, the load balancer forcibly closes connections to the de-registering instance.
-
-Sticky session feature of the Classic Load Balancer can provide session management, however, take note that this feature has its limitations such as, in the event of a failure, you are likely to lose the sessions that were resident on the failed node. In the event that the number of your web servers change when your Auto Scaling kicks in, it's possible that the traffic may be unequally spread across the web servers as active sessions may exist on particular servers. If not mitigated properly, this can hinder the scalability of your applications.
-
 Application Load Balancers support Weighted Target Groups routing. With this feature, you will be able to do weighted routing of the traffic forwarded by a rule to multiple target groups. This enables various use cases like blue-green, canary and hybrid deployments without the need for multiple load balancers. It even enables zero-downtime migration between on-premises and cloud or between different compute types like EC2 and Lambda.
 
 .. figure:: /network_d/weighted.png
    :align: center
 
 	 Application Load Balancers with Weighted Target Groups routing
+
+Path conditions
+^^^^^^^^^^^^^^^
+
+You can use path conditions to define rules that forward requests to different target groups based on the URL in the request (also known as path-based routing). Each path condition has one path pattern. If the URL in a request matches the path pattern in a listener rule exactly, the request is routed using that rule. 
+
+A path pattern is case-sensitive, can be up to 128 characters in length, and can contain any of the following characters. You can include up to three wildcard characters.
+
+A–Z, a–z, 0–9
+_ - . $ / ~ " ' @ : +
+& (using &amp;)
+* (matches 0 or more characters)
+? (matches exactly 1 character)
+Example path patterns
+
+``/img/*``
+``/js/*``
+ 
 
 `AWS re:Invent 2018: [REPEAT 1] Elastic Load Balancing: Deep Dive and Best Practices (NET404-R1) <https://www.youtube.com/watch?v=VIgAT7vjol8&feature=youtu.be>`_
 

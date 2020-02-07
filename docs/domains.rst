@@ -379,6 +379,11 @@ To make your applications perform well regardless of how much traffic they recei
 
 * **Horizongal scaling** is when you increase o decrease the number of instances (add or remove instances as needed). It is called scaling in and scaling out. The easiest way to do horizontal scaling is through Auto Scaling.
 
+.. figure:: /domains_d/scaling.png
+    :align: center
+
+    Vertical scaling vs Horizongal scaling
+
 Test axioms
 ===========
 

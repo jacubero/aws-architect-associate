@@ -43,7 +43,7 @@ Serverless applications have 3 components: the event source, that triggers the A
 
 * **Functions** that can be developed in Node.js, Python, Java, C#, Go, Ruby, Runtime API.
 
-The anatomy of a Lambda function is as follows:
+A Lambda function consists of code and any associated dependencies. In addition, a Lambda function also has configuration information associated with it. Initially, you specify the configuration information when you create a Lambda function. Lambda provides an API for you to update some of the configuration data. The anatomy of a Lambda function is as follows:
 
 * **Handler() function** is the function to be executed upon invocation.
 
@@ -120,6 +120,13 @@ Pricing
 You buy compute time in 100ms increments. There is no hourly, daily, or monthly minimums and no per-device fees. You never pay for idle time. The free tier covers 1 million requests and 400,000 GBs of compute every month, every customer.
 
 Lambda exposes only a memory control, with the percentage of CPU core and network capacity allocated to a function proportionally. If your code is CPU, network or memory-bound, then it could be cheaper to choose more memory.
+
+You pay for the AWS resources that are used to run your Lambda function. To prevent your Lambda function from running indefinitely, you specify a timeout. When the specified timeout is reached, AWS Lambda terminates execution of your Lambda function. It is recommended that you set this value based on your expected execution time. The default timeout is 3 seconds and the maximum execution duration per request in AWS Lambda is 900 seconds, which is equivalent to 15 minutes.
+
+Limits
+======
+
+By default, the AWS Lambda limits the total concurrent executions across all functions within a given region to 1000. By setting a concurrency limit on a function, Lambda guarantees that allocation will be applied specifically to that function, regardless of the amount of traffic processing the remaining functions. If that limit is exceeded, the function will be throttled but not terminated.
 
 AWS Step Functions 
 ******************

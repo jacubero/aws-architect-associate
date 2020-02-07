@@ -387,6 +387,18 @@ Stopping a DB instance removes pending actions, except for pending actions for t
 
 You can also save money by using Reverved Instances (RIs) that provide a discount over on-demand prices. You have to match region, instance family and engine of on-demand usage to apply benefit. There is size flexibility available for open source and Oracle BYOL engines. By default, RIs are shared among all accounts in consolidated billing. You can use the RI utilization and coverage reports to determine how your RIs are being used. Amazon RDS RI recommendations report uses historical data to recommend which RIs to buy.
 
+Best practices
+==============
+
+MySQL
+-----
+
+* Ensure that automated backups are enabled for the RDS.
+
+* Use InnoDB as the storage engine for MySQL.
+
+* Partition your large tables so that file sizes does not exceed the 16 TB limit.
+
 Amazon Aurora
 *************
 

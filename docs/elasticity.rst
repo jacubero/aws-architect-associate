@@ -167,6 +167,14 @@ Take note that there is a multi-platform CloudWatch agent which can be installed
 CloudWatch Logs
 ---------------
 
+CloudWatch Logs agent provides an automated way to send log data to CloudWatch Logs from Amazon EC2 instances. The CloudWatch Logs agent is comprised of the following components:
+
+* A plug-in to the AWS CLI that pushes log data to CloudWatch Logs.
+
+* A script (daemon) that initiates the process to push data to CloudWatch Logs.
+
+* A cron job that ensures that the daemon is always running.
+
 `AWS re:Invent 2018: CloudWatch Logs Insights Customer Use Case <https://www.youtube.com/watch?time_continue=3&v=RnN1o4Zdego&feature=emb_logo>`_
 
 AWS CloudTrail

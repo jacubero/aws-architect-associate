@@ -329,7 +329,7 @@ AWS License Manager offers a simplified license management for on premises and c
 
 * Discover non-compliant software and help prevent misuse.
 
-* Seamless integration with AWS Systems Managet and AWS Organizations.
+* Seamless integration with AWS Systems Manager and AWS Organizations.
 
 * Free service for all customers.
 
@@ -491,7 +491,13 @@ The product options are the following:
 
 * **Auto scaling** automatically adjusts the number of EC2 instances in your deployment according to conditions you define. This service is available at no additional charge beyond CloudWatch fees.
 
-* **Elastic IP addresses**. You can have one Elastic IP address associated with a running instance at no charge.
+* **Elastic IP addresses**. An Elastic IP address doesn’t incur charges as long as the following conditions are true:
+
+  * The Elastic IP address is associated with an Amazon EC2 instance.
+  * The instance associated with the Elastic IP address is running.
+  * The instance has only one Elastic IP address attached to it.
+
+If you've stopped or terminated an EC2 instance with an associated Elastic IP address and you don't need that Elastic IP address anymore, consider disassociating or releasing the Elastic IP address.
 
 Operating systems and Software packages:
 
@@ -533,6 +539,9 @@ Capacity reservation is charged the equivalent on-demand rate, regardless of whe
 
 Zonal RI billing discounts do not apply to capacity reservations. Capacity reservations can't be created in placement groups. Capacity reservations can't be used with dedicated hosts.
 
+Convertible Reserved Instances
+------------------------------
+
 Convertible RIs give customers the ability to modify reservations across families, sizes, operating system, and tenancy. The only aspect customer cannot modify is the Region. So, as long as the customer stays in the same Region, they can continue to modify the RIs. Convertibles give customers the opportunity to maximize flexibility and increase savings.
 
 The only time customers cannot convert RIs is between the time the request to exchange is submitted and the time the request to exchange is fulfilled. Typically requests take only a matter of hours to fulfill but could take a up to 2 days.
@@ -558,7 +567,17 @@ Some guidelines for exchanging convertible RIs are the following:
 
 For complete set of conversion rules, see `Exchanging Convertible Reserved Instances <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ri-convertible-exchange.html>`_.
 
-Scheduled RIs are reserved for specific times like for a few hours every weekend.
+Scheduled Reserved Instances
+----------------------------
+
+Scheduled Reserved Instances (Scheduled Instances) enable you to purchase capacity reservations that recur on a daily, weekly, or monthly basis, with a specified start time and duration, for a one-year term. You reserve the capacity in advance, so that you know it is available when you need it. You pay for the time that the instances are scheduled, even if you do not use them.
+
+.. figure:: /ec2_d/ec2_sched_ri_find_sched_2.png
+  :align: center
+
+  Scheduled Reserved Instances
+
+Scheduled Instances are a good choice for workloads that do not run continuously, but do run on a regular schedule. For example, you can use Scheduled Instances for an application that runs during business hours or for batch processing that runs at the end of the week.
 
 Spot Instances
 ==============
@@ -658,5 +677,30 @@ Instances within a VPC with a public address have that address released when it 
 All EC2 instances in the default VPC have both a public and private IP address.
 
 
+.. list-table:: EC2-Classic vs Default VPC vs Nondefault VPC
+   :widths: 20 30 30 30
+   :header-rows: 1
+   :stub-columns: 1
+
+   * - Characteristic  
+     - EC2-Classic 
+     - Default VPC 
+     - Nondefault VPC
+   * - Public IPv4 address (from Amazon's public IP address pool)
+     - Your instance receives a public IPv4 address from the EC2-Classic public IPv4 address pool.
+     - Your instance launched in a default subnet receives a public IPv4 address by default, unless you specify otherwise during launch, or you modify the subnet's public IPv4 address attribute.
+     - Your instance doesn't receive a public IPv4 address by default, unless you specify otherwise during launch, or you modify the subnet's public IPv4 address attribute.
+   * - Private IPv4 address
+     - Your instance receives a private IPv4 address from the EC2-Classic range each time it's started.
+     - Your instance receives a static private IPv4 address from the address range of your default VPC.
+     - Your instance receives a static private IPv4 address from the address range of your VPC.
+   * - Multiple private IPv4 addresses
+     - We select a single private IP address for your instance; multiple IP addresses are not supported.
+     - You can assign multiple private IPv4 addresses to your instance.
+     - You can assign multiple private IPv4 addresses to your instance.
+   * - Elastic IP address (IPv4)
+     - An Elastic IP is disassociated from your instance when you stop it.
+     - An Elastic IP remains associated with your instance when you stop it.
+     - An Elastic IP remains associated with your instance when you stop it.
 
 

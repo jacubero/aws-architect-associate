@@ -9,6 +9,27 @@ CloudFront
 
 CloudFront provides improved latency, packet loss and overall quality. It avoids conflicts and network interconnect capacity. It offers greater operational control.
 
+You can control how long your objects stay in a CloudFront cache before CloudFront forwards another request to your origin. Reducing the duration allows you to serve dynamic content. Increasing the duration means your users get better performance because your objects are more likely to be served directly from the edge cache. A longer duration also reduces the load on your origin.
+
+Typically, CloudFront serves an object from an edge location until the cache duration that you specified passes — that is, until the object expires. After it expires, the next time the edge location gets a user request for the object, CloudFront forwards the request to the origin server to verify that the cache contains the latest version of the object.
+
+The ``Cache-Control`` and ``Expires`` headers control how long objects stay in the cache. The ``Cache-Control max-age`` directive lets you specify how long (in seconds) you want an object to remain in the cache before CloudFront gets the object again from the origin server. The minimum expiration time CloudFront supports is 0 seconds for web distributions and 3600 seconds for RTMP distributions.
+
+File versions
+=============
+
+To control the versions of files that are served from your distribution, you can either invalidate files or give them versioned file names. If you want to update your files frequently, AWS recommends that you primarily use file versioning for the following reasons:
+
+* Versioning enables you to control which file a request returns even when the user has a version cached either locally or behind a corporate caching proxy. If you invalidate the file, the user might continue to see the old version until it expires from those caches.
+
+* CloudFront access logs include the names of your files, so versioning makes it easier to analyze the results of file changes.
+
+* Versioning provides a way to serve different versions of files to different users.
+
+* Versioning simplifies rolling forward and back between file revisions.
+
+* Versioning is less expensive. You still have to pay for CloudFront to transfer new versions of your files to edge locations, but you don't have to pay for invalidating files.
+
 Origin Access Identity (OAI) 
 ============================
 

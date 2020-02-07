@@ -1083,8 +1083,6 @@ The most common design pattern used by customers for performance optimization is
 Multipart uploads
 -----------------
 
-`Multipart Upload Overview <https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html>`_
-
 The multipart upload API enables you to upload large objects in a set of parts and you can also upload those parts in parallel. Multipart uploading is a three-step process:
 
 1. You initiate the upload: ``InitiateMultipartUpload(partSize) -> uploadId``
@@ -1094,6 +1092,11 @@ The multipart upload API enables you to upload large objects in a set of parts a
 3. Complete the multipart upload: ``CompleteMultipartUpload(uploadId) -> objectId`` 
 
 Upon receiving the complete multipart upload request, S3 contructs the object from the uploaded parts, and you can then access the object just as you would any other object in your bucket.
+
+.. figure:: /storage_d/s3_multipart_upload.png
+   :align: center
+
+	 S3 Multipart upload
 
 In general, when your object size reaches 100 MB, you should consider using multipart uploads instead of a single object upload. Also consider using multipart upload when uploading objects over a spotty network, this way you only need to retry the parts that were interrupted, this increasing the resiliency for your application. Using multipart upload provides a few advantages. The following are some examples:
 
@@ -1108,6 +1111,8 @@ In general, when your object size reaches 100 MB, you should consider using mult
 You should also remember to use ``AbortImcompleteMultipartUpload`` action in case your upload doesn't complete to avoid unwanted storage costs of abandoned multipart uploads. You can configure the ``AbortImcompleteMultipartUpload`` in the lifecycle rules configuration of your bucket in the S3 console. This directs S3 to abort multipart uploads that don't complete within a specified number of days after being initiated. When a multipart upload is not completed within the time frame, it becomes eligible for an abort operation and S3 aborts the multipart upload and deletes the parts associated with the multipart upload.
 
 There are also some tools that can be used in S3 for multipart uploads such as TransferManager which is part of S3 SDK for Java. TransferManager provides a simple API for uploading content to S3, and makes extensive use of S3 multipart uploads to achieve enhanced throughput, performance and reliability. When possible, TransferManager attempts to use multiple threads to upload multiple parts of a single upload at once. When dealing with large content size and high bandwidth, this can have a significant increase on throughput.
+
+`Multipart Upload Overview <https://docs.aws.amazon.com/AmazonS3/latest/dev/mpuoverview.html>`_
 
 Amazon CloudFront
 -----------------

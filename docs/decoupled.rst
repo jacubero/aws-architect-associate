@@ -56,6 +56,16 @@ The following scenario describes the lifecycle of an Amazon SQS message in a que
 
 	Amazon SQS automatically deletes messages that have been in a queue for more than maximum message retention period. The default message retention period is 4 days. However, you can set the message retention period to a value from 60 seconds to 1,209,600 seconds (14 days) using the ``SetQueueAttributes`` action. Once the message retention limit is reached, your messages are automatically deleted.
 
+Amazon SQS uses short polling by default, querying only a subset of the servers (based on a weighted random distribution) to determine whether any messages are available for inclusion in the response. Short polling works for scenarios that require higher throughput. However, you can also configure the queue to use Long polling instead, to reduce cost.
+
+The ``ReceiveMessageWaitTimeSeconds`` is the queue attribute that determines whether you are using Short or Long polling. By default, its value is zero which means it is using Short polling. If it is set to a value greater than zero, then it is Long polling. Quick facts about SQS Long Polling:
+
+* Long polling helps reduce your cost of using Amazon SQS by reducing the number of empty responses when there are no messages available to return in reply to a ReceiveMessage request sent to an Amazon SQS queue and eliminating false empty responses when messages are available in the queue but aren't included in the response. 
+
+* Long polling reduces the number of empty responses by allowing Amazon SQS to wait until a message is available in the queue before sending a response. Unless the connection times out, the response to the ``ReceiveMessage`` request contains at least one of the available messages, up to the maximum number of messages specified in the ``ReceiveMessage`` action.
+
+* Long polling eliminates false empty responses by querying all (rather than a limited number) of the servers. Long polling returns messages as soon any message becomes available.
+
 Amazon SQS Standard Queues
 ==========================
 
@@ -185,6 +195,20 @@ If one of the channels fail for any reason (for instance, it was an HTTP endpoin
 
 4. *Post-Backoff Phase*. This phase follows the backoff phase. It specifies a number of retries and the amount of delay between them. This is the final phase.
 
+Fanout
+======
+
+A "fanout" pattern is when an Amazon SNS message is sent to a topic and then replicated and pushed to multiple Amazon SQS queues, HTTP endpoints, or email addresses. This allows for parallel asynchronous processing. For example, you could develop an application that sends an Amazon SNS message to a topic whenever an order is placed for a product. Then, the Amazon SQS queues that are subscribed to that topic would receive identical notifications for the new order. The Amazon EC2 server instance attached to one of the queues could handle the processing or fulfillment of the order, while the other server instance could be attached to a data warehouse for analysis of all orders received.
+
+.. figure:: /decoupled_d/sns-fanout.png
+   :align: center
+
+	Fanout pattern
+
+When a consumer receives and processes a message from a queue, the message remains in the queue. Amazon SQS doesn't automatically delete the message. Because Amazon SQS is a distributed system, there's no guarantee that the consumer actually receives the message (for example, due to a connectivity issue, or due to an issue in the consumer application). Thus, the consumer must delete the message from the queue after receiving and processing it.
+
+Immediately after the message is received, it remains in the queue. To prevent other consumers from processing the message again, Amazon SQS sets a visibility timeout, a period of time during which Amazon SQS prevents other consumers from receiving and processing the message. The default visibility timeout for a message is 30 seconds. The maximum is 12 hours.
+
 Amazon MQ
 *********
 
@@ -206,7 +230,7 @@ When building solutions to coordinate tasks in a distributed environment, the de
 
 By using Amazon SWF you can easily manage your application tasks and how to coordinate them.
 
-.. figure:: /appendix_d/ecommerceSWF.png
+.. figure:: /decoupled_d/ecommerceSWF.png
    :align: center
 
 	An e-commerce application workflow
@@ -232,7 +256,7 @@ Overview
 
 Domain is a collection of related workflows. A workflow starter is any application that can initiate workflow executions. Workflows are collections of actions and actions are tasks or workflow steps. Decider implements the workflow coordination logic. Activity workers implements actions. Workflow history is the detailed, complete and consistent record of every event that occur since the workflow execution started. Additionally, in the course of its operations SWF interacts with a number of different types of programmatic actors. Actors can be workflow starters, deciders or activity workers. These actors communicate with SWF through its API. You can develop these actors in any programming language.
 
-.. figure:: /appendix_d/swf-components.png
+.. figure:: /decoupled_d/swf-components.png
    :align: center
 
 	SWF key components

@@ -26,9 +26,90 @@ There is no additional charge for AWS CloudFormation. You only pay for the AWS r
 
 `AWS CloudFormation Deep Dive and Recent Enhancements <https://www.youtube.com/watch?v=d6SJPMdBShI&feature=emb_logo>`_
 
-Protecting stacks
-=================
+Template Anatomy
+================
 
+A template is a JSON- or YAML-formatted text file that describes your AWS infrastructure. The following examples show an AWS CloudFormation template structure and its sections.
+
+JSON
+----
+
+The following example shows a JSON-formatted template fragment.
+
+.. code-block:: JSON
+
+	{
+	  "AWSTemplateFormatVersion" : "version date",
+
+	  "Description" : "JSON string",
+
+	  "Metadata" : {
+	    template metadata
+	  },
+
+	  "Parameters" : {
+	    set of parameters
+	  },
+
+	  "Mappings" : {
+	    set of mappings
+	  },
+
+	  "Conditions" : {
+	    set of conditions
+	  },
+
+	  "Transform" : {
+	    set of transforms
+	  },
+
+	  "Resources" : {
+	    set of resources
+	  },
+
+	  "Outputs" : {
+	    set of outputs
+	  }
+	}
+
+YAML
+----
+
+The following example shows a YAML-formatted template fragment.
+
+.. code-block:: YAML
+
+	---
+	AWSTemplateFormatVersion: "version date"
+
+	Description:
+	  String
+
+	Metadata:
+	  template metadata
+
+	Parameters:
+	  set of parameters
+
+	Mappings:
+	  set of mappings
+
+	Conditions:
+	  set of conditions
+
+	Transform:
+	  set of transforms
+
+	Resources:
+	  set of resources
+
+	Outputs:
+	  set of outputs
+
+Template Sections
+-----------------
+
+Templates include several major sections. The Resources section is the only required section. Some sections in a template can be in any order. However, as you build your template, it can be helpful to use the logical order shown in the following list because values in one section might refer to values from a previous section.
 
 Enterprise management
 =====================

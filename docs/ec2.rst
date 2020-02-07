@@ -299,6 +299,8 @@ AWS Systems Manager allows you to operate cloud and on-premises Linux and Window
 
 * Install agents safely across instances with rate control.
 
+You can use Run Command from the console to configure instances without having to login to each instance. AWS Systems Manager Run Command lets you remotely and securely manage the configuration of your managed instances. A managed instance is any Amazon EC2 instance or on-premises machine in your hybrid environment that has been configured for Systems Manager. Run Command enables you to automate common administrative tasks and perform ad hoc configuration changes at scale. You can use Run Command from the AWS console, the AWS Command Line Interface, AWS Tools for Windows PowerShell, or the AWS SDKs. Run Command is offered at no additional cost.
+
 AWS Resource Access Manager
 ---------------------------
 
@@ -601,6 +603,8 @@ To use Spot Instances, you create a Spot Instance request that includes the numb
 You can specify whether Amazon EC2 should hibernate, stop, or terminate Spot Instances when they are interrupted. You can choose the interruption behavior that meets your needs.
 
 Take note that there is no "bid price" anymore for Spot EC2 instances since March 2018. You simply have to set your maximum price instead.
+
+If your Spot instance is terminated or stopped by Amazon EC2 in the first instance hour, you will not be charged for that usage. However, if you terminate the instance yourself, you will be charged to the nearest second. If the Spot instance is terminated or stopped by Amazon EC2 in any subsequent hour, you will be charged for your usage to the nearest second. If you are running on Windows and you terminate the instance yourself, you will be charged for an entire hour.
 
 `Spot Instance Advisor <https://aws.amazon.com/ec2/spot/instance-advisor/>`_
 

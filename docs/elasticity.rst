@@ -210,6 +210,7 @@ For most services, events are recorded in the region where the action occurred. 
 Setting up your event logs
 --------------------------
 
+By default, CloudTrail event log files are encrypted using Amazon S3 server-side encryption (SSE). You can also choose to encrypt your log files with an AWS Key Management Service (AWS KMS) key. You can store your log files in your bucket for as long as you want. You can also define Amazon S3 lifecycle rules to archive or delete log files automatically. If you want notifications about log file delivery and validation, you can set up Amazon SNS notifications.
 
 `AWS re:Invent 2018: Augmenting Security & Improving Operational Health w/ AWS CloudTrail (SEC323) <https://www.youtube.com/watch?v=YWzmoDzzg4U&feature=emb_logo>`_
 
@@ -242,6 +243,18 @@ We recommend that you use launch templates instead of launch configurations to e
 	Sample Auto Scaling group
 
 3. Define a least one **Auto Scaling policy**, which specifies how and when to scale in or scale out, that is, to launch or terminate EC2 instances. 
+
+If you are using Auto Scaling and you want to new instances, they must meet the following criteria:
+
+* The instance is in the running state.
+
+* The AMI used to launch the instance must still exist.
+
+* The instance is not a member of another Auto Scaling group.
+
+* The instance is launched into one of the Availability Zones defined in your Auto Scaling group.
+
+* If the Auto Scaling group has an attached load balancer, the instance and the load balancer must both be in EC2-Classic or the same VPC. If the Auto Scaling group has an attached target group, the instance and the load balancer must both be in the same VPC.
 
 Auto Scaling policies
 =====================
@@ -313,7 +326,9 @@ The **cooldown period** helps to ensure that your Auto Scaling group doesn't lau
 Step scaling
 ^^^^^^^^^^^^
 
-Increase or decrease the current capacity of the group based on a set of scaling adjustments, known as step adjustments, that vary based on the size of the alarm breach.
+With step scaling, you choose scaling metrics and threshold values for the CloudWatch alarms that trigger the scaling process as well as define how your scalable target should be scaled when a threshold is in breach for a specified number of evaluation periods. Step scaling policies increase or decrease the current capacity of a scalable target based on a set of scaling adjustments, known as step adjustments. The adjustments vary based on the size of the alarm breach. After a scaling activity is started, the policy continues to respond to additional alarms, even while a scaling activity is in progress. Therefore, all alarms that are breached are evaluated by Application Auto Scaling as it receives the alarm messages.
+
+When you configure dynamic scaling, you must define how to scale in response to changing demand. For example, you have a web application that currently runs on two instances and you want the CPU utilization of the Auto Scaling group to stay at around 50 percent when the load on the application changes. This gives you extra capacity to handle traffic spikes without maintaining an excessive amount of idle resources. You can configure your Auto Scaling group to scale automatically to meet this need. The policy type determines how the scaling action is performed.
 
 .. figure:: /elasticity_d/steps.png
    	:align: center

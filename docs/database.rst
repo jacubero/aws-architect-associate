@@ -46,6 +46,8 @@ If you are developing a new application, then it is recommended to go with the n
 
 You can run Amazon RDS on VMware through the Amazon RDS connector. It packages technologies at the core of Amazon RDS in AWS and deploys them on premises. You need connectivity to AWS via a dedicated VPN tunnel enables database management entirely within your private data center.
 
+You manage your DB engine configuration through the use of parameters in a DB parameter group. DB parameter groups act as a container for engine configuration values that are applied to one or more DB instances.
+
 Instance types
 --------------
 
@@ -433,6 +435,22 @@ Using endpoints, you can map each connection to the appropriate instance or grou
 
 The custom endpoint provides load-balanced database connections based on criteria other than the read-only or read-write capability of the DB instances. For example, you might define a custom endpoint to connect to instances that use a particular AWS instance class or a particular DB parameter group. Then you might tell particular groups of users about this custom endpoint. For example, you might direct internal users to low-capacity instances for report generation or ad hoc (one-time) querying, and direct production traffic to high-capacity instances. 
 
+Failover
+========
+
+Failover is automatically handled by Amazon Aurora so that your applications can resume database operations as quickly as possible without manual administrative intervention.
+
+.. figure:: /database_d/Aurora-Arch.jpg
+   :align: center
+
+   Aurora failover
+
+If you have an Amazon Aurora Replica in the same or a different Availability Zone, when failing over, Amazon Aurora flips the canonical name record (CNAME) for your DB Instance to point at the healthy replica, which in turn is promoted to become the new primary. Start-to-finish, failover typically completes within 30 seconds.
+
+If you are running Aurora Serverless and the DB instance or AZ become unavailable, Aurora will automatically recreate the DB instance in a different AZ.
+
+If you do not have an Amazon Aurora Replica (i.e. single instance) and are not running Aurora Serverless, Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance. This replacement of the original instance is done on a best-effort basis and may not succeed, for example, if there is an issue that is broadly affecting the Availability Zone.
+
 Amazon DynamoDB
 ***************
 
@@ -507,12 +525,12 @@ One example for this is the use of partition keys with high-cardinality attribut
    * - Characteristic
      - Relational Database Management System (RDBMS)
      - Amazon DynamoDB
-   * - Optional workloads
+   * - Optimal workloads
      - Ad hoc queries, data warehousing; OLAP
      - Web-scale applications, including social networks, gaming, media sharing, and IoT
    * - Data model
-     - The relational model requires a well-defined schema, where data is normalized into tables, rows, and columns. In addition, all of the relationships are defined among tables, columns, indixes, and other database elements.
-  - DynamoDB has schema flexibility. Every table must have a primary key to uniquely identify each data item, but there are no similar constraints on other non-key attributes. It can manage structured or semi-structured data, including JSON documents.
+     - The relational model requires a well-defined schema, where data is normalized into tables, rows, and columns. In addition, all of the relationships are defined among tables, columns, indexes, and other database elements.
+     - DynamoDB has schema flexibility. Every table must have a primary key to uniquely identify each data item, but there are no similar constraints on other non-key attributes. It can manage structured or semi-structured data, including JSON documents.
    * - Data access
      - SQL is the standard for storing and retriving data. RDBMS offer a rich set of tools for simplifying the development of database-driven applications using SQL
   - You can use AWS Management console or the AWS CLI to work with DynamoDB and perform ad hoc tasks. Applications can leverage the AWS SDKs to work with DynamoDB using object-based, document-centric, or low-level interfaces.
@@ -772,5 +790,38 @@ Amazon Redshift Spectrum
 
 Amazon Redshift also includes Redshift Spectrum, allowing you to directly run SQL queries against exabytes of unstructured data in Amazon S3. No loading or transformation is required, and you can use open data formats, including Avro, CSV, Grok, ORC, Parquet, RCFile, RegexSerDe, SequenceFile, TextFile, and TSV. Redshift Spectrum automatically scales query compute capacity based on the data being retrieved, so queries against Amazon S3 run fast, regardless of data set size.
 
+Relational vs NoSQL databases
+*****************************
+
+.. list-table:: Relational databases vs NoSQL databases
+   :widths: 20 50 50
+   :header-rows: 1
+   :stub-columns: 1
+
+   * - Optimal workloads
+     - They are designed for transactional and strongly consistent OLTP applications nad are good for OLAP.
+     - NoSQL key-value, document, graph, and in-memory databases are designed for OLTP for a number of data access patterns that include low-latency applications. NoSQL, search databases are designed for analytics and semi-structured data.
+   * - Data model
+     - The relational model normalizes data into tables that are composed of rows and columns. A schema strictly defines the tables, rows, columns, indexes, relationships between tables, and other database elements. The database enforces the referential integrity in relationships between tables.
+     - NoSQL databases provide a variety of data models that includes document, graph, key-value, in-memory, and search.
+   * - ACID properties
+     - They provide atomicity, consistency, isolation, and durability (ACID) properties: Atomicity requires a transaction to execute completely or not at all. Consistency requires that when a transaction has been committed, the data must conform to the database schema. Isolation requires that concurrent transactions execute separately for each other. Durability requires the ability to recover from an unexpected system failure or power outage to the last kown state.
+     - They often make tradeoffs by relaxing some of the ACID properties of relational databases for a more flexible data model that can scale horizontally. This makes NoSQL databases an excellent choice for high throughput, low-latency use cases that need to scale horizontally beyond the limitations of a single instance.
+   * - Performance
+     - Performance is generally dependent on the disk subsystem. The organization of the queries, indexes, and table structure is often required to achieve peak performance.
+     - Performance is generally a function of the underlying HW cluster size, network latency, and the calling application.
+   * - Scale
+     - They typically scale up by increasing the compute capabilities of the HW or scale-out by adding replicas for read-only workloads.
+     - NoSQL databases typically are partitionable because key-value access patterns and able to scale out by using a distributed architecture to increase throughput that provides consistent performance at near boundless scale.
+   * - API
+     - Requests to store and retrieve data are communicated using queries that conform to a structured query language (SQL). These queries are parsed and executed by the relational database.
+     - Object-based APIs allow app developers to easily store and retrieve in-memory data structures. Partition keys let apps look up key-value pairs, column sets, or semistructured documents that contain serialized app objects and attributes.
+
 Migrating data into your AWS databases
 **************************************
+
+AWS Database Migration Service helps you migrate databases to AWS quickly and securely. The source database remains fully operational during the migration, minimizing downtime to applications that rely on the database. The AWS Database Migration Service can migrate your data to and from most widely used commercial and open-source databases.
+
+AWS Database Migration Service can migrate your data to and from most of the widely used commercial and open source databases. It supports homogeneous migrations such as Oracle to Oracle, as well as heterogeneous migrations between different database platforms, such as Oracle to Amazon Aurora. Migrations can be from on-premises databases to Amazon RDS or Amazon EC2, databases running on EC2 to RDS, or vice versa, as well as from one RDS database to another RDS database. It can also move data between SQL, NoSQL, and text based targets.
+
+In heterogeneous database migrations the source and target databases engines are different, like in the case of Oracle to Amazon Aurora, Oracle to PostgreSQL, or Microsoft SQL Server to MySQL migrations. In this case, the schema structure, data types, and database code of source and target databases can be quite different, requiring a schema and code transformation before the data migration starts. That makes heterogeneous migrations a two step process. First use the AWS Schema Conversion Tool to convert the source schema and code to match that of the target database, and then use the AWS Database Migration Service to migrate data from the source database to the target database. All the required data type conversions will automatically be done by the AWS Database Migration Service during the migration. The source database can be located in your own premises outside of AWS, running on an Amazon EC2 instance, or it can be an Amazon RDS database. The target can be a database in Amazon EC2 or Amazon RDS.

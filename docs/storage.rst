@@ -1779,7 +1779,7 @@ With Glacier Select, you can specify all items in an expression with ``SELECT *`
 
 Row-level SQL expressions are support such as ``+,</>, LIKE, AND/OR, ISNULL, STRING, CASE, COUNT, MAX``. For full SQL capabilities including joins and windowing, tools such as Amazon Athena should be subsequently employed.
 
-.. figure:: /storage_d/sql.png
+.. figure:: /storage_d/sqls.png
    :align: center
 
    SQL expressions supported by Amazon Glacier
@@ -1793,7 +1793,7 @@ How Amazon Glacier Select works
 
 Glacier Select works when initiate a request job with the SQL parameters you specify. When the job request is received, Glacier returns an acknowledgment ID 200 to indicate that the request was received successfully. Glacier then processes the request ad writes the output to a S3 bucket with the specified prefix in the job request. SNS sends a notification to alert you when the job is complete.
 
-.. figure:: /storage_d/selectworks.png
+.. figure:: /storage_d/select_works.png
    :align: center
 
    How Amazon Glacier Select works

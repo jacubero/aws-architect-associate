@@ -691,7 +691,7 @@ If either VPC in a peering relationship has one of the following connections, yo
 
 * (IPv6) A ClassicLink connection. You can enable IPv4 communication between a linked EC2-Classic instance and instances in a VPC on the other side of a VPC peering connection. However, IPv6 is not supported in EC2-Classic, so you cannot extend this connection for IPv6 communication.
 
-.. figure:: /network_d/peering.png
+.. figure:: /network_d/transitive-peering-diagram.png
    :align: center
 
 	 VPC peering connection
@@ -771,15 +771,17 @@ You can use path conditions to define rules that forward requests to different t
 
 A path pattern is case-sensitive, can be up to 128 characters in length, and can contain any of the following characters. You can include up to three wildcard characters.
 
-A–Z, a–z, 0–9
-_ - . $ / ~ " ' @ : +
-& (using &amp;)
-* (matches 0 or more characters)
-? (matches exactly 1 character)
-Example path patterns
+.. code-block:: console
 
-``/img/*``
-``/js/*``
+	A–Z, a–z, 0–9
+	_ - . $ / ~ " ' @ : +
+	& (using &amp;)
+	* (matches 0 or more characters)
+	? (matches exactly 1 character)
+	Example path patterns
+
+	/img/*
+	/js/*
  
 
 `AWS re:Invent 2018: [REPEAT 1] Elastic Load Balancing: Deep Dive and Best Practices (NET404-R1) <https://www.youtube.com/watch?v=VIgAT7vjol8&feature=youtu.be>`_

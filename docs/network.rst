@@ -1,4 +1,4 @@
-ACLNetworking in AWS
+Networking in AWS
 #################
 
 Design and implement AWS networks
@@ -235,6 +235,8 @@ If an EC2 in a private subnet wants to communicate to the Internet, this subnet 
 	  Example of private subnet route table
 
 The NAT gateway allows the EC2 with a private address to reach the Internet but the EC2 instance is not reachable from the Internet. The NAT gateway requires an Elastic IP address that will be used to translate the private address of the EC2 instance. Even if you are using a NAT gateway, you are still passing through an Internet Gateway to reach the Internet. You have one Internet Gateway per VPC but you can have multiple NAT gateways inside you VPC. The reason to have more than one is that they are highly available within an AZ, not across AZs. 
+
+You can achieve HA across AZs by launching a NAT gateway in each AZ. If one AZ is down, all subnets associated to that AZ are down. If you have high availability, you would have multiple subnets spanning multiple zones: each zone's private subnets would point to a NAT Gateway in that zone's public subnet, with separate routing tables for each zone.
 
 A NAT gateway separate subnets and can scale up to 45 Gbps. There is a limit of 55000 connections towards the same destination. If you need more thant 45 Gbps or more than 55000 connections towards the same destination, then you will need more than one NAT gateway. In that case, you will need another subnet with a different route table that will point towards the second NAT gateway.
 
@@ -621,6 +623,16 @@ Static VPN (policy-based VPN) is limited to one unique security association (SA)
 
 * Configure the policy to allow "any" network (``0.0.0.0/0``) from behind your VPN termination endpoint to the VPC CIDR.
 
+Monitoring
+^^^^^^^^^^
+
+You can monitor VPN tunnels using CloudWatch, which collects and processes raw data from the VPN service into readable, near real-time metrics. These statistics are recorded for a period of 15 months, so that you can access historical information and gain a better perspective on how your web application or service is performing. VPN metric data is automatically sent to CloudWatch as it becomes available. The following metrics are available for your VPN tunnels:
+
+* ``TunnelState``. The state of the tunnel. For static VPNs, 0 indicates DOWN and 1 indicates UP. For BGP VPNs, 1 indicates ESTABLISHED and 0 is used for all other states.
+
+* ``TunnelDataIn``. The bytes received through the VPN tunnel. Each metric data point represents the number of bytes received after the previous data point. Use the Sum statistic to show the total number of bytes received during the period. This metric counts the data after decryption.
+
+* ``TunnelDataOut``. The bytes sent through the VPN tunnel. Each metric data point represents the number of bytes sent after the previous data point. Use the Sum statistic to show the total number of bytes sent during the period. This metric counts the data before encryption.
 
 Connecting networks
 *******************

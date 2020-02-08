@@ -809,15 +809,37 @@ If cross-zone load balancing is disabled, each of the 2 targets in Availability 
 
 	 Cross-zone load balancing disabled
 
-High availability
-*****************
-
-Multi-region high availability and DNS
-**************************************
-
 Amazon Route 53
-===============
+***************
 
 When you sign up for Route 53 the first thing you do is create a Hosted Zone. This is where your DNS data will be kept. When you do that, you receive 4 name servers where you can delegate your domain. Then you specify your Fully Qualified Domain Name, which is the domain you have purchased with a DNS registrar. This could be external, or you can use Route 53 to purchase a domain. Proxy and privacy services are options with Amazon's Route 53 registrar, allowing you to hide partial or all your information within the DNS query.
 
-The Hosted Zone will contain record sets, which are the DNS translations you want to perform for that specific domain
+The Hosted Zone will contain record sets, which are the DNS translations you want to perform for that specific domain.
+
+Amazon Route 53's DNS services does not support DNSSEC at this time. However, their domain name registration service supports configuration of signed DNSSEC keys for domains when DNS service is configured at another provider. More information on configuring DNSSEC for your domain name registration can be found `Configuring DNSSEC for a Domain <https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/domain-configure-dnssec.html>`_.
+
+Amazon Route 53 currently supports the following DNS record types:
+
+* A (address record)
+
+* AAAA (IPv6 address record)
+
+* CNAME (canonical name record)
+
+* CAA (certification authority authorization)
+
+* MX (mail exchange record)
+
+* NAPTR (name authority pointer record)
+
+* NS (name server record)
+
+* PTR (pointer record)
+
+* SOA (start of authority record)
+
+* SPF (sender policy framework)
+
+* SRV (service locator)
+
+* TXT (text record)

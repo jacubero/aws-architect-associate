@@ -284,6 +284,26 @@ Best practices for encryption are follow with RDS:
 
 * Add encryption to an uncrypted DB instance by encrypting a snapshot copy.
 
+Microsoft SQL Server
+--------------------
+
+You can use Secure Sockets Layer (SSL) to encrypt connections between your client applications and your Amazon RDS DB instances running Microsoft SQL Server. SSL support is available in all AWS regions for all supported SQL Server editions.
+
+When you create a SQL Server DB instance, Amazon RDS creates an SSL certificate for it. The SSL certificate includes the DB instance endpoint as the Common Name (CN) for the SSL certificate to guard against spoofing attacks. There are 2 ways to use SSL to connect to your SQL Server DB instance:
+
+* Force SSL for all connections, this happens transparently to the client, and the client doesn't have to do any work to use SSL.
+
+* Encrypt specific connections, this sets up an SSL connection from a specific client computer, and you must do work on the client to encrypt connections.
+
+.. figure:: /database_d/rds_sql_ssl_cert.png
+   :align: center
+
+   SSL certificate
+
+You can force all connections to your DB instance to use SSL, or you can encrypt connections from specific client computers only. To use SSL from a specific client, you must obtain certificates for the client computer, import certificates on the client computer, and then encrypt the connections from the client computer.
+
+If you want to force SSL, use the ``rds.force_ssl`` parameter. By default, the ``rds.force_ssl`` parameter is set to ``false``. Set the ``rds.force_ssl`` parameter to ``true`` to force connections to use SSL. The ``rds.force_ssl`` parameter is static, so after you change the value, you must reboot your DB instance for the change to take effect.
+
 Monitoring
 ==========
 

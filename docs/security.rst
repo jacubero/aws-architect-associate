@@ -201,6 +201,18 @@ It is agent-based, API-driven, and delivered as a service. This makes it easy fo
 CloudHSM
 ********
 
+AWS Key Management Service (KMS) is a multi-tenant, managed service that allows you to use and manage encryption keys. AWS CloudHSM is a cloud-based hardware security module (HSM) that enables you to easily generate and use your own encryption keys on the AWS Cloud. Both services offer a high level of security for your cryptographic keys. AWS CloudHSM provides a dedicated, FIPS 140-2 Level 3 HSM under your exclusive control, directly in your Amazon Virtual Private Cloud (VPC).
+
+You should consider using AWS CloudHSM over AWS KMS if you require:
+
+* Keys stored in dedicated, third-party validated hardware security modules under your exclusive control.
+
+* FIPS 140-2 compliance.
+
+* Integration with applications using PKCS#11, Java JCE, or Microsoft CNG interfaces.
+
+* High-performance in-VPC cryptographic acceleration (bulk crypto).
+
 Attempting to log in as the administrator more than twice with the wrong password zeroizes your HSM appliance. When an HSM is zeroized, all keys, certificates, and other data on the HSM is destroyed. You can use your cluster's security group to prevent an unauthenticated user from zeroizing your HSM.
 
 Amazon does not have access to your keys nor to the credentials of your Hardware Security Module (HSM) and therefore has no way to recover your keys if you lose your credentials. Amazon strongly recommends that you use two or more HSMs in separate Availability Zones in any production CloudHSM Cluster to avoid loss of cryptographic keys.

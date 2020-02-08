@@ -109,7 +109,25 @@ The following example shows a YAML-formatted template fragment.
 Template Sections
 -----------------
 
-Templates include several major sections. The Resources section is the only required section. Some sections in a template can be in any order. However, as you build your template, it can be helpful to use the logical order shown in the following list because values in one section might refer to values from a previous section.
+Templates include several major sections. Some sections in a template can be in any order. However, as you build your template, it can be helpful to use the logical order shown in the following list because values in one section might refer to values from a previous section. Take note that all of the sections here are optional, except for Resources, which is the only one required.
+
+* Format Version
+
+* Description
+
+* Metadata
+
+* Parameters
+
+* Mappings
+
+* Conditions
+
+* Transform
+
+* Resources (required)
+
+* Outputs
 
 Enterprise management
 =====================

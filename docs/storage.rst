@@ -2896,6 +2896,17 @@ All data transferred between any type of gateway appliance and AWS storage is en
 
    AWS Storage Gateway
 
+Volume gateway
+--------------
+
+Volume gateway provides an iSCSI target, which enables you to create block storage volumes and mount them as iSCSI devices from your on-premises or EC2 application servers. The volume gateway runs in either a cached or stored mode.
+
+* In the cached mode, your primary data is written to S3, while retaining your frequently accessed data locally in a cache for low-latency access.
+
+* In the stored mode, your primary data is stored locally and your entire dataset is available for low-latency access while asynchronously backed up to AWS.
+
+In either mode, you can take point-in-time snapshots of your volumes, which are stored as Amazon EBS Snapshots in AWS, enabling you to make space-efficient versioned copies of your volumes for data protection, recovery, migration and various other copy data needs.
+
 Cached volumes
 --------------
 

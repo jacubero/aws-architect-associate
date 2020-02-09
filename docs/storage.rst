@@ -609,8 +609,8 @@ This is how client-side encryption using client-side master key works:
 
 * When *downloading an object*. The client downloads the encrypted object from Amazon S3. Using the material description from the object's metadata, the client determines which master key to use to decrypt the data key. The client uses that master key to decrypt the data key and then uses the data key to decrypt the object.
 
-.. Note:: Default Encryption.
-	**Default Encryption** is an option that allows you to enable automatically encrypt of all new objects written to your Amazon S3 bucket using either SSE-SE or SSE-KMS. This property does not affect existing objects in your bucket.
+.. Note:: 
+	Default Encryption is an option that allows you to enable automatically encrypt of all new objects written to your Amazon S3 bucket using either SSE-S3 or SSE-KMS. This property does not affect existing objects in your bucket.
 
 AWS Config
 ----------

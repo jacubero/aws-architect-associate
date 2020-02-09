@@ -66,6 +66,8 @@ The ``ReceiveMessageWaitTimeSeconds`` is the queue attribute that determines whe
 
 * Long polling eliminates false empty responses by querying all (rather than a limited number) of the servers. Long polling returns messages as soon any message becomes available.
 
+Amazon SQS supports dead-letter queues, which other queues (source queues) can target for messages that can't be processed (consumed) successfully. Dead-letter queues are useful for debugging your application or messaging system because they let you isolate problematic messages to determine why their processing doesn't succeed. 
+
 Amazon SQS Standard Queues
 ==========================
 

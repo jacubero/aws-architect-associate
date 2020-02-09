@@ -492,6 +492,8 @@ If you are running Aurora Serverless and the DB instance or AZ become unavailabl
 
 If you do not have an Amazon Aurora Replica (i.e. single instance) and are not running Aurora Serverless, Aurora will attempt to create a new DB Instance in the same Availability Zone as the original instance. This replacement of the original instance is done on a best-effort basis and may not succeed, for example, if there is an issue that is broadly affecting the Availability Zone.
 
+You can use the reader endpoint to provide high availability for your read-only queries from your DB cluster by placing multiple Aurora Replicas in different Availability Zones and then connecting to the read-only endpoint for your read workload. The reader endpoint also load-balances connections to the Aurora Replicas in a DB cluster.
+
 Amazon DynamoDB
 ***************
 

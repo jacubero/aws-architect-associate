@@ -250,6 +250,8 @@ We recommend that you use launch templates instead of launch configurations to e
 
 	Sample Auto Scaling group
 
+There is a Health Check Grace Period setting (in seconds) in the Auto Scaling group configuration. This indicates how long Auto Scaling should wait until it starts using the ELB health check (which, in turn, has settings for how often to check and how many checks are required to mark an instance as Healthy/Unhealthy).
+
 3. Define a least one **Auto Scaling policy**, which specifies how and when to scale in or scale out, that is, to launch or terminate EC2 instances. 
 
 If you are using Auto Scaling and you want to new instances, they must meet the following criteria:

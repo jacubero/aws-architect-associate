@@ -214,7 +214,9 @@ AWS privatelink allows you the ability to have an endpoint from any VPC to share
 
 When you have many VPCs in your application, you can simplify the network with AWS Transit Gateway. It provides hub and spoke for managing VPCs. You essentially connect each of your VPCs to the AWS Transit Gateway, as well as the AWS Direct connect gateway and the customer gateway, all talking to each other via the AWS Transit Gateway. 
 
-If the instance is stopped, its **Elastic IP address** is disassociated from the instance if it is an EC2-Classic instance. Otherwise, if it is an EC2-VPC instance, the Elastic IP address remains associated.
+If the instance is stopped, its **Elastic IP address** is disassociated from the instance if it is an EC2-Classic instance. Otherwise, if it is an EC2-VPC instance, the Elastic IP address remains associated. By default, all AWS accounts are limited to 5 Elastic IP addresses per region for each AWS account, because public (IPv4) Internet addresses are a scarce public resources. AWS strongly encourages you to use and EIP primarily for load balancing use cases, and use DNS hostnames for all other inter-node communication.
+
+If you feel your architecture warrants additional EIPs, you would need to complete the Amazon EC2 Elastic IP Address Request Form and give reasons as to your need for additional addresses.
 
 When you launch an EC2 instance into a default VPC, AWS provides it with public and private DNS hostnames that correspond to the public IPv4 and private IPv4 addresses for the instance.
 
@@ -344,6 +346,24 @@ Monitoring
 
 Troubleshooting
 ===============
+
+Troubleshooting Instance Launch Issues
+--------------------------------------
+
+Instance Terminates Immediately
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Description**: Your instance goes from the pending state to the terminated state immediately after restarting it.
+
+**Cause**: The following are a few reasons why an instance might immediately terminate:
+
+* You've reached your EBS volume limit.
+
+* An EBS snapshot is corrupt.
+
+* The root EBS volume is encrypted and you do not have permissions to access the KMS key for decryption.
+
+* The instance store-backed AMI that you used to launch the instance is missing a required part (an image.part.xx file).
 
 Connecting to Your Instance
 ---------------------------
@@ -681,7 +701,6 @@ For all new AWS accounts, 20 instances are allowed per region. However, you can 
 Instances within a VPC with a public address have that address released when it is stopped and are reassigned a new IP when restarted.
 
 All EC2 instances in the default VPC have both a public and private IP address.
-
 
 .. list-table:: EC2-Classic vs Default VPC vs Nondefault VPC
    :widths: 20 30 30 30

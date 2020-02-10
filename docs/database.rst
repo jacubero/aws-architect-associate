@@ -558,6 +558,8 @@ The optimal usage of a table's provisioned throughput depends not only on the wo
 
 One example for this is the use of partition keys with high-cardinality attributes, which have a large number of distinct values for each item. 
 
+DynamoDB supports in-place atomic updates. It supports both increment and decrement atomic operations.
+
 `AWS re:Invent 2018: Amazon DynamoDB Deep Dive: Advanced Design Patterns for DynamoDB (DAT401) <https://www.youtube.com/watch?v=HaEPXoXVf2k&feature=emb_logo>`_
 
 .. list-table:: RDBMS vs Amazon DynamoDB

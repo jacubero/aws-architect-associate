@@ -180,6 +180,8 @@ When accessing your bucket with a HTTP-based URL, if your bucket has a period in
 How a request is routed
 -----------------------
 
+In AWS, S3 does not provide any query facility. To retrieve a specific object the user needs to know the exact bucket / object key. In this case, it is recommended to have an own DB system which manages the S3 metadata and key mapping.
+
 S3 uses DNS to route requests to facilities that can process them. This system works very effectively. However, temporary routing errors can occur. If a request arrives at the wrong Amazon S3 region, S3 responds with a temporary redirect that tells the requester to resend the request to the correct region. If a request is incorrectly formed, S3 uses permanent redirects to provide direction on how to perform the request correctly and S3 will respond with a 400 error.
 
 In the following diagram are the steps of how the DNS request process occurs:
@@ -1988,6 +1990,8 @@ When you create an EBS volume from a snapshot, the new volume begins as an exact
 
 EBS snapshots occur asynchronously. This means that the point-in-time snapshot is created immediately, but the status of the snapshot is ``pending`` until the snapshot is complete (when all of the modified blocks have been transferred to Amazon S3), which can take several hours for large initial snapshots or subsequent snapshots where many blocks have changed. While it is completing, an in-progress snapshot is not affected by ongoing reads and writes to the volume hence, you can still use the volume.
 
+Snapshots with AWS Marketplace product codes can't be made public.
+
 How does a snapshot work?
 -------------------------
 
@@ -2173,6 +2177,8 @@ Deleting an EBS volume
 ----------------------
 
 After volume deletion, the data is physically gone, and the volume cannot be attached to any instance. However, before deletion, it is good practicce to create a snapshot of the volume, which you can use to re-create the volume later if needed. To delete a volume, it must be in the available state (that is, not attached to an instance).
+
+If you want to retain the data on Amazon EBS, then you should disable ``DeleteOnTermination`` for the Amazon EBS volume.
 
 Modifying Amazon EBS volumes
 ============================

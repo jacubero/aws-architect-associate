@@ -170,3 +170,8 @@ You can enable X-Ray for an API stage by using the API Gateway management consol
    :align: center
 
    Amazon API Gateway trace view with AWS X-Ray
+
+Amazon ECS
+**********
+
+In Amazon EC2 container service, Docker is the only container platform supported by EC2 container service presently.
